@@ -1,0 +1,11 @@
+{
+  "name": "israel-polls-2026",
+  "owner": { "name": "Amit Lev" },
+  "plugins": [
+    {
+      "name": "israel-polls-2026",
+      "source": "./plugins/israel-polls-2026",
+      "description": "Live Hebrew dashboard for Israeli 2026 Knesset election polls with auto-refresh from Wikipedia."
+    }
+  ]
+}
