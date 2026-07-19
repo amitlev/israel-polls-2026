@@ -1,0 +1,9 @@
+{
+  "name": "israel-polls-2026",
+  "version": "1.0.0",
+  "description": "Live Hebrew dashboard for Israeli 2026 Knesset election polls: per-party seat averages with leader photos, coalition/opposition half-donut, trend charts, and auto-refresh from Wikipedia.",
+  "author": { "name": "Amit Lev" },
+  "repository": "https://github.com/amitlev/israel-polls-2026",
+  "license": "MIT",
+  "keywords": ["israel", "elections", "polls", "dashboard", "hebrew", "knesset"]
+}
