@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח סקרי הבחירות לכנסת 2026</title>
+<style>
+  :root { color-scheme: light; --bg:#f4f6f9; --card:#fff; --ink:#1a2233; --muted:#6b7686; --border:#e2e6ed; --accent:#1a4b8c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Heebo","Assistant",Arial,sans-serif; background:var(--bg); color:var(--ink); padding:10px 14px; }
+  .wrap { max-width:1240px; margin:0 auto; }
+  .header-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+  h1 { font-size:16px; margin:0; }
+  .subtitle { color:var(--muted); font-size:11px; }
+  .refresh-status { font-size:11px; color:var(--muted); }
+  .refresh-status.ok { color:#0f7a3d; } .refresh-status.warn { color:#b06000; }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; margin-bottom:10px; }
+  .panel h2 { font-size:11px; letter-spacing:.03em; color:var(--muted); margin:0 0 6px; }
+  .f-label { font-size:11px; color:var(--muted); display:block; margin-bottom:2px; }
+
+  .range-slider { position:relative; width:100%; max-width:300px; height:30px; direction:ltr; }
+  .range-slider .track { position:absolute; top:13px; left:0; right:0; height:4px; background:#e2e6ed; border-radius:2px; }
+  .range-slider .fill { position:absolute; top:13px; height:4px; background:var(--accent); border-radius:2px; }
+  .range-slider input[type=range] { position:absolute; top:4px; left:0; width:100%; margin:0; -webkit-appearance:none; appearance:none; background:none; pointer-events:none; height:22px; }
+  .range-slider input[type=range]::-webkit-slider-thumb { pointer-events:auto; -webkit-appearance:none; appearance:none; width:15px; height:15px; border-radius:50%; background:var(--accent); cursor:pointer; border:2.5px solid #fff; box-shadow:0 0 3px rgba(0,0,0,.35); }
+  .range-slider input[type=range]::-moz-range-thumb { pointer-events:auto; width:12px; height:12px; border-radius:50%; background:var(--accent); cursor:pointer; border:2.5px solid #fff; box-shadow:0 0 3px rgba(0,0,0,.35); }
+  .range-label { font-size:11px; font-weight:600; direction:ltr; text-align:left; }
+
+  .dd { position:relative; display:inline-block; }
+  .dd summary { list-style:none; cursor:pointer; font-size:12px; border:1px solid var(--border); border-radius:8px; background:#fff; padding:4px 10px; user-select:none; white-space:nowrap; }
+  .dd summary::-webkit-details-marker { display:none; }
+  .dd summary::after { content:" ▾"; color:var(--muted); }
+  .dd[open] summary { border-color:var(--accent); }
+  .dd-menu { position:absolute; z-index:30; top:calc(100% + 4px); inset-inline-start:0; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 14px rgba(0,0,0,.12); padding:6px; min-width:200px; max-height:250px; overflow-y:auto; }
+  .dd-item { display:flex; align-items:center; gap:6px; font-size:12px; padding:3px 6px; border-radius:6px; cursor:pointer; white-space:nowrap; }
+  .dd-item:hover { background:#f0f3f8; }
+  .dd-item .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dd-actions { display:flex; gap:8px; padding:2px 6px 4px; border-bottom:1px solid var(--border); margin-bottom:4px; }
+  .dd-actions button { font-size:10.5px; border:none; background:none; color:var(--accent); cursor:pointer; padding:0; }
+
+  .main-grid { display:grid; grid-template-columns: 57% 1fr; gap:10px; align-items:start; }
+  @media (max-width: 980px) { .main-grid { grid-template-columns: 1fr; } }
+  .half-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .half-title { font-size:12.5px; font-weight:700; }
+
+  .toolbar { display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .toolbar button { font-size:11px; border:1px solid var(--border); background:#fff; border-radius:6px; padding:2px 8px; cursor:pointer; color:var(--ink); }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:right; padding:3px 6px; font-size:12px; }
+  thead th { font-size:10px; color:var(--muted); border-bottom:1px solid var(--border); }
+  tbody tr { border-bottom:1px solid var(--border); }
+  tbody tr:last-child { border-bottom:none; }
+  .party-cell { display:flex; align-items:center; gap:7px; }
+  .avatar { width:24px; height:24px; border-radius:50%; object-fit:cover; flex-shrink:0; background:#ddd; display:block; }
+  .avatar-fallback { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:9px; flex-shrink:0; }
+  .party-info { display:flex; align-items:baseline; gap:6px; min-width:0; }
+  .party-name { font-weight:600; font-size:12px; white-space:nowrap; }
+  .leader-name { color:var(--muted); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bloc-seg { display:inline-flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; margin-inline-start:auto; flex-shrink:0; }
+  .bloc-seg button { font-size:8.5px; padding:0 5px; border:none; background:#fff; color:var(--muted); cursor:pointer; line-height:1.7; }
+  .bloc-seg button:not(:last-child) { border-inline-end:1px solid var(--border); }
+  .bloc-seg button.sel-coal { background:#d0342c; color:#fff; }
+  .bloc-seg button.sel-opp { background:#1c5fb8; color:#fff; }
+  .bloc-seg button.sel-other { background:#9aa3b0; color:#fff; }
+  .num { font-variant-numeric:tabular-nums; font-weight:600; font-size:12px; direction:ltr; unicode-bidi:embed; }
+  .bar-bg { background:#eef1f6; border-radius:3px; height:4px; width:100%; margin-top:2px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:3px; }
+  .pollcount { color:var(--muted); font-size:11px; }
+  .empty-state { text-align:center; color:var(--muted); padding:18px 0; font-size:12px; }
+  .poll-log { font-size:10px; color:var(--muted); margin-top:4px; max-height:90px; overflow-y:auto; display:none; }
+  .poll-log.show { display:block; }
+  .poll-log div { padding:1px 0; border-bottom:1px dashed #eee; }
+  .poll-log .newpoll { color:#0f7a3d; font-weight:600; }
+  .chart-wrap { direction:ltr; }
+  footer { color:var(--muted); font-size:10px; margin-top:8px; line-height:1.6; }
+  footer summary { cursor:pointer; font-size:10.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header-row">
+    <h1>לוח סקרי הבחירות לכנסת 2026</h1>
+    <span class="subtitle">על בסיס דף הסקרים המלא בוויקיפדיה</span>
+    <span class="refresh-status" id="refreshStatus">טוען סקרים עדכניים…</span>
+  </div>
+
+  <div class="panel">
+    <div class="half-head">
+      <div>
+        <label class="f-label">כלי תקשורת / סוקרים (חל על שני הצדדים)</label>
+        <details class="dd" id="outletDD">
+          <summary id="outletSummary">כל כלי התקשורת</summary>
+          <div class="dd-menu" id="outletList"></div>
+        </details>
+      </div>
+      <div style="margin-inline-start:auto">
+        <button id="toggleLog" style="font-size:11px;border:1px solid var(--border);background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;color:var(--ink)">הצג סקרים כלולים</button>
+      </div>
+    </div>
+    <div class="poll-log" id="pollLog"></div>
+  </div>
+
+  <div class="main-grid">
+    <!-- right half (RTL first column): parties -->
+    <div>
+      <div class="panel">
+        <div class="half-head">
+          <span class="half-title">לפי מפלגה</span>
+          <div>
+            <div class="range-slider" id="partyRange" style="width:250px"></div>
+            <div class="range-label" id="partyRangeLabel"></div>
+          </div>
+          <span id="partySummary" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:52%">מפלגה</th>
+              <th>ממוצע</th>
+              <th>חציון</th>
+              <th>סקרים</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none">אין סקרים בטווח שנבחר.</div>
+      </div>
+      <div class="panel">
+        <div class="half-head" style="margin-bottom:4px">
+          <h2 style="margin:0">מגמות מפלגות</h2>
+          <details class="dd" id="partyDD">
+            <summary id="partySelSummary">בחירת מפלגות</summary>
+            <div class="dd-menu" id="partySelList"></div>
+          </details>
+        </div>
+        <div class="chart-wrap">
+          <svg id="partyTrend" viewBox="0 0 560 210" style="width:100%;height:auto;"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- left half: blocs -->
+    <div>
+      <div class="panel">
+        <div class="half-head">
+          <span class="half-title">לפי גוש</span>
+          <div>
+            <div class="range-slider" id="blocRange" style="width:250px"></div>
+            <div class="range-label" id="blocRangeLabel"></div>
+          </div>
+          <span id="blocSummary" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <svg id="blocChart" viewBox="0 0 420 250" style="max-width:310px;width:100%;height:auto;"></svg>
+          <div id="blocNote" style="font-size:10px;color:var(--muted);margin-top:2px;text-align:center;"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>מגמת הגושים</h2>
+        <div class="chart-wrap">
+          <svg id="blocTrend" viewBox="0 0 480 220" style="width:100%;height:auto;"></svg>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">שיוך הגושים נקבע בכפתורים שבטבלת המפלגות.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <details>
+      <summary>מקורות והערות מתודולוגיות</summary>
+      מקור הנתונים: דף הסקרים המלא בוויקיפדיה — "Opinion polling for the 2026 Israeli legislative election" (141 סקרים, ינואר–יולי 2026). בכל טעינה מחדש הלוח מנסה למשוך סקרים חדשים ולמזג אותם.
+      מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0 מנדטים. הממוצע והחציון מחושבים רק על סקרים שדיווחו נתון למפלגה; מפלגות שהתמזגו ("בנט 2026", "יש עתיד", "המילואימניקים") אינן בטבלה אך נכללות בגושים ההיסטוריים.
+      "יחד" = מיזוג בנט–לפיד (אפריל); "יסודות ישראל" = הנדל–טרופר–המילואימניקים (יולי); "הרשימה המשותפת" מופיעה בסקרים שבדקו ריצה ערבית משותפת. שיוך הגושים נשמר מקומית ומשפיע על חצי-הסופגנייה ועל מגמת הגושים. תמונות מוויקיפדיה.
+    </details>
+  </footer>
+</div>
+
+<script>
+const BASE_POLLS = [{"date": "2026-01-01", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 10, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": 21, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-01", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 5, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 8, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 11, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 66}, {"date": "2026-01-01", "pollster": "Lazar", "outlet": "Maariv", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 8, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": 19, "Together": null, "Yashar": 10, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-01-01", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 6, "Shas": 10, "UTJ": 8, "Yesh Atid": 10, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 22, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-01-07", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 10, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 24, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-01-08", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 12, "Bennett 2026": 21, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-01-08", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 9, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 8, "Bennett 2026": 13, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 66}, {"date": "2026-01-08", "pollster": "Lazar", "outlet": "Maariv", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 22, "Together": null, "Yashar": 10, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-08", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": 10, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 21, "Together": null, "Yashar": 6, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-01-14", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 10, "UTJ": 7, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 23, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-01-15", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 8, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 12, "Bennett 2026": 22, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-15", "pollster": "TrendZone", "outlet": "TrendZone", "Likud": 34, "Religious Zionism": null, "Otzma Yehudit": 10, "Shas": 6, "UTJ": 6, "Yesh Atid": 5, "National Unity": 0, "Yisrael Beiteinu": 6, "The Democrats": 12, "Bennett 2026": 21, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 56}, {"date": "2026-01-15", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 9, "Yesh Atid": 5, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 11, "Bennett 2026": 11, "Together": null, "Yashar": 6, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 66}, {"date": "2026-01-15", "pollster": "Lazar", "outlet": "Maariv", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 8, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 22, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-15", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": 9, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 19, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-01-20", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 10, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 23, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 5, "Balad": 4, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-22", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 8, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": 22, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-22", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 5, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 9, "Yesh Atid": 5, "National Unity": 4, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 10, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": null, "_govTotal": 65}, {"date": "2026-01-22", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 23, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-01-22", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 10, "UTJ": 8, "Yesh Atid": 8, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 18, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-01-29", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 11, "Bennett 2026": 21, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": 12, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 51}, {"date": "2026-01-29", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 9, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 12, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 64}, {"date": "2026-01-29", "pollster": "Lazar", "outlet": "Maariv", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 22, "Together": null, "Yashar": 10, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 50}, {"date": "2026-01-29", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 8, "Yesh Atid": 8, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 19, "Together": null, "Yashar": 7, "Yesodot Yisrael": null, "Joint List": 16, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-02-04", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 26, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 6, "Yesh Atid": 8, "National Unity": null, "Yisrael Beiteinu": 7, "The Democrats": 8, "Bennett 2026": 22, "Together": null, "Yashar": 6, "Yesodot Yisrael": null, "Joint List": 15, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 54}, {"date": "2026-02-05", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 9, "Yesh Atid": 4, "National Unity": 4, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 11, "Together": null, "Yashar": 6, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-02-05", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": 8, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 18, "Together": null, "Yashar": 6, "Yesodot Yisrael": null, "Joint List": 14, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-02-06", "pollster": "TrendZone", "outlet": "TrendZone", "Likud": 33, "Religious Zionism": null, "Otzma Yehudit": 8, "Shas": 7, "UTJ": 7, "Yesh Atid": 5, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 20, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": 15, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 55}, {"date": "2026-02-11", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 20, "Together": null, "Yashar": 10, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 52}, {"date": "2026-02-12", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": 20, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": 12, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 50}, {"date": "2026-02-12", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 5, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 9, "Yesh Atid": 5, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 10, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 66}, {"date": "2026-02-12", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": 8, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 19, "Together": null, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": 15, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-02-12", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 8, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 21, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-02-17", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 7, "Yesh Atid": 9, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 7, "Bennett 2026": 22, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": 15, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 50}, {"date": "2026-02-18", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": 0, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 14, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": 14, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 64}, {"date": "2026-02-19", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 9, "Yesh Atid": 5, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 11, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-02-19", "pollster": "Lazar", "outlet": "Maariv", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 11, "Bennett 2026": 20, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-02-19", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": 7, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 18, "Together": null, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-02-26", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 11, "Bennett 2026": 21, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 4, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-02-26", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 11, "UTJ": 8, "Yesh Atid": 4, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 10, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-02-26", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 20, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": 14, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 49}, {"date": "2026-02-26", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": 7, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 18, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-03-05", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 11, "UTJ": 9, "Yesh Atid": 4, "National Unity": 0, "Yisrael Beiteinu": 7, "The Democrats": 9, "Bennett 2026": 11, "Together": null, "Yashar": 10, "Yesodot Yisrael": null, "Joint List": 13, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 66}, {"date": "2026-03-05", "pollster": "Lazar", "outlet": "Maariv", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 21, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-03-05", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 31, "Religious Zionism": null, "Otzma Yehudit": 6, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 15, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-03-11", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 26, "Religious Zionism": null, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 12, "Bennett 2026": 21, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-03-12", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 29, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 8, "UTJ": 7, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 17, "Together": null, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 54}, {"date": "2026-03-13", "pollster": "Lazar", "outlet": "Maariv", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 22, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0}, {"date": "2026-03-19", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 12, "Bennett 2026": 20, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-03-19", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 8, "UTJ": 8, "Yesh Atid": 5, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 15, "Together": null, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-03-20", "pollster": "Lazar", "outlet": "Maariv", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 8, "UTJ": 7, "Yesh Atid": 8, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": 21, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-03-26", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 29, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 8, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": 16, "Together": null, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-03-26", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 9, "Yesh Atid": 4, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 10, "Together": null, "Yashar": 11, "Yesodot Yisrael": null, "Joint List": 12, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-03-26", "pollster": "Lazar", "outlet": "Maariv", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 21, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-03-29", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": 7, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 19, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-03-31", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": 8, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 22, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-04-09", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 9, "Yesh Atid": 4, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 10, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": 11, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-04-09", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": 19, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-04-09", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 22, "Religious Zionism": 5, "Otzma Yehudit": 10, "Shas": 10, "UTJ": 7, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 8, "Bennett 2026": 21, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 54}, {"date": "2026-04-09", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 22, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-04-10", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 8, "Bennett 2026": 24, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-04-16", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": 20, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-04-16", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 6, "Shas": 9, "UTJ": 8, "Yesh Atid": 5, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": 16, "Together": null, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-04-16", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 10, "Shas": 9, "UTJ": 7, "Yesh Atid": 6, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 20, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-04-16", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 8, "Yesh Atid": 0, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": 11, "Together": null, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": 12, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 65}, {"date": "2026-04-17", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 24, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-04-23", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": 21, "Together": null, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-04-23", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 35, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 11, "UTJ": 8, "Yesh Atid": 4, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 8, "Bennett 2026": 10, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": 11, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 66}, {"date": "2026-04-24", "pollster": "Lazar", "outlet": "Maariv", "Likud": 24, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": 7, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": 24, "Together": null, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-04-26", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 8, "Bennett 2026": null, "Together": 20, "Yashar": 9, "Yesodot Yisrael": null, "Joint List": 11, "Ra'am": null, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 64}, {"date": "2026-04-27", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 26, "Religious Zionism": 4, "Otzma Yehudit": 10, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 6, "The Democrats": 8, "Bennett 2026": null, "Together": 26, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 57}, {"date": "2026-04-27", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 27, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 11, "Bennett 2026": null, "Together": 24, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-04-27", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 26, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-04-27", "pollster": "Lazar", "outlet": "Walla", "Likud": 28, "Religious Zionism": null, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 27, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-04-27", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 33, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 11, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 6, "The Democrats": 9, "Bennett 2026": null, "Together": 24, "Yashar": 8, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 7, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 62}, {"date": "2026-04-30", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 28, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": null, "Together": 23, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-04-30", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 26, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 28, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-04-30", "pollster": "Lazar", "outlet": "Maariv", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": null, "Together": 28, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-05-07", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": null, "Together": 25, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-05-07", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 34, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 8, "Bennett 2026": null, "Together": 16, "Yashar": 13, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 65}, {"date": "2026-05-07", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 26, "Religious Zionism": null, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 4, "Yisrael Beiteinu": 9, "The Democrats": 8, "Bennett 2026": null, "Together": 26, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-05-07", "pollster": "Lazar", "outlet": "Maariv", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 26, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-05-12", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 26, "Religious Zionism": null, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 25, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-05-13", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 10, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 7, "The Democrats": 9, "Bennett 2026": null, "Together": 26, "Yashar": 12, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 56}, {"date": "2026-05-13", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": null, "Together": 24, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-05-13", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 26, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-05-14", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 26, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 24, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-05-14", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 24, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-05-14", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 7, "The Democrats": 9, "Bennett 2026": null, "Together": 16, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 63}, {"date": "2026-05-19", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 30, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 15, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 60}, {"date": "2026-05-20", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": null, "Together": 23, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-05-20", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 27, "Religious Zionism": null, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 10, "Bennett 2026": null, "Together": 23, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-05-20", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 4, "Yisrael Beiteinu": 9, "The Democrats": 8, "Bennett 2026": null, "Together": 23, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-05-20", "pollster": "Lazar", "outlet": "Maariv", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 25, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-05-21", "pollster": "Lazar", "outlet": "Maariv", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 25, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-05-25", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 10, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 23, "Yashar": 14, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 56}, {"date": "2026-05-27", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 25, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": null, "Together": 22, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-05-28", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": null, "Together": 22, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-05-28", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 22, "Yashar": 18, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 52}, {"date": "2026-05-28", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 5, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 15, "Yashar": 15, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 63}, {"date": "2026-06-03", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 30, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 14, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 6, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 60}, {"date": "2026-06-04", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 10, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 23, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-06-04", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 21, "Yashar": 19, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-06-04", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 6, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 4, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 21, "Yashar": 19, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-06-04", "pollster": "Lazar", "outlet": "Maariv", "Likud": 25, "Religious Zionism": 0, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 23, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-06-05", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 32, "Religious Zionism": 5, "Otzma Yehudit": 9, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 14, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 63}, {"date": "2026-06-11", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 11, "Bennett 2026": null, "Together": 20, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-06-11", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": null, "Together": 19, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-06-11", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 13, "Yashar": 16, "Yesodot Yisrael": null, "Joint List": 6, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 63}, {"date": "2026-06-11", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 24, "Religious Zionism": null, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 21, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-06-11", "pollster": "Lazar", "outlet": "Maariv", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 21, "Yashar": 17, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-06-16", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": null, "Together": 17, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 7, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-06-16", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 28, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": null, "Together": 12, "Yashar": 18, "Yesodot Yisrael": null, "Joint List": 7, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 58}, {"date": "2026-06-18", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 19, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-06-18", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 10, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": 6, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 62}, {"date": "2026-06-18", "pollster": "Lazar", "outlet": "Maariv", "Likud": 21, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 20, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 49}, {"date": "2026-06-18", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 23, "Religious Zionism": null, "Otzma Yehudit": 9, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 10, "The Democrats": 8, "Bennett 2026": null, "Together": 19, "Yashar": 23, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-06-18", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 11, "The Democrats": 11, "Bennett 2026": null, "Together": 17, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-06-24", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 23, "Religious Zionism": 5, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 12, "The Democrats": 10, "Bennett 2026": null, "Together": 15, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-06-24", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 24, "Religious Zionism": 5, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": null, "Together": 16, "Yashar": 22, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 53}, {"date": "2026-06-25", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 18, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-06-25", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 27, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 11, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": 7, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": 0, "_govTotal": 57}, {"date": "2026-06-25", "pollster": "Lazar", "outlet": "Maariv", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 11, "The Democrats": 10, "Bennett 2026": null, "Together": 18, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-06-25", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 21, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 7, "Yesh Atid": null, "National Unity": 4, "Yisrael Beiteinu": 11, "The Democrats": 7, "Bennett 2026": null, "Together": 17, "Yashar": 23, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 4, "Balad": null, "Reservists": null, "_govTotal": 50}, {"date": "2026-06-29", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 17, "Yashar": 22, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-06-30", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 29, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": null, "Together": 11, "Yashar": 19, "Yesodot Yisrael": null, "Joint List": 7, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 58}, {"date": "2026-07-01", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 21, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 11, "Bennett 2026": null, "Together": 17, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 51}, {"date": "2026-07-02", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 33, "Religious Zionism": 5, "Otzma Yehudit": 7, "Shas": 11, "UTJ": 7, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 9, "Bennett 2026": null, "Together": 9, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": 6, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 63}, {"date": "2026-07-02", "pollster": "Lazar", "outlet": "Maariv", "Likud": 21, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 19, "Yashar": 20, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 50}, {"date": "2026-07-02", "pollster": "Yossi Tatika", "outlet": "Zman Israel / Times of Israel", "Likud": 22, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 11, "The Democrats": 8, "Bennett 2026": null, "Together": 16, "Yashar": 23, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 5, "Balad": null, "Reservists": null, "_govTotal": 53}, {"date": "2026-07-05", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 23, "Religious Zionism": 5, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 9, "Bennett 2026": null, "Together": 16, "Yashar": 23, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": null, "Reservists": 0, "_govTotal": 53}, {"date": "2026-07-06", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 23, "Religious Zionism": 4, "Otzma Yehudit": 9, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 16, "Yashar": 23, "Yesodot Yisrael": null, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": 0, "_govTotal": 52}, {"date": "2026-07-08", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 22, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 15, "Yashar": 23, "Yesodot Yisrael": 0, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": null, "Reservists": null, "_govTotal": 51}, {"date": "2026-07-09", "pollster": "Kantar", "outlet": "Israel Hayom", "Likud": 24, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 9, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 8, "The Democrats": 8, "Bennett 2026": null, "Together": 14, "Yashar": 23, "Yesodot Yisrael": 4, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 53}, {"date": "2026-07-09", "pollster": "Direct Polls", "outlet": "i24NEWS", "Likud": 29, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 9, "UTJ": 8, "Yesh Atid": null, "National Unity": null, "Yisrael Beiteinu": 9, "The Democrats": 10, "Bennett 2026": null, "Together": 9, "Yashar": 21, "Yesodot Yisrael": null, "Joint List": 7, "Ra'am": 5, "Hadash-Ta'al": null, "Balad": null, "Reservists": null, "_govTotal": 59}, {"date": "2026-07-09", "pollster": "Lazar", "outlet": "Maariv", "Likud": 21, "Religious Zionism": 4, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 18, "Yashar": 22, "Yesodot Yisrael": 0, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 6, "Balad": 0, "Reservists": null, "_govTotal": 49}, {"date": "2026-07-12", "pollster": "Kantar", "outlet": "Kan 11", "Likud": 23, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 9, "Bennett 2026": null, "Together": 15, "Yashar": 24, "Yesodot Yisrael": 0, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 52}, {"date": "2026-07-13", "pollster": "Midgam", "outlet": "Channel 12 (HaHadashot 12)", "Likud": 22, "Religious Zionism": 5, "Otzma Yehudit": 8, "Shas": 8, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 10, "Bennett 2026": null, "Together": 16, "Yashar": 23, "Yesodot Yisrael": 0, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 51}, {"date": "2026-07-15", "pollster": "Maagar Mochot", "outlet": "Channel 13", "Likud": 22, "Religious Zionism": 6, "Otzma Yehudit": 7, "Shas": 7, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 10, "The Democrats": 11, "Bennett 2026": null, "Together": 15, "Yashar": 21, "Yesodot Yisrael": 4, "Joint List": null, "Ra'am": 4, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 50}, {"date": "2026-07-16", "pollster": "Filber", "outlet": "Channel 14 (Direct Polls)", "Likud": 32, "Religious Zionism": 6, "Otzma Yehudit": 7, "Shas": 10, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 7, "The Democrats": 11, "Bennett 2026": null, "Together": 8, "Yashar": 21, "Yesodot Yisrael": 0, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 63}, {"date": "2026-07-17", "pollster": "Lazar", "outlet": "Maariv", "Likud": 22, "Religious Zionism": 4, "Otzma Yehudit": 7, "Shas": 7, "UTJ": 8, "Yesh Atid": null, "National Unity": 0, "Yisrael Beiteinu": 9, "The Democrats": 11, "Bennett 2026": null, "Together": 16, "Yashar": 22, "Yesodot Yisrael": 4, "Joint List": null, "Ra'am": 5, "Hadash-Ta'al": 5, "Balad": 0, "Reservists": null, "_govTotal": 48}];
+const PARTIES = [{"id": "Likud", "name": "הליכוד", "leader": "בנימין נתניהו", "photoKey": "Benjamin Netanyahu", "color": "#1a4b8c", "active": true}, {"id": "Religious Zionism", "name": "הציונות הדתית", "leader": "בצלאל סמוטריץ'", "photoKey": "Bezalel Smotrich", "color": "#f28c28", "active": true}, {"id": "Otzma Yehudit", "name": "עוצמה יהודית", "leader": "איתמר בן גביר", "photoKey": "Itamar Ben-Gvir", "color": "#7a1f1f", "active": true}, {"id": "Shas", "name": "ש\"ס", "leader": "אריה דרעי", "photoKey": "Aryeh Deri", "color": "#00539b", "active": true}, {"id": "UTJ", "name": "יהדות התורה", "leader": "משה גפני", "photoKey": "Moshe Gafni", "color": "#4a4a4a", "active": true}, {"id": "Yesh Atid", "name": "יש עתיד", "leader": "יאיר לפיד", "photoKey": "Yair Lapid", "color": "#0087cc", "active": false}, {"id": "National Unity", "name": "כחול לבן", "leader": "בני גנץ", "photoKey": "Benny Gantz", "color": "#2e5aa8", "active": true}, {"id": "Yisrael Beiteinu", "name": "ישראל ביתנו", "leader": "אביגדור ליברמן", "photoKey": "Avigdor Lieberman", "color": "#1c3f94", "active": true}, {"id": "The Democrats", "name": "הדמוקרטים", "leader": "יאיר גולן", "photoKey": "Yair Golan", "color": "#e63946", "active": true}, {"id": "Bennett 2026", "name": "בנט 2026", "leader": "נפתלי בנט", "photoKey": "Naftali Bennett", "color": "#2e8b57", "active": false}, {"id": "Together", "name": "יחד (בנט–לפיד)", "leader": "נפתלי בנט ויאיר לפיד", "photoKey": "Naftali Bennett", "color": "#3aa17e", "active": true}, {"id": "Yashar", "name": "ישר!", "leader": "גדי איזנקוט", "photoKey": "Gadi Eisenkot", "color": "#6a5acd", "active": true}, {"id": "Yesodot Yisrael", "name": "יסודות ישראל", "leader": "יועז הנדל וחילי טרופר", "photoKey": "Yoaz Hendel", "color": "#8a9a2b", "active": true}, {"id": "Joint List", "name": "הרשימה המשותפת", "leader": "איימן עודה ואחמד טיבי", "photoKey": "Ayman Odeh", "color": "#147a6f", "active": true}, {"id": "Ra'am", "name": "רע\"ם", "leader": "מנסור עבאס", "photoKey": "Mansour Abbas", "color": "#0f9d58", "active": true}, {"id": "Hadash-Ta'al", "name": "חד\"ש–תע\"ל", "leader": "איימן עודה ואחמד טיבי", "photoKey": "Ayman Odeh", "color": "#cc2222", "active": true}, {"id": "Balad", "name": "בל\"ד", "leader": "סאמי אבו שחאדה", "photoKey": "Sami Abou Shehadeh", "color": "#222222", "active": true}, {"id": "Reservists", "name": "המילואימניקים", "leader": "יועז הנדל", "photoKey": "Yoaz Hendel", "color": "#6b8e23", "active": false}];
+const PHOTOS = {"Benjamin Netanyahu": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwUBBAYCB//EADAQAAIBAwMBBQcEAwAAAAAAAAECAwAEEQUSITEGEyJRgRQyQWFxkaEHUrHRIzPB/8QAGQEAAgMBAAAAAAAAAAAAAAAAAwQBAgUA/8QAHhEBAAIDAAIDAAAAAAAAAAAAAQACAxEhMUESE1H/2gAMAwEAAhEDEQA/AH7abq08byC0RZXn7xHLjcgHu45qJNXv7mO3jukiRJJCjBAd+5ecY9PzWnsLiO7sILiE5SVAw9aVatBp2n3h1W7uIrcbSo3nGWPxHmcU19xarW508RcxNblqPN9nG6VZUjWItGer5GB+f+etU5VluFcSx7UJ248wfLn+qNb3a3dqtxbs8kLKSuwe9zjOD9Kp6zf+x6ZJK++JVKjJPK5OPhWWVW2psbCu5hNcsbqylllgk3QHmIBecc8GltvbatdxCSJV2lgnzyQSOPSn2p39tcxWYVlkjYsG5GBig6ZdTWeme0RRh+7niByeACpGfzTOTHWofEi1FsKviWLntTqem6Taadp8/c+EuzhQWGTwBn6H71lp7i4vbjvry4lnk/dIxY/c1Oozb7jP7QF+1cKMUzmRyWT9ieETGDPUNCuYouwNtOyuTEzJuXqviPXkZqn+pFzFBo1hYQh1adu+cP72AMDd88n8VR0O439jDbZPF4wIz8NgP8mlnbDVHu9dhmO12ggiXDKGBONxyDweSa5whQv7VlzItmm+Eyhjbc2G4PWmVlqFyLdrIBHSRgx8POV6VRnPLucLubJCjAH0qInxKrYIFAubIWjp1OLh/D1yTRI3DDrQ2iDDyphY9nNXu4faLSzkkiPRshdw+WasuusoC8Iw0G92rJbE4U/5B9cc/wAUouZzPM8jdWOf6FaKw7Ga5/tZYYdylcPJyMjHOKQ32h6va3htHsZ3k6ju0LhvmCOtEtnralaHrcgxWLNki+V8tiibh60NreRHKygoynBUjBBqT4RQ5M//2Q==", "Avigdor Lieberman": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAwEBAQEAAAAAAAAAAAAABAUGAgcBA//EAC8QAAIBAwIDBwEJAAAAAAAAAAECAwAEEQUhBhJBMVFhcZGh0RMUFSIjUoGyweH/xAAYAQADAQEAAAAAAAAAAAAAAAAAAwQCAf/EAB0RAAIDAQEAAwAAAAAAAAAAAAABAhEhEwMSMWH/2gAMAwEAAhEDEQA/AOdCM91U/CMEeJ2dNy64PkD80sRYutPtBZUWQRgFQct4Uj53g6MdRSx6lbxcsZLZbYEKcE0Jf6nAZWgZDkbHmYD9sda9aCzi/Oitw82M5GMgeZrEd5BeSO7QBRnbJBOe/HdXKwqv9IriC2CamxRcBwGwKWfTPUVX6xHAbgPId2z20qdLboRR0rCWUNM6faCSNWcDcZ3IHzTqxiNtLlHjVG2cYJyPQVNW7Tw45XwB0NMBfXVyEtcqA7BTgbnejjNytB0ikUsMAvWNvK6rybjfZvmtSWNtaI8ztHmMZUqgXevtxDa2cCvPDJKs4HMUiXmC56n9NA6Lb/eL5vRO6Rtg8qZQnxPb7VRwd0Y75Yvuolu5QWZeZVGQ2c77/wB0r1SzFvbmRMbHo2aJ4j5k1+4aNiuMcpU4wMClrl5RiV2bzNLfg1LGC9U1qNDsBozSAG1mzB6zp/IUAhyooi1n+zXkFxjP0pFfHkc1ShLOq6wy22i3DBQcryjPjtS3hKQtaz25x+BgUOOjZ29R70TxJMj6FE0bBklkUqR1GCRS/hBsXlwvfGCPX/aavowSnFJDcR3gHYr49hSjqaM1adbjV7yZWBR5nKkdRnb2oF2IHZSmaR//2Q==", "Yair Lapid": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAABQECAwQGBwD/xAAvEAACAQMCAwcEAQUAAAAAAAABAgMABBEFEgYhMRMiQWGRobEUI3HBURUy0eHx/8QAGQEAAwEBAQAAAAAAAAAAAAAAAQIDAAUE/8QAHhEAAgICAwEBAAAAAAAAAAAAAAECERJBAxMxITL/2gAMAwEAAhEDEQA/ADrcRSmCILZTC4bEQOBt7THTrmsRrSPbW5S4hnQRShw0q7ckjvDP5HvXRP6TGuvrf7u7tBCeAfoW9MUD45BSznkBAKgkEjNX5eSGOPGvROOMruTHWJSPToEXJzGhyeRPdBqQmIqySruR/wC4HnkePyaGW722r6fBcSxFsHoT0PjUs0Nskkt0kWJdhAJ/B9K5zbs6aisTJw8QxW+oR3aRJujTYFLHHTHP1pYeKHt7mKeMR9pEpUE56EAfqmR29svEFvBJAjI8yqVxnrj/AHVriC3tobq1SGKNQS4ICjoFGPmr1qzy3ujovEGvWOhCGS9LkyDuJGuS2AM/IrnfE3GD6yzRW9sIbdhht53M36FVeLNVfUtQh7TrbwrETnqRzJ9/agZqsoYtp6IxlatG50B4Tws1wHRTauyyq/IHPMEetM4hKw8Mx3IdN9y6iLsmyABzJz7UC0a5RNL1OF+ZZFZB55wT6GrvEV0q2OjGJYx9oyGPaNueS5x57TQ64/oftlWJnre+liu47hhvaOQOD0OR/wAohPfx3csMzhy8Yw249TtA+RQctgjz51bsShl2uoOR40k3StaDD66ZFcymaV5HPec5NQhvWpWQMMY50iWNy7fZjL7ugHU/5p27+sRLSPQylH5HAPI/irWp3Im+mQHIihCe5P7psWi6pPzSylAxz3Db816bSNQEqoLcyMwzmM7hnzI5UM15YcJe0D2OZBVq3fY6keFNuNPurRx9TEY8nAz/AD/FIqedb1GVpn//2Q==", "Moshe Gafni": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUCAwYHAf/EAC8QAAIBAwIEAwcFAQAAAAAAAAECAwAEEQUhBhIxQRNR8BQiYYGhscEVMnFy0fH/xAAWAQEBAQAAAAAAAAAAAAAAAAACAwT/xAAbEQACAgMBAAAAAAAAAAAAAAAAAQIREhMhMf/aAAwDAQACEQMRAD8A6BSrWXVpba3YjDEuR54xj18Ka0h4hif2q0njcIwDJlhkb+vrWWXhqj6Wq6KeXmXOOmare7tfEMJmTxOhXO9KI9OmW8R2uCCTuFAG3f8A7Xv6PCt6/iTO/OcgOx6fmpUjVTNLpdws1u0YPvQtyEeXl9KMNI+HREZbs268qK3KQO5wP8p2aqnwyyVMlSniaJ5dGlaMHnjIYEdt6L1DU7PTYg95OsYPRepb+BWF1vja4u3lttOjEVvgguwyzfgUlFsGVBds9zfAkOOYqPeyRjzx86ldWcltb+IZzj946kn45zQ2jzk6YL1sLG7lGPYNnofXejI5hflLRHIMmzt2QbdaOHaLbeF3CN/Y28VwLi7giknkUhXcKTsfOtaa4trCw+3XkdqMQrIUj3zspwKJ07V7+1t19mvJkUDZQ5wPl0qushnbBLm9nupzLcyvK7dWY5NDRnDtnuag7bA5qa7iqk7NLwpeMpudNZVkhuSjFG6HB3HzH2p7cCfQbC9MuGgLhrV+bLf1Pr71jNGmEOq27scKXCk+Wdq23GZA0dpWOeZ1jjB7dyfoaLXRKVKjn2OVMCq1conKuwzVkh2qgnekE//Z", "Aryeh Deri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAgIDAQAAAAAAAAAAAAAABAUGBwACAwH/xAAwEAACAQMBBgUDAwUAAAAAAAABAgMABBEhBQYSMVFxExQiQWGBkbEkM9EyQqGywf/EABgBAAMBAQAAAAAAAAAAAAAAAAIDBAAF/8QAGxEAAwEBAAMAAAAAAAAAAAAAAAERAkEDIjH/2gAMAwEAAhEDEQA/AOVnHll7U2ntFmsmjYaMRn51FA2S+pOwp+IBNb8GvtyoLFQkq4b2ogt7JOPhjXGNdKGvmha1cs6cJ5EnFbXqQ3MLM05CAAMoJBH259qW7Whg8tapHMAEJXR+RPY/FSo6HCPXWUgnkGgjXw0PyeZ/H2pAtpJIccJHpyc++c4qVTWwZILUHxA0pDnrqAf9qywsC6q+OSqO4yn8N96pz8OfpezD7PR4+wp15yC3EaGVTLI4REByWJOOX1qumuLjg4fHl4QMY4jii93jwbdsXY5JuEye7CmrxwCkv2wkPgRXEMjqs7K4xzwcGkG07aFZ/EPiqc6sRgNUs29axw3ccZ/bOXUKf6R75HTpSG5/XeaiSRFdbZmRScMcDTCnXmOdJWayh7mTzZ0McLjUvJIcj3wOvbP/ACm0KIi8K4BGNKryx2pe2LZgmJXTKv6lOPx9KkWz96IZmWK/hEZJ/cU5XPyPamPDEUj7j0D5oiwbgv7ZuXDKh+zCh31xWyvwMGH9pzTwS1N5tkW02y7i7J4LmGNnWX3zg6fx0oLdHYdrBslp3xNLOSxlI15kDB6aUw3zuPL7vyZQukjKjgdPeg9wrkTbuvCG4vLuyg9VOo/P+KXw3SqpYjDI8Z5oxU/SubcmHSme8EXg7d2hHyxcOR9STStjrnqtEY//2Q==", "Benny Gantz": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAwEBAAMAAAAAAAAAAAAAAwQFAgYAAQf/xAAyEAACAQMCAgcFCQAAAAAAAAABAgMABBEFIRIxBhNBUWGRoSIkQnGxFCMzUnKBwdHh/8QAGQEAAgMBAAAAAAAAAAAAAAAAAwQAAQUC/8QAHREAAgMBAQADAAAAAAAAAAAAAAECAxESEwQhMv/aAAwDAQACEQMRAD8AvdlP32OqjJO3s/Q1PpjUblUSOIggmNW4sbcjt61xY8Wkpj08AJDHKxaReInv7PCt3FpB1JUKo22I7KT+1tBwgRh3OOeQD++DRbm/EfD1sTAMASw3AzSWtmoopIDO2NFVO1HYbfpNQr8+8Lvn2BVSS4V7Zo15tlh3AYP91G1I5utjzUczUpjlgC38nVA0xqcam0hkZT+Go9KVBouqXMSw2loH4ri4VQkQ5kcJ3+VPWR1YJUScZahaNyIV+7VmwME/xQxOZJQrW8i4GCXOPLFLLJGAYLlA8XMFgCKzPNZwESwiMyDZeFACKRw2DePd5JyOEMxUb+FRdSfF4N85UHOc1bLE6JG+MZkOfI1zmqvm6BznKDeq+O27GK3v6AXnSTULjIjYQJ2BBv50HSr9oNatLyaR3KSrxsxJOOR9Kmt4c685jwNaQklh9k1nTLZ7V7rjSJlGSWOFb/akaRo9rdIb1pY3RSQEQg7jv7vlVG4ure56Jpf3eXVrUNwg/GR9c0j0KtozDcyk4mMnDKo5YwCNvP1oflFroKrpJc6cENcvbeV4WbjgEhPVt8O55GvV1erczLIoK+yAQe+p8r9ZK8n5iW86yp7qvzjupHHbzD//2Q==", "Gadi Eisenkot": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAAAwABAgQGBwX/xAAuEAACAQMBBgUCBwAAAAAAAAABAgMABBEFBhIhMUFhBxMyUYEiYhUzcXKhwfD/xAAXAQADAQAAAAAAAAAAAAAAAAAAAwQB/8QAGxEAAgIDAQAAAAAAAAAAAAAAAAECEQMSMSH/2gAMAwEAAhEDEQA/AOc0gKcDNEVaakKbo9HRNAutZdvI3UjT1O3IdqNq2zlxpoyWDr7da1OyEbx6EPImRC0hZyVz2xjPaoa6XnilmEqlFYqBunPb4qeWRqVFccMXC305/u1EirU0QSRlU5AOM0IrVNEd06GRc0UPGvM5/SorwQmmCjHChuuAo7dNTsnfyJ56bjNbIAxwfqUk44f7pRdoL3FpcSW6ybgIyznOD0FT8PYEubu/hkZgphBwDzOSP7peIUkdqLXSoGJCjzXB6dB8njn4pLhb2ZRHJrDRGUFzDIMnKnrmk6AjKnI9xVTAA70S1z5+70IPCnRnfjJ5Y0laGLekZ70kfgKHzJz7Uy8GxS2/RkVSNr4bzBdelUkANbtz7MtZ/aDUfxTXLq7BJRnIQ/aOA/igWGoPp7zPF6pYXiB9t4YqlnAob8Nr0Zj9VEgJFzGfuxQObcKLF+dH+4ULoPh//9k=", "Yair Golan": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwQCBQYAAf/EACwQAAIBAwMCBQIHAAAAAAAAAAECAwAEEQUSITFBEyJRUqEyQmFxgZGx0fD/xAAYAQADAQEAAAAAAAAAAAAAAAABAgMABP/EAB4RAAICAgIDAAAAAAAAAAAAAAABAhEDMRJRFCEi/9oADAMBAAIRAxEAPwBw1HNetQycVAsTtrOK4kZ5WO4nHFGuNLsgq7Ad47k80usUDozsh3qfKR2pp44C0kwXzt9w6Go27O1QXEGAVAVvqAwalXOQ0hK9K6rI42qYFqCxorms5qN/O08kcchSNW2+Xgn9aZRctCuSRfRTBW24DqThgOcH/H5p1n32s8yJ4ccSFmYjuBwKz2li4ttAuL2NY3VpQNsgPlx3GO5z8U9rV7dRaXBYTNFunAlcRqRtXspOefz/AAorB9W9DeTUOK2HsryC7TMTebGSh6imqxJLeJuUlSOhHBFW2natOjiO5PiR+7uP7ppY+ian2WlxL4UTye1Sayr8qSTk55rQaq+LCXHUgD5rOrzG3OeTRxL02DIWtzdNHoul2MRxvDTyD1ySF/hvigX1wbi5Z8kqAFTPtAwPgUs7+LLFjpHEE/apA5OeMdqsTPAMDJokYIHpk80N2+kepowIHJPArGP/2Q==", "Yoaz Hendel": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAwADAQAAAAAAAAAAAAAAAwUGAgQHAf/EAC0QAAEDAgQCCgMBAAAAAAAAAAECAwQAEQUSITETYQYUIjJBUXGBkbFiocHh/8QAGAEAAwEBAAAAAAAAAAAAAAAAAgMEAQX/xAAdEQACAgIDAQAAAAAAAAAAAAAAAQIREiEDMTKB/9oADAMBAAIRAxEAPwBfKVnhH0VWUTWG0eVABzxCPxI/VFgrQmAhS1BIF9Sa3k8oVw+pfBih3hNFZZUoA2sB3v8AKaYQ8DiTLfUyz2SoKuPEbUmekBuPGdbWoNPo73MGxBpngHEdl8QPKW22Dmuq4F9h91LK92dFVjofzTmJHMH7rxhWVm3OsXlXWfQf2hZsulDHoVLs5u9McYYS0kDe501rSdkF1uwJFvCsXHVvIzG29ayTZz2q1k8VSKnAZHWsFfhOMqc4TgUFi3YCuW+4PzTNKjg8JyUiSi6gEoQgZrH8uXOlHQhwJxstHZ1tSfcWI+qtsSwxE/CZDBbSlbieyUixzDUH5Fbgns3NrQLC5jmJQxKEdYT3SU6gm/gN7eoor+ZLgBFtKmOj81t7C3MPjSODPVHLTYWCNcyiSCAfP18hXuDTJsXj4Y5AXIei20SsAAX1NyRfcVO4JdB5WR6LhoZiQLX2vQXFDNcfdbDKVqSCo3tsPKgPoKXBfY04AZdGpIYx+ItV7ZwDbxvp/a6i5JDcVx9RytpSom4sU1yDDzw8RjLBUMrqT2TY7jY1fTU8KK8VPTb2uptYz5vPc66UyG0DIjG5nU8ZTMbGfI7nASdxeq+KW1dK0yWyeHMhB1NxbxGh+L1BP8MPrS0VFF9M2/vVBgWI8Gdh4fJDbHESF6nRQGnsQfmkckb2hsJVpn//2Q==", "Naftali Bennett": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAAAQUCAwQGAAf/xAAxEAABAwMDAQYEBgMAAAAAAAABAgMRAAQFEiExEwYiMlFhwRVxgaEHFEFCgpKx4fD/xAAZAQEAAwEBAAAAAAAAAAAAAAACAwQFAAH/xAAcEQADAQEAAwEAAAAAAAAAAAAAAQIRAxIhMRP/2gAMAwEAAhEDEQA/AGuVxDljikXlteXSls6dXeE6NyqNvWaxvY1d/bfEHrh9aTqS0lZErQDtJjaTXVJebucSy8ndDqUmPmKT5/N4rHWQtw+2XEDSlhsyRH6Hy+tT/rTly/pXnjKtUvhBpLgdQQ+nplPgjeaz3LXUtXBfPpW0TJ0jTAFU276lWFu69KQ80laVhMpUY3H0O1Zc9ddDG9VYV0FOBoqjeSCfb7iqKlusNOrSnRE3ZXaFKSLhtJQQCFA8kehrQ2L9LIWLhjSePF5T51H8+yXXOi8h3UZCognbyqZuylspCRH+o96VPGdz4upTFd5nskbb4ei5Wi2bJAQgxPzPNKZj5V55ZW8tzkEzQBBEirdPabM+FkpH0TsLk+v2dyONUG1u2yFPMhzwgEex/wA1ly16rJ/h6VOtoQ7a3SUqKR4jxJ9e9XNdnL02WT5hL7a2FfyED7xTZperstmGTxLLif7EH2rxSsbF5PUjlIppjX7hbSmkkK0me8eB/wAKWcGp2L/Tup/ae6aj6LZJOdZRSeKDShojyMURuNzUOmUklBn0pgLZpkq9Ix7iAdn0hJ+hB9qVbxuDRLoLQRI2JNKa9NBa+BURzVLKpFB0qgAA78GKklsIJAMidjxQ3WLPR//Z", "Ayman Odeh": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwUEBgcCAP/EAC8QAAIBAwIEBAMJAAAAAAAAAAECAwAEESExBQYSQRMiUcEycZEUNFJhgYKh0eH/xAAYAQEBAAMAAAAAAAAAAAAAAAAAAgEDBP/EABoRAQEAAgMAAAAAAAAAAAAAAAABAhEDEjH/2gAMAwEAAhEDEQA/AMwolvJ4NxHJ+BgaHR1tXOC3lFNbGn8EeFpmWOBDHNEMnfP91G5+u1g5eWCKIATOqHp0CDf2oHK8DwxWcYvTD4o83V2GdDROeJrdnHCYstFCeqRidWk/ytePFezpy5p01Ga16ps/D5EHVFl19O9Qq2WacwkAzMudhrTmztmu7qC3T4pXVB8yaWWaaO52AwKs/J6qeNQTPqsCtKf2qTVTxhb45reyvr6cIphsovDjU7EjQD61SLmVpnklc5ZiSfmaZ8SvGXhwiJ89xIZH/MDb+SfpSORwqE96sFiIKZ7UhvPvcumPNTqFT0AZ7b0mviDdyY9anLwg0KH7L5d9zTvluQpFMw+IxFB+pHtmktm+Y+k/KmnCj4Mky9tCKQE4pMGu+gHSNQvv70tmcnAAzk7V07tLK7AasSSa6YLHnXUaE4rIKHKxHrJXpGwpG7dbs3qc1NuZgI2CknOmpqBU5Uj/2Q==", "Bezalel Smotrich": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABQYBAgQDB//EADIQAAIBAwEFBQUJAAAAAAAAAAECAwAEEQUGEiExQRNRYYHBFHGRodEWIiMyQlKx4fD/xAAYAQADAQEAAAAAAAAAAAAAAAADBAUBAP/EACIRAAIBAwMFAQAAAAAAAAAAAAABAgMRIQQiMRITMkFRcf/aAAwDAQACEQMRAD8AMbT2AvLJpVA7W3y4Ph1H+7qUHhk1bWopbpi0pAAJHMAf1TJtZqJVk022y0sxG+B3dB5mrPYewm3hn3WlhAOR4g58vpRajcdOk/bx+GUoqVU0wW9qiBUhjBxjIUZrM9lZm5XtYIQh57wAzUvZq0yzqzDuGeHwrNe2Yku0mmc4J4Lnljn/ADU5FNrHAU0u2S2geJCTiQ5z34HpiutwKvAECkx8Vbr5Y9KpOadh4om1FuYnaJoNzqzPMkqxIhwGYE7x8KNHRJtJmaaS7Sd1hZjGoO9u5Az8TV7vaHSdnLdbOBvaZohjcjP6uuTyHH30saXtXN9rBqmoEGGYdjKg4hIz0Hu50xV1U53S4YOFKMbN8h+C4TUGKwzHEajI/dWO8XssXBdvzADA4t4c+NH9V2QVnN9os5jEg3t1TkHPUd4rFZabKLiWefNxPbRs6IV3QhCkgnzwBU/pyPdy8QvaKUtY1YFTu8QelUnoFBtjaP8AdubaWI96kMPSiEOp2d8cW06s2M7p4H4UwsCjyeU5qVNVFT7q409O2C2jeXQ5tNc5ubZfwS3Ebh+h9K5RLdw62sM90WmdgyylsBiePkDyxSPoeotperW94MlFbDgdVPOm/aKVV1FZoHBDKroQeGMcCKFUxkc0e6Th9Qr6ramxv57Ns5gcqM88dPlWeG5ktpI54jho2DDyo5tsoOqxXqHKXcIcHvI4H5YpaLYGKIhNqx//2Q==", "Itamar Ben-Gvir": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgABAAMBAQEAAAAAAAAAAAAABAIFBgABA//EAC8QAAIBAwIDBgUFAQAAAAAAAAECAwAEERIhBTFBBhMUUXGBFSJhkcEyM0JS0fD/xAAXAQEAAwAAAAAAAAAAAAAAAAADAQIE/8QAHBEAAwACAwEAAAAAAAAAAAAAAAERAjEDIUES/9oADAMBAAIRAxEAPwDO4pdg3h5PFd0HMf7Yblr6euKPinWwMlqkaAMyyFsddwP8q+iEqzpouJcbm13808kf8Y9WFHsNq5uHixzJbSzQSrnDK2lgfUVfcLVsHMgVs7+tIvreKWIl9LZ8qJZv00PiXhhMzGZxOMknIcDAbzqWKVeqq3bxomkLj3o5FKnVQGo4fXFO4bbpKk7uMCPSSRsevX2omKkszQxyAZww3xUvRC2Ns+H6ZoXWT5mYEA5Bxnr9Kbd2K/EZSZ9LMSdxnC55jb26VXPHJdLG8LuybMAqnUD6g/inAdxa6pXdNJJyxJZifXl/3KgpriKq7j0PIC5fcYPtRsVNpBM7MpyM7V5imxXRmzdZC6vIbbZ2y39V50L4sBNG5jBjDDUuc5XrvQGB58zXaAd/OlgdNLNa3/CV72GRmtW3WRRkYPLNM4Xw6/7RyAySOLZDhpSNvQeZpdrJeXHYBpLWbungQqzDmQvT6bVc9h4OIRcLWWecS2shPdxt+qPG2x8j5VR8a2XWbkMX2rVeHce8PZfLHBEiY5567/egxcSjYYlUofMbikdqJO+7SX7jkJSv22/FVBG9J89B0//Z", "Mansour Abbas": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAABAUGAwEH/8QALxAAAgEDAgUCBQMFAAAAAAAAAQIDAAQRBRITITFBUQZhFCIjgaFxkcEVYtHw8f/EABcBAQEBAQAAAAAAAAAAAAAAAAMCAAT/xAAeEQACAgMBAAMAAAAAAAAAAAAAAQIREiExQQMTMv/aAAwDAQACEQMRAD8ARhssSeu1unjH/aovTd5FZ2t281wkKuyrljzPXpUzGRxWyT0Ipxp9rbXOn3LXVy0CoQSV6sPH4qPCofpDPU9VgttiqGmMgyHZ9igec96VC7+KdjtXaB1Vtyn71rqGpaVbfD20S8bhRBFBzj350Lc6rHcwrHawCOLwo5VB0MFn4ShkQEHIJxzFCznnREpQIxxhyo/ahJTzqnsBpJ6NFl33LELgE8vamFksUxeKZ8BxyHk/6aJ1fRLTTrdZ7a4kkYyBSHXAwc9PPShNPtGurjA3BFXc7DsKXDwKMq2hg2ghY4pFMATaPqOSzN9jypXfXMdrMYLcDbt5+5ppetK3FgWNsQtjCseXIH+aCsdBuL+cu6mKAH5nP8eTU47xXR8tW+GVlave2t1O/wAsUELNuPdgM4/FKRMsihh17jxVnrwTTfTckVtHtjb6QJ7k9f1OM1CRDBHvTv4FST6c32278G7W/wAPcMpkMiEAqT39/anfpR5J9VntVTMHC3SNjuOg6e9T4d9u7BdzgKBzJPYV6Z6Y0f8Ao+krFNg3Ep4kx/uPb7UtKEaDbsGOlcLjXLGPa53nc34rSztbq4VROwEY6YGDjxTT4SKSXiyLubqoJ5L+grmpXcem6dNduBtiQsB5PYVMWot11mlJyST8ID11eiXUI9PiP0bVfmA7uf8AAx+5qVCASDmT368hRE87zyy3M7bnkYux8k1gpwCzdTSGR//Z", "Sami Abou Shehadeh": null};
+const OUTLET_HE = {"Channel 12 (HaHadashot 12)": "ערוץ 12 (חדשות 12)", "Channel 13": "ערוץ 13", "Channel 14 (Direct Polls)": "ערוץ 14", "Israel Hayom": "ישראל היום", "Kan 11": "כאן 11", "Maariv": "מעריב", "Zman Israel / Times of Israel": "זמן ישראל", "i24NEWS": "i24NEWS", "Walla": "וואלה", "TrendZone": "TrendZone"};
+
+let POLLS = [...BASE_POLLS];
+const WIKI_URL = "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election";
+const MAX_BAKED_DATE = BASE_POLLS.map(p => p.date).sort().pop();
+const FIRM_OUTLET = {
+  'Midgam': 'Channel 12 (HaHadashot 12)', 'Lazar': 'Maariv',
+  'Yossi Taktika': 'Zman Israel / Times of Israel', 'Yossi Tatika': 'Zman Israel / Times of Israel',
+  'Filber': 'Channel 14 (Direct Polls)', 'Maagar Mochot': 'Channel 13',
+  'Kantar': 'Israel Hayom', 'Direct Polls': 'i24NEWS',
+};
+const MONTHS = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+const GOV_PARTIES = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ"];
+
+function median(arr) { const s=[...arr].sort((a,b)=>a-b), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function outletDisplay(o) { return OUTLET_HE[o] || o; }
+function heDate(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}.${y}`; }
+function heDateShort(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}`; }
+function initials(name) { return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
+const DAY = 24*60*60*1000;
+function isoToT(iso) { return new Date(iso + 'T00:00:00Z').getTime(); }
+function tToIso(t) { return new Date(t).toISOString().slice(0,10); }
+
+/* ---------- dual range slider ---------- */
+function makeSlider(containerId, labelId, onChange) {
+  const cont = document.getElementById(containerId);
+  const label = document.getElementById(labelId);
+  cont.innerHTML = '<div class="track"></div><div class="fill"></div><input type="range" class="lo"><input type="range" class="hi">';
+  const lo = cont.querySelector('.lo'), hi = cont.querySelector('.hi'), fill = cont.querySelector('.fill');
+  const api = {
+    minT: 0,
+    setBounds(minIso, maxIso, keepValues) {
+      const prevLo = keepValues ? api.getLoIso() : null;
+      const prevHi = keepValues ? api.getHiIso() : null;
+      api.minT = isoToT(minIso);
+      const days = Math.max(1, Math.round((isoToT(maxIso) - api.minT) / DAY));
+      lo.min = 0; lo.max = days; hi.min = 0; hi.max = days;
+      if (keepValues && prevLo && prevHi) api.setRange(prevLo, prevHi, true);
+    },
+    idxToIso(i) { return tToIso(api.minT + i * DAY); },
+    isoToIdx(iso) { return Math.max(0, Math.min(+lo.max, Math.round((isoToT(iso) - api.minT) / DAY))); },
+    getLoIso() { return api.idxToIso(Math.min(+lo.value, +hi.value)); },
+    getHiIso() { return api.idxToIso(Math.max(+lo.value, +hi.value)); },
+    setRange(fromIso, toIso, silent) {
+      lo.value = api.isoToIdx(fromIso);
+      hi.value = api.isoToIdx(toIso);
+      api.paint();
+      if (!silent) onChange();
+    },
+    paint() {
+      const max = +lo.max || 1;
+      const a = Math.min(+lo.value, +hi.value) / max * 100;
+      const b = Math.max(+lo.value, +hi.value) / max * 100;
+      fill.style.left = a + '%';
+      fill.style.width = (b - a) + '%';
+      label.textContent = heDate(api.getLoIso()) + ' — ' + heDate(api.getHiIso());
+    }
+  };
+  const rafFn = (typeof requestAnimationFrame === 'function') ? requestAnimationFrame : (cb => setTimeout(cb, 16));
+  let pending = false;
+  function handle() {
+    api.paint();
+    if (pending) return;
+    pending = true;
+    rafFn(() => { pending = false; onChange(); });
+  }
+  lo.addEventListener('input', handle);
+  hi.addEventListener('input', handle);
+  return api;
+}
+
+/* ---------- generic multi-select dropdown ---------- */
+function makeMultiSelect(ddId, summaryId, menuId, items, defaults, storageKey, allLabel, onChange) {
+  // items: [{id, name, color?}]
+  let selected = new Set(defaults);
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    if (saved && Array.isArray(saved)) selected = new Set(saved.filter(id => items.some(x => x.id === id)));
+  } catch (e) {}
+  const menu = document.getElementById(menuId);
+  const summary = document.getElementById(summaryId);
+  function save() { try { localStorage.setItem(storageKey, JSON.stringify([...selected])); } catch (e) {} }
+  function updateSummary() {
+    summary.textContent = selected.size === items.length ? allLabel : (selected.size === 0 ? 'לא נבחרו' : `${selected.size} מתוך ${items.length}`);
+  }
+  function rebuild() {
+    menu.innerHTML = '<div class="dd-actions"><button type="button" class="dd-all">בחר הכל</button><button type="button" class="dd-none">נקה</button></div>';
+    items.forEach(it => {
+      const item = document.createElement('label');
+      item.className = 'dd-item';
+      item.innerHTML = (it.color ? `<span class="dot" style="background:${it.color}"></span>` : '') +
+        `<input type="checkbox" ${selected.has(it.id) ? 'checked' : ''}> ${it.name}`;
+      item.querySelector('input').addEventListener('change', (e) => {
+        if (e.target.checked) selected.add(it.id); else selected.delete(it.id);
+        save(); updateSummary(); onChange();
+      });
+      menu.appendChild(item);
+    });
+    menu.querySelector('.dd-all').addEventListener('click', () => {
+      items.forEach(it => selected.add(it.id));
+      save(); rebuild(); updateSummary(); onChange();
+    });
+    menu.querySelector('.dd-none').addEventListener('click', () => {
+      selected.clear();
+      save(); rebuild(); updateSummary(); onChange();
+    });
+  }
+  rebuild(); updateSummary();
+  document.addEventListener('click', (e) => {
+    const dd = document.getElementById(ddId);
+    if (dd.open && !dd.contains(e.target)) dd.removeAttribute('open');
+  });
+  return {
+    get: () => selected,
+    setItems(newItems) { items = newItems; rebuild(); updateSummary(); },
+  };
+}
+
+/* ---------- refresh ---------- */
+function convVal(v) {
+  v = (v||'').trim();
+  if (/^\d+$/.test(v)) return parseInt(v,10);
+  if (/^\([\d.]+%\)$/.test(v)) return 0;
+  return null;
+}
+function parseDateToISO(s) {
+  s = s.replace(/–|—/g,'-').trim();
+  const parts = s.split('-');
+  const last = parts[parts.length-1].trim();
+  let m = last.match(/(\d{1,2})\s+([A-Za-z]+)/), day, mon;
+  if (m) { day = +m[1]; mon = MONTHS[m[2].slice(0,3)]; }
+  else {
+    const m2 = last.match(/^(\d{1,2})$/), m3 = parts[0].match(/([A-Za-z]+)/);
+    if (!m2 || !m3) return null;
+    day = +m2[1]; mon = MONTHS[m3[1].slice(0,3)];
+  }
+  if (!mon || !day || day > 31) return null;
+  return (mon === 12 ? 2025 : 2026) + '-' + String(mon).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+}
+const LAYOUTS = [
+  { hasSample: true,  cols: ["Likud","Together","Religious Zionism","Otzma Yehudit","National Unity","Shas","UTJ","Yisrael Beiteinu","Ra'am","Hadash-Ta'al","Balad","The Democrats","Yashar","Yesodot Yisrael"] },
+  { hasSample: false, cols: ["Likud","Yesh Atid","Religious Zionism","Otzma Yehudit","National Unity","Shas","UTJ","Yisrael Beiteinu","Ra'am","Hadash-Ta'al","Balad","The Democrats","Bennett 2026","Yashar","Reservists"] },
+];
+function parseWikiText(text) {
+  const results = [];
+  for (const line of text.split('\n')) {
+    const fields = line.split(';').map(f => f.trim());
+    if (fields.length < 14 || fields.length > 22) continue;
+    const ci = fields[0].indexOf(':');
+    if (ci < 0) continue;
+    const datePart = fields[0].slice(0, ci).trim();
+    const firm = fields[0].slice(ci+1).trim();
+    if (!/^\d/.test(datePart) || !firm || firm === 'TBA') continue;
+    const iso = parseDateToISO(datePart);
+    if (!iso) continue;
+    const publisher = fields[1];
+    for (const layout of LAYOUTS) {
+      const start = layout.hasSample ? 3 : 2;
+      const vals = fields.slice(start).map(convVal);
+      if (vals.length < layout.cols.length) continue;
+      const rec = { date: iso, pollster: firm, outlet: FIRM_OUTLET[firm] || publisher };
+      layout.cols.forEach((c, i) => rec[c] = vals[i]);
+      const govsum = GOV_PARTIES.reduce((a, p) => a + (rec[p] || 0), 0);
+      const tail = vals.slice(layout.cols.length);
+      const gv = tail.find(t => t !== null && Math.abs(t - govsum) <= 1);
+      const totalSeats = layout.cols.reduce((a, p) => a + (rec[p] || 0), 0);
+      if (gv !== undefined && totalSeats >= 95 && totalSeats <= 122) {
+        rec._govTotal = gv;
+        results.push(rec);
+        break;
+      }
+    }
+  }
+  return results;
+}
+async function tryRefresh() {
+  const statusEl = document.getElementById('refreshStatus');
+  if (!(window.cowork && window.cowork.callMcpTool)) {
+    statusEl.textContent = 'מציג נתונים שמורים (רענון חי אינו זמין).';
+    return;
+  }
+  try {
+    const r = await window.cowork.callMcpTool('mcp__workspace__web_fetch', { url: WIKI_URL });
+    if (r.isError) throw new Error('fetch');
+    const text = (r.content || []).map(c => c.text || '').join('\n');
+    if (!text || text.length < 1000) throw new Error('empty');
+    const parsed = parseWikiText(text);
+    const keys = new Set(POLLS.map(p => p.date + '|' + p.pollster));
+    const fresh = parsed.filter(p => p.date > MAX_BAKED_DATE && !keys.has(p.date + '|' + p.pollster));
+    fresh.forEach(p => p._new = true);
+    if (fresh.length > 0) {
+      POLLS = [...POLLS, ...fresh].sort((a,b) => a.date < b.date ? -1 : 1);
+      initBounds(true);
+      rebuildOutlets();
+      statusEl.textContent = `עודכן: נוספו ${fresh.length} סקרים חדשים מוויקיפדיה.`;
+      statusEl.className = 'refresh-status ok';
+    } else {
+      statusEl.textContent = 'הנתונים עדכניים — אין סקרים חדשים בוויקיפדיה.';
+      statusEl.className = 'refresh-status ok';
+    }
+  } catch (e) {
+    statusEl.textContent = 'רענון נכשל — מציג נתונים שמורים.';
+    statusEl.className = 'refresh-status warn';
+  }
+  renderAll();
+}
+
+/* ---------- bloc assignments ---------- */
+const BLOC_DEFAULTS = {};
+PARTIES.forEach(p => { BLOC_DEFAULTS[p.id] = GOV_PARTIES.includes(p.id) ? 'coal' : 'opp'; });
+let blocAssign = null;
+function loadBlocAssign() {
+  if (blocAssign) return blocAssign;
+  blocAssign = { ...BLOC_DEFAULTS };
+  try {
+    const saved = JSON.parse(localStorage.getItem('ilpolls_blocs') || 'null');
+    if (saved) for (const k in saved) if (k in blocAssign && ['coal','opp','other'].includes(saved[k])) blocAssign[k] = saved[k];
+  } catch (e) {}
+  return blocAssign;
+}
+function saveBlocAssign() { try { localStorage.setItem('ilpolls_blocs', JSON.stringify(blocAssign)); } catch (e) {} }
+function pollBlocs(p) {
+  const assign = loadBlocAssign();
+  const allIds = PARTIES.map(x => x.id);
+  const known = allIds.filter(n => p[n] !== null && p[n] !== undefined).length;
+  if (known < 8) return null;
+  let gov = 0, opp = 0;
+  allIds.forEach(n => {
+    const v = p[n] || 0;
+    if (assign[n] === 'coal') gov += v;
+    else if (assign[n] === 'opp') opp += v;
+  });
+  if (gov + opp > 120) return null;
+  return { gov, opp, other: 120 - gov - opp };
+}
+
+/* ---------- half-donut ---------- */
+function polar(cx, cy, r, frac) {
+  const t = Math.PI * (1 - frac);
+  return [cx + r * Math.cos(t), cy - r * Math.sin(t)];
+}
+function donutSegment(cx, cy, rOut, rIn, f1, f2) {
+  const [x1o,y1o] = polar(cx,cy,rOut,f1), [x2o,y2o] = polar(cx,cy,rOut,f2);
+  const [x1i,y1i] = polar(cx,cy,rIn,f1), [x2i,y2i] = polar(cx,cy,rIn,f2);
+  return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rOut} ${rOut} 0 0 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rIn} ${rIn} 0 0 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
+}
+function renderBlocDonut(filtered) {
+  const svg = document.getElementById('blocChart');
+  const note = document.getElementById('blocNote');
+  const eligible = filtered.map(pollBlocs).filter(Boolean);
+  if (!eligible.length) { svg.innerHTML = ''; note.textContent = 'אין מספיק נתונים בטווח שנבחר.'; return; }
+  let g = Math.round(mean(eligible.map(e => e.gov)));
+  let o = Math.round(mean(eligible.map(e => e.opp)));
+  if (g + o > 120) o = 120 - g;
+  const b = { gov: g, opp: o, other: Math.max(0, 120 - g - o), n: eligible.length };
+  const RED='#d0342c', BLUE='#1c5fb8', GRAY='#9aa3b0';
+  const cx=210, cy=200, rOut=148, rIn=92;
+  const fOpp = Math.max(0, Math.min(1, b.opp/120));
+  const fOther = Math.max(0, Math.min(1 - fOpp, b.other/120));
+  const segs = [
+    { f1:0, f2:fOpp, color:BLUE, seats:b.opp },
+    { f1:fOpp, f2:fOpp+fOther, color:GRAY, seats:b.other },
+    { f1:fOpp+fOther, f2:1, color:RED, seats:b.gov },
+  ];
+  let s = segs.filter(x => x.f2 - x.f1 > 0.0005).map(x => `<path d="${donutSegment(cx,cy,rOut,rIn,x.f1,x.f2)}" fill="${x.color}"/>`).join('');
+  const [mx1,my1] = polar(cx,cy,rIn-6,0.5), [mx2,my2] = polar(cx,cy,rOut+6,0.5);
+  s += `<line x1="${mx1}" y1="${my1}" x2="${mx2}" y2="${my2}" stroke="#1a2233" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  s += `<text x="${cx}" y="${my2-8}" text-anchor="middle" font-size="12" fill="#1a2233">61 לרוב</text>`;
+  const rMid = (rIn+rOut)/2;
+  segs.forEach(x => {
+    if (x.f2 - x.f1 >= 0.1) {
+      const [nx, ny] = polar(cx, cy, rMid, (x.f1 + x.f2) / 2);
+      s += `<text x="${nx.toFixed(1)}" y="${(ny+10).toFixed(1)}" text-anchor="middle" font-size="30" font-weight="700" fill="#fff">${x.seats}</text>`;
+    }
+  });
+  s += `<text x="${cx+rMid}" y="${cy+24}" text-anchor="middle" font-size="15" font-weight="700" fill="${RED}">הקואליציה ${b.gov}</text>`;
+  s += `<text x="${cx-rMid}" y="${cy+24}" text-anchor="middle" font-size="15" font-weight="700" fill="${BLUE}">האופוזיציה ${b.opp}</text>`;
+  s += `<text x="${cx}" y="${cy-30}" text-anchor="middle" font-size="16" font-weight="700" fill="#5a6472">${b.other}</text>`;
+  s += `<text x="${cx}" y="${cy-14}" text-anchor="middle" font-size="11" fill="#5a6472">אחרים</text>`;
+  svg.innerHTML = s;
+  note.textContent = `ממוצע על ${b.n} סקרים, לפי שיוך הגושים שבטבלה. "אחרים" כולל קולות מתחת לאחוז החסימה.`;
+}
+
+/* ---------- shared line chart ---------- */
+function drawLineChart(svgEl, series, opts) {
+  const W = opts.W, H = opts.H, ML = 26, MR = 34, MT = 8, MB = 22;
+  if (!series.length || series.every(x => !x.pts.length)) {
+    svgEl.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="#6b7686">אין נתונים בטווח</text>`;
+    return;
+  }
+  const allDates = [...new Set(series.flatMap(x => x.pts.map(p => p[0])))].sort();
+  const t0 = isoToT(allDates[0]), t1 = isoToT(allDates[allDates.length-1]);
+  const span = Math.max(t1 - t0, 1);
+  const X = iso => ML + (isoToT(iso) - t0) / span * (W - ML - MR);
+  let yMax = opts.yMin || 10;
+  series.forEach(x => x.pts.forEach(p => yMax = Math.max(yMax, p[1])));
+  yMax = Math.ceil(yMax / 5) * 5;
+  const Y = v => MT + (1 - v / yMax) * (H - MT - MB);
+  const gStep = yMax > 40 ? 10 : 5;
+  let s = '';
+  for (let g = 0; g <= yMax; g += gStep) {
+    s += `<line x1="${ML}" y1="${Y(g)}" x2="${W-MR}" y2="${Y(g)}" stroke="#e8ecf2" stroke-width="1"/>`;
+    s += `<text x="${ML-5}" y="${Y(g)+3.5}" text-anchor="end" font-size="9.5" fill="#6b7686">${g}</text>`;
+  }
+  if (opts.line61 && yMax >= 61) {
+    s += `<line x1="${ML}" y1="${Y(61)}" x2="${W-MR}" y2="${Y(61)}" stroke="#1a2233" stroke-width="1" stroke-dasharray="4 3"/>`;
+    s += `<text x="${W-MR+2}" y="${Y(61)+3.5}" font-size="9" fill="#1a2233">61</text>`;
+  }
+  const nTicks = Math.min(6, allDates.length);
+  for (let i = 0; i < nTicks; i++) {
+    const d = allDates[Math.round(i * (allDates.length-1) / Math.max(nTicks-1,1))];
+    s += `<text x="${X(d)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="#6b7686">${heDateShort(d)}</text>`;
+  }
+  series.forEach(({name, color, pts, thick}) => {
+    if (!pts.length) return;
+    const path = pts.map(([d,v], i) => (i ? 'L' : 'M') + X(d).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+    s += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${thick ? 2.6 : 1.7}" stroke-linejoin="round"/>`;
+    pts.forEach(([d,v]) => {
+      s += `<circle cx="${X(d).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${thick ? 2.4 : 1.9}" fill="${color}"><title>${name}: ${v.toFixed(1)} (${heDate(d)})</title></circle>`;
+    });
+    const [ld, lv] = pts[pts.length-1];
+    s += `<text x="${(X(ld)+4).toFixed(1)}" y="${(Y(lv)+3.5).toFixed(1)}" font-size="10" font-weight="600" fill="${color}">${Math.round(lv)}</text>`;
+  });
+  svgEl.innerHTML = s;
+}
+function perDateSeries(filtered, valueFn) {
+  const dates = [...new Set(filtered.map(p => p.date))].sort();
+  const pts = [];
+  dates.forEach(d => {
+    const vals = filtered.filter(x => x.date === d).map(valueFn).filter(v => v !== null && v !== undefined);
+    if (vals.length) pts.push([d, mean(vals)]);
+  });
+  return pts;
+}
+
+/* ---------- party half ---------- */
+function renderPartyHalf() {
+  const act = outletSel.get();
+  const from = partySlider.getLoIso(), to = partySlider.getHiIso();
+  const filtered = POLLS.filter(p => p.date >= from && p.date <= to && act.has(p.outlet));
+  document.getElementById('partySummary').textContent = filtered.length ? `${filtered.length} סקרים` : 'אין סקרים';
+
+  const emptyState = document.getElementById('emptyState');
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+  if (!filtered.length) { emptyState.style.display = 'block'; }
+  else {
+    emptyState.style.display = 'none';
+    const rows = PARTIES.filter(p => p.active !== false).map(party => {
+      const vals = filtered.map(p => p[party.id]).filter(v => v !== null && v !== undefined);
+      if (!vals.length) return null;
+      return { party, avg: mean(vals), med: median(vals), n: vals.length };
+    }).filter(Boolean);
+    rows.sort((a,b) => b.avg - a.avg);
+    const maxAvg = Math.max(...rows.map(r => r.avg), 1);
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const src = PHOTOS[r.party.photoKey];
+      const avatar = src
+        ? `<img class="avatar" src="${src}" alt="${r.party.leader}">`
+        : `<div class="avatar-fallback" style="background:${r.party.color}">${initials(r.party.leader)}</div>`;
+      const assign = loadBlocAssign()[r.party.id];
+      const seg = `<span class="bloc-seg" data-party="${r.party.id}">` +
+        `<button data-bloc="coal" class="${assign==='coal'?'sel-coal':''}" title="שיוך לקואליציה">קוא׳</button>` +
+        `<button data-bloc="opp" class="${assign==='opp'?'sel-opp':''}" title="שיוך לאופוזיציה">אופ׳</button>` +
+        `<button data-bloc="other" class="${assign==='other'?'sel-other':''}" title="שיוך לאחרים">אחר</button></span>`;
+      tr.innerHTML = `
+        <td><div class="party-cell">${avatar}<div class="party-info"><span class="party-name">${r.party.name}</span><span class="leader-name">${r.party.leader}</span></div>${seg}</div></td>
+        <td><span class="num">${r.avg.toFixed(1)}</span><div class="bar-bg"><div class="bar-fill" style="width:${(r.avg/maxAvg*100).toFixed(0)}%;background:${r.party.color}"></div></div></td>
+        <td class="num">${r.med.toFixed(1)}</td>
+        <td class="pollcount">${r.n}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // party trend
+  const sel = partySel.get();
+  const series = PARTIES.filter(p => sel.has(p.id)).map(p => ({
+    name: p.name, color: p.color,
+    pts: perDateSeries(filtered, x => x[p.id]),
+  }));
+  drawLineChart(document.getElementById('partyTrend'), series, { W:560, H:210 });
+}
+
+/* ---------- bloc half ---------- */
+function renderBlocHalf() {
+  const act = outletSel.get();
+  const from = blocSlider.getLoIso(), to = blocSlider.getHiIso();
+  const filtered = POLLS.filter(p => p.date >= from && p.date <= to && act.has(p.outlet));
+  document.getElementById('blocSummary').textContent = filtered.length ? `${filtered.length} סקרים` : 'אין סקרים';
+  renderBlocDonut(filtered);
+  const series = [
+    { name:'הקואליציה', color:'#d0342c', thick:true, pts: perDateSeries(filtered, p => { const b = pollBlocs(p); return b ? b.gov : null; }) },
+    { name:'האופוזיציה', color:'#1c5fb8', thick:true, pts: perDateSeries(filtered, p => { const b = pollBlocs(p); return b ? b.opp : null; }) },
+    { name:'אחרים', color:'#9aa3b0', thick:true, pts: perDateSeries(filtered, p => { const b = pollBlocs(p); return b ? b.other : null; }) },
+  ];
+  drawLineChart(document.getElementById('blocTrend'), series, { W:480, H:220, line61:true, yMin:65 });
+}
+
+/* ---------- poll log ---------- */
+function renderPollLog() {
+  const act = outletSel.get();
+  document.getElementById('pollLog').innerHTML = [...POLLS]
+    .filter(p => act.has(p.outlet))
+    .sort((a,b) => a.date < b.date ? 1 : -1)
+    .map(p => `<div${p._new ? ' class="newpoll"' : ''}>${heDate(p.date)} — ${p.pollster} / ${outletDisplay(p.outlet)}${p._new ? ' (חדש)' : ''}</div>`)
+    .join('');
+}
+function renderAll() { renderPartyHalf(); renderBlocHalf(); renderPollLog(); }
+
+/* ---------- init ---------- */
+const partySlider = makeSlider('partyRange', 'partyRangeLabel', renderPartyHalf);
+const blocSlider = makeSlider('blocRange', 'blocRangeLabel', renderBlocHalf);
+
+let outletSel = null, partySel = null;
+function outletItems() {
+  return [...new Set(POLLS.map(p => p.outlet))].sort().map(o => ({ id: o, name: outletDisplay(o) }));
+}
+function rebuildOutlets() { outletSel.setItems(outletItems()); }
+
+function initBounds(keep) {
+  const dates = POLLS.map(p => p.date).sort();
+  const minD = dates[0], maxD = dates[dates.length-1];
+  partySlider.setBounds(minD, maxD, keep);
+  blocSlider.setBounds(minD, maxD, keep);
+  if (!keep) {
+    let defFrom = tToIso(Date.now() - 2*DAY);
+    if (defFrom < minD) defFrom = minD;
+    if (!POLLS.some(p => p.date >= defFrom)) defFrom = maxD;
+    partySlider.setRange(defFrom, maxD, true);
+    blocSlider.setRange(minD, maxD, true);
+  }
+}
+
+document.getElementById('resultsBody').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-bloc]');
+  if (!btn) return;
+  const segEl = btn.closest('.bloc-seg');
+  loadBlocAssign();
+  blocAssign[segEl.getAttribute('data-party')] = btn.getAttribute('data-bloc');
+  saveBlocAssign();
+  segEl.querySelectorAll('button').forEach(b => b.className = '');
+  btn.className = 'sel-' + btn.getAttribute('data-bloc');
+  renderBlocHalf();
+});
+document.getElementById('toggleLog').addEventListener('click', () => {
+  const log = document.getElementById('pollLog');
+  log.classList.toggle('show');
+  document.getElementById('toggleLog').textContent = log.classList.contains('show') ? 'הסתר סקרים כלולים' : 'הצג סקרים כלולים';
+});
+
+initBounds(false);
+outletSel = makeMultiSelect('outletDD', 'outletSummary', 'outletList',
+  outletItems(), outletItems().map(x => x.id), 'ilpolls_outlets', 'כל כלי התקשורת', renderAll);
+partySel = makeMultiSelect('partyDD', 'partySelSummary', 'partySelList',
+  PARTIES.map(p => ({ id: p.id, name: p.name, color: p.color })),
+  ["Likud","Yashar","Together","The Democrats","Shas","Yisrael Beiteinu"],
+  'ilpolls_trendparties', 'כל המפלגות', renderPartyHalf);
+renderAll();
+tryRefresh();
+</script>
+</body>
+</html>
