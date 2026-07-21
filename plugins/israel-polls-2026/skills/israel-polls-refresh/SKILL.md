@@ -5,7 +5,7 @@ description: Fetch new Israel 2026 Knesset election polls from Wikipedia and upd
 
 # Israel Polls Refresh
 
-Fetch any polls newer than what's currently baked into the `israel-2026-election-polls` artifact, add them, and update the artifact.
+Fetch any polls newer than what's currently baked into the `israel-2026-election-polls` artifact, add them, and update the artifact and GitHub repository.
 
 ## Step 1 — Find the current max baked date
 
@@ -26,10 +26,20 @@ print(max(dates) if dates else '2025-12-01')
 
 Replace `ARTIFACT_PATH` with the actual path returned by `list_artifacts`.
 
-## Step 2 — Fetch Wikipedia
+## Step 2 — Fetch Wikipedia (with cache-busting)
 
-Use `mcp__workspace__web_fetch` with:
-- `url`: `https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election`
+`mcp__workspace__web_fetch` caches responses by URL. Append a timestamp to force a fresh fetch every time.
+
+**First**, generate the timestamp in bash:
+
+```bash
+python3 -c "import time; print(int(time.time()))"
+```
+
+**Then** call `mcp__workspace__web_fetch` with:
+- `url`: `https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election?_t=TIMESTAMP`
+
+Replace `TIMESTAMP` with the integer from bash above. Each run produces a unique URL, guaranteeing an uncached response.
 
 The tool may save the result to a file if it's too large — read it from there if so.
 
@@ -48,7 +58,7 @@ FIRM_OUTLET = {
     'Midgam':'Channel 12 (HaHadashot 12)','Lazar':'Maariv',
     'Yossi Taktika':'Zman Israel / Times of Israel','Yossi Tatika':'Zman Israel / Times of Israel',
     'Filber':'Channel 14 (Direct Polls)','Maagar Mochot':'Channel 13',
-    'Kantar':'Israel Hayom','Direct Polls':'i24NEWS',
+    'Direct Polls':'i24NEWS',
 }
 GOV = ['Likud','Religious Zionism','Otzma Yehudit','Shas','UTJ']
 LAYOUTS = [
@@ -119,10 +129,24 @@ If there are new polls:
 1. Read the artifact HTML (from the path found in step 1).
 2. Locate the `BASE_POLLS = [` line. Find the closing `];` that ends the array.
 3. Convert each new poll object to a JSON object literal and **append** them just before the closing `];` (BASE_POLLS is sorted oldest-first, Wikipedia gives newest-first so reverse them before inserting).
-4. Write the updated HTML to a temp file in the outputs directory.
+4. Write the updated HTML to a temp file in the outputs directory. **Keep the full updated HTML string in memory — needed for step 5.**
 5. Call `mcp__cowork__update_artifact`:
    - `id`: `israel-2026-election-polls`
    - `html_path`: the temp file path
-   - `update_summary`: `"רענון שבועי — N סקרים חדשים"` (replace N)
+   - `update_summary`: `"רענון — N סקרים חדשים"` (replace N)
    - `mcp_tools`: `[]`
-6. Report: "רענון הצליח — N סקרים חדשים נוספו"
+
+## Step 5 — Push to GitHub
+
+Call `mcp__github__push_files` with:
+- `owner`: `amitlev`
+- `repo`: `israel-polls-2026`
+- `branch`: `main`
+- `message`: `"רענון אוטומטי — N סקרים חדשים (YYYY-MM-DD)"` (replace N and date)
+- `files`: one entry:
+  - `path`: `plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html`
+  - `content`: the full updated HTML string already in memory from step 4 — do **not** re-read the file
+
+## Step 6 — Report
+
+Report: `"רענון הצליח — N סקרים חדשים נוספו ✓ GitHub עודכן"`
