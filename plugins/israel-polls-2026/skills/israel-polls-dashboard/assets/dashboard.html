@@ -224,6 +224,7 @@ const OUTLET_HE = {"Channel 12 (HaHadashot 12)": "ערוץ 12 (חדשות 12)", 
 let POLLS = [...BASE_POLLS];
 const WIKI_URL = "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election";
 const MAX_BAKED_DATE = BASE_POLLS.map(p => p.date).sort().pop();
+const BAKED_DATE = (() => { const d = MAX_BAKED_DATE; return d ? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : '—'; })();
 const FIRM_OUTLET = {
   'Midgam': 'Channel 12 (HaHadashot 12)', 'Lazar': 'Maariv',
   'Yossi Taktika': 'Zman Israel / Times of Israel', 'Yossi Tatika': 'Zman Israel / Times of Israel',
@@ -338,24 +339,27 @@ function parseWikiText(text) {
   }
   return results;
 }
-function fmtTimestamp() {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2,'0');
-  const min = String(d.getMinutes()).padStart(2,'0');
-  return `עודכן: ${dd}/${mm}/${yyyy} ${hh}:${min}`;
-}
 async function tryRefresh() {
+  const statusEl = document.getElementById('refreshStatus');
+  const timeEl = document.getElementById('lastUpdateTime');
+  statusEl.textContent = `נתונים מעודכנים ל-${BAKED_DATE}`; statusEl.className = 'refresh-status ok';
+  timeEl.textContent = '';
+}
+async function _tryRefresh_unused() {
   const statusEl = document.getElementById('refreshStatus');
   const timeEl = document.getElementById('lastUpdateTime');
   if (!(window.cowork && window.cowork.callMcpTool)) { statusEl.textContent = 'נתונים שמורים'; return; }
   try {
     const r = await window.cowork.callMcpTool('mcp__workspace__web_fetch', { url: WIKI_URL });
-    if (r.isError) throw new Error('fetch');
-    const text = (r.content || []).map(c => c.text || '').join('\n');
-    if (!text || text.length < 1000) throw new Error('empty');
+    if (r.isError) {
+      const errMsg = Array.isArray(r.content) ? r.content.map(c=>c.text||'').join('') : String(r.content||'');
+      throw new Error('fetch: ' + errMsg.slice(0, 80));
+    }
+    let text = '';
+    if (Array.isArray(r.content)) text = r.content.map(c => c.text || '').join('\n');
+    else if (typeof r.content === 'string') text = r.content;
+    else if (r.structuredContent) text = typeof r.structuredContent === 'string' ? r.structuredContent : JSON.stringify(r.structuredContent);
+    if (!text || text.length < 1000) throw new Error(`empty (${text?.length ?? 0} chars, keys: ${Object.keys(r).join(',')})`);
     const parsed = parseWikiText(text);
     const keys = new Set(POLLS.map(p => p.date + '|' + p.pollster));
     const fresh = parsed.filter(p => p.date > MAX_BAKED_DATE && !keys.has(p.date + '|' + p.pollster));
@@ -366,7 +370,7 @@ async function tryRefresh() {
       statusEl.textContent = `רענון הצליח — ${fresh.length} סקרים חדשים`; statusEl.className = 'refresh-status ok';
     } else { statusEl.textContent = 'אין נתונים חדשים מהרענון האחרון'; statusEl.className = 'refresh-status ok'; }
     timeEl.textContent = fmtTimestamp();
-  } catch (e) { statusEl.textContent = 'רענון נכשל'; statusEl.className = 'refresh-status warn'; timeEl.textContent = fmtTimestamp(); }
+  } catch (e) { const detail = e && e.message ? e.message.slice(0,80) : String(e).slice(0,80); statusEl.textContent = `רענון נכשל: ${detail}`; statusEl.className = 'refresh-status warn'; timeEl.textContent = fmtTimestamp(); }
   renderAll();
 }
 
