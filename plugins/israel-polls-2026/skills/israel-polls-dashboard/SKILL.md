@@ -5,30 +5,53 @@ description: Install or update the Israel 2026 Knesset election polls dashboard 
 
 # Israel 2026 election polls dashboard
 
-Install a self-contained Hebrew (RTL) dashboard tracking Israeli 2026 Knesset election polls as a persistent Cowork artifact.
+Install a self-contained Hebrew (RTL) dashboard tracking Israeli 2026 Knesset election polls as a persistent Cowork artifact, and set up a weekly scheduled task that automatically fetches new polls from Wikipedia.
 
-The dashboard HTML is bundled at `assets/dashboard.html` relative to this skill directory. It is fully self-contained: 141+ baked-in polls (January-July 2026, sourced from Wikipedia's "Opinion polling for the 2026 Israeli legislative election"), embedded party-leader photos, and JavaScript that auto-refreshes newer polls from Wikipedia on every open.
+The dashboard HTML is bundled at `assets/dashboard.html` relative to this skill directory. It contains 141+ baked-in polls (January–July 2026) sourced from Wikipedia. A separate `israel-polls-refresh` skill (also in this plugin) handles fetching newer polls and is invoked automatically by the scheduled task.
 
 ## Installation steps
 
-1. Read the bundled file `assets/dashboard.html` (in this skill's directory).
-2. Copy it to a file in your workspace scratch directory.
-3. Create a Cowork artifact from it:
-   - Call `mcp__cowork__create_artifact` with:
-     - `id`: `israel-2026-election-polls`
-     - `html_path`: the copied file path
-     - `description`: "לוח סקרי הבחירות לכנסת 2026 — ממוצעי מנדטים לפי מפלגה, חלוקה לגושים, וגרפי מגמות. מתרענן אוטומטית מוויקיפדיה."
-     - `mcp_tools`: `["mcp__workspace__web_fetch"]` — the dashboard calls this tool at load time to pull new polls from Wikipedia.
-   - If an artifact with that id already exists, use `mcp__cowork__update_artifact` instead with the same parameters plus a short `update_summary`.
-4. Tell the user the dashboard is installed in their artifacts sidebar and will auto-refresh with new polls each time it opens.
+### 1. Create or update the artifact
+
+Read the bundled file `assets/dashboard.html` (in this skill's directory).
+Copy it to a file in your workspace scratch directory.
+
+Call `mcp__cowork__list_artifacts` to check if `israel-2026-election-polls` already exists.
+
+- If it **does not exist**: call `mcp__cowork__create_artifact` with:
+  - `id`: `israel-2026-election-polls`
+  - `html_path`: the copied file path
+  - `description`: "לוח סקרי הבחירות לכנסת 2026 — ממוצעי מנדטים לפי מפלגה, חלוקה לגושים, וגרפי מגמות."
+  - `mcp_tools`: `[]`
+
+- If it **already exists**: call `mcp__cowork__update_artifact` with the same parameters plus `update_summary`: "עדכון לגרסה העדכנית"
+
+### 2. Set up the weekly scheduled refresh
+
+Call `mcp__scheduled-tasks__list_scheduled_tasks` and check if a task named **"Israel Polls Weekly Refresh"** already exists.
+
+If it does **not** exist, call `mcp__scheduled-tasks__create_scheduled_task` with:
+- `name`: `"Israel Polls Weekly Refresh"`
+- `cronExpression`: `"0 8 * * 1"` (every Monday at 08:00)
+- `prompt`: `"Run the israel-polls-refresh skill to fetch any new Israel 2026 Knesset election polls from Wikipedia and update the israel-2026-election-polls artifact."`
+
+If it already exists, skip this step.
+
+### 3. Confirm to the user
+
+Tell the user:
+- The dashboard is now in their artifacts sidebar.
+- It auto-refreshes with new polls every Monday morning at 08:00.
+- They can also say "refresh Israel polls" any time to trigger an immediate update.
 
 ## Fallback (no artifact support)
 
-If artifact tools are unavailable (e.g., Claude Code rather than Cowork), copy `assets/dashboard.html` to the user's working directory as `israel_2026_polls_dashboard.html` and tell them to open it in a browser. Note that the auto-refresh feature only works inside Cowork artifacts; in a plain browser the dashboard shows its baked-in data.
+If artifact tools are unavailable (e.g., Claude Code rather than Cowork), copy `assets/dashboard.html` to the user's working directory as `israel_2026_polls_dashboard.html` and tell them to open it in a browser. The scheduled refresh won't work outside Cowork; they can run the `israel-polls-refresh` skill manually to get a fresh copy.
 
 ## Dashboard features (for answering user questions)
 
-- Right half "לפי מפלגה": seat-average/median table with leader photos and per-party coalition/opposition/other assignment buttons, plus a party trend chart with a multi-select party picker.
-- Left half "לפי גוש": TV-style half-donut (coalition red, opposition blue, 61-seat majority marker) plus a bloc trend chart. Bloc composition follows the user's assignment buttons and persists in localStorage.
-- Each half has its own dual-handle date-range slider; a media-outlet multi-select dropdown at the top applies to both halves.
-- Data: Wikipedia is the single source of truth. Parties below the 3.25% electoral threshold count as 0 seats. Merged parties (Bennett 2026, Yesh Atid, Reservists) are hidden from the table but included in historical bloc math.
+- Right panel "לפי מפלגה": seat-average/median table with leader photos and per-party coalition/opposition/other assignment buttons, plus a party trend chart.
+- Left panel "לפי גוש": TV-style half-donut (coalition red, opposition blue, 61-seat majority marker) plus a bloc trend chart.
+- Controls: dual-handle date-range slider and a media-outlet multi-select dropdown at the top.
+- Data: Wikipedia is the single source of truth. Parties below the 3.25% electoral threshold count as 0 seats.
+- The header badge shows the date of the most recently baked poll and updates to "רענון הצליח — N סקרים חדשים" after a successful scheduled refresh.
