@@ -26,6 +26,10 @@
   .refresh-status.ok { color:#6eeab3; } .refresh-status.ok::before { background:#6eeab3; }
   .refresh-status.warn { color:#fbbf24; } .refresh-status.warn::before { background:#fbbf24; }
   .last-update-time { font-size:10.5px; color:rgba(255,255,255,.4); margin-inline-start:6px; white-space:nowrap; }
+  .refresh-btn { margin-inline-start:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:11px; font-weight:600; border-radius:20px; padding:4px 12px; cursor:pointer; display:flex; align-items:center; gap:5px; transition:background .15s,border-color .15s; white-space:nowrap; }
+  .refresh-btn:hover { background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.4); }
+  .refresh-btn:active { background:rgba(255,255,255,.08); }
+  .refresh-btn .icon { font-size:13px; line-height:1; }
 
   .wrap { max-width:1280px; margin:0 auto; padding:16px 18px; }
 
@@ -117,6 +121,9 @@
     <span class="sub">מבוסס על ויקיפדיה</span>
     <span class="refresh-status" id="refreshStatus">טוען סקרים עדכניים…</span>
     <span class="last-update-time" id="lastUpdateTime"></span>
+    <button class="refresh-btn" id="refreshBtn" onclick="doManualRefresh()" title="בדוק סקרים חדשים מוויקיפדיה">
+      <span class="icon">↻</span> רענן
+    </button>
   </div>
 </header>
 
@@ -338,6 +345,19 @@ function parseWikiText(text) {
     }
   }
   return results;
+}
+function doManualRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  const statusEl = document.getElementById('refreshStatus');
+  btn.disabled = true;
+  btn.querySelector('.icon').textContent = '⏳';
+  statusEl.textContent = 'שולח בקשת רענון…'; statusEl.className = 'refresh-status';
+  if (typeof sendPrompt === 'function') {
+    sendPrompt('Run the israel-polls-refresh skill');
+  } else {
+    statusEl.textContent = 'הרענון אינו זמין — נסה שוב מחוץ לדפדפן'; statusEl.className = 'refresh-status warn';
+    btn.disabled = false; btn.querySelector('.icon').textContent = '↻';
+  }
 }
 async function tryRefresh() {
   const statusEl = document.getElementById('refreshStatus');
