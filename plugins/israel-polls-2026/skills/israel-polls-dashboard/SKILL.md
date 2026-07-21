@@ -28,11 +28,11 @@ Call `mcp__cowork__list_artifacts` to check if `israel-2026-election-polls` alre
 
 ### 2. Set up the weekly scheduled refresh
 
-Call `mcp__scheduled-tasks__list_scheduled_tasks` and check if a task named **"Israel Polls Weekly Refresh"** already exists.
+Call `mcp__scheduled-tasks__list_scheduled_tasks` and check if a task named **"Israel Polls Twice-Daily Refresh"** already exists.
 
 If it does **not** exist, call `mcp__scheduled-tasks__create_scheduled_task` with:
-- `name`: `"Israel Polls Weekly Refresh"`
-- `cronExpression`: `"0 8 * * 1"` (every Monday at 08:00)
+- `name`: `"Israel Polls Twice-Daily Refresh"`
+- `cronExpression`: `"0 10,22 * * *"` (every day at 10:00 and 22:00)
 - `prompt`: `"Run the israel-polls-refresh skill to fetch any new Israel 2026 Knesset election polls from Wikipedia and update the israel-2026-election-polls artifact."`
 
 If it already exists, skip this step.
@@ -41,7 +41,7 @@ If it already exists, skip this step.
 
 Tell the user:
 - The dashboard is now in their artifacts sidebar.
-- It auto-refreshes with new polls every Monday morning at 08:00.
+- It auto-refreshes with new polls twice daily at 10:00 and 22:00.
 - They can also say "refresh Israel polls" any time to trigger an immediate update.
 
 ## Fallback (no artifact support)
