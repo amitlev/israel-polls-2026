@@ -349,14 +349,13 @@ function parseWikiText(text) {
 function doManualRefresh() {
   const btn = document.getElementById('refreshBtn');
   const statusEl = document.getElementById('refreshStatus');
-  btn.disabled = true;
-  btn.querySelector('.icon').textContent = '⏳';
-  statusEl.textContent = 'שולח בקשת רענון…'; statusEl.className = 'refresh-status';
-  if (typeof sendPrompt === 'function') {
-    sendPrompt('Run the israel-polls-refresh skill');
+  if (window.cowork && window.cowork.runScheduledTask) {
+    btn.disabled = true;
+    btn.querySelector('.icon').textContent = '⏳';
+    statusEl.textContent = 'שולח בקשת רענון…'; statusEl.className = 'refresh-status';
+    window.cowork.runScheduledTask('israel-polls-refresh');
   } else {
-    statusEl.textContent = 'הרענון אינו זמין — נסה שוב מחוץ לדפדפן'; statusEl.className = 'refresh-status warn';
-    btn.disabled = false; btn.querySelector('.icon').textContent = '↻';
+    statusEl.textContent = 'כתוב בצ\'אט: "refresh Israel polls"'; statusEl.className = 'refresh-status warn';
   }
 }
 async function tryRefresh() {
