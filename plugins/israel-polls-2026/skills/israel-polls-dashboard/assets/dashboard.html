@@ -386,30 +386,19 @@ function parseWikiText(text) {
   }
   return results;
 }
-function doManualRefresh() {
+async function fetchFreshPolls() {
+  const statusEl = document.getElementById('refreshStatus');
+  const timeEl = document.getElementById('lastUpdateTime');
   const btn = document.getElementById('refreshBtn');
-  const statusEl = document.getElementById('refreshStatus');
-  if (window.cowork && window.cowork.runScheduledTask) {
-    btn.disabled = true;
-    btn.querySelector('.icon').textContent = '⏳';
-    statusEl.textContent = 'שולח בקשת רענון…'; statusEl.className = 'refresh-status';
-    window.cowork.runScheduledTask('israel-polls-refresh');
-  } else {
+  if (!(window.cowork && window.cowork.callMcpTool)) {
     statusEl.textContent = 'כתוב בצ\'אט: "refresh Israel polls"'; statusEl.className = 'refresh-status warn';
+    return;
   }
-}
-async function tryRefresh() {
-  const statusEl = document.getElementById('refreshStatus');
-  const timeEl = document.getElementById('lastUpdateTime');
-  statusEl.textContent = `נתונים מעודכנים ל-${BAKED_DATE}`; statusEl.className = 'refresh-status ok';
-  timeEl.textContent = '';
-}
-async function _tryRefresh_unused() {
-  const statusEl = document.getElementById('refreshStatus');
-  const timeEl = document.getElementById('lastUpdateTime');
-  if (!(window.cowork && window.cowork.callMcpTool)) { statusEl.textContent = 'נתונים שמורים'; return; }
+  if (btn) { btn.disabled = true; btn.querySelector('.icon').textContent = '⏳'; }
+  statusEl.textContent = 'מושך נתונים מוויקיפדיה…'; statusEl.className = 'refresh-status';
   try {
-    const r = await window.cowork.callMcpTool('mcp__workspace__web_fetch', { url: WIKI_URL });
+    const freshUrl = WIKI_URL + '?_t=' + Date.now();
+    const r = await window.cowork.callMcpTool('mcp__workspace__web_fetch', { url: freshUrl });
     if (r.isError) {
       const errMsg = Array.isArray(r.content) ? r.content.map(c=>c.text||'').join('') : String(r.content||'');
       throw new Error('fetch: ' + errMsg.slice(0, 80));
@@ -418,7 +407,7 @@ async function _tryRefresh_unused() {
     if (Array.isArray(r.content)) text = r.content.map(c => c.text || '').join('\n');
     else if (typeof r.content === 'string') text = r.content;
     else if (r.structuredContent) text = typeof r.structuredContent === 'string' ? r.structuredContent : JSON.stringify(r.structuredContent);
-    if (!text || text.length < 1000) throw new Error(`empty (${text?.length ?? 0} chars, keys: ${Object.keys(r).join(',')})`);
+    if (!text || text.length < 1000) throw new Error(`empty (${text?.length ?? 0} chars)`);
     const parsed = parseWikiText(text);
     const keys = new Set(POLLS.map(p => p.date + '|' + p.pollster));
     const fresh = parsed.filter(p => p.date > MAX_BAKED_DATE && !keys.has(p.date + '|' + p.pollster));
@@ -426,11 +415,25 @@ async function _tryRefresh_unused() {
     if (fresh.length > 0) {
       POLLS = [...POLLS, ...fresh].sort((a,b) => a.date < b.date ? -1 : 1);
       initBounds(true); rebuildOutlets();
-      statusEl.textContent = `רענון הצליח — ${fresh.length} סקרים חדשים`; statusEl.className = 'refresh-status ok';
-    } else { statusEl.textContent = 'אין נתונים חדשים מהרענון האחרון'; statusEl.className = 'refresh-status ok'; }
+      statusEl.textContent = `רענון הצליח — ${fresh.length} סקרים חדשים ✓`; statusEl.className = 'refresh-status ok';
+    } else {
+      statusEl.textContent = 'אין סקרים חדשים'; statusEl.className = 'refresh-status ok';
+    }
     timeEl.textContent = fmtTimestamp();
-  } catch (e) { const detail = e && e.message ? e.message.slice(0,80) : String(e).slice(0,80); statusEl.textContent = `רענון נכשל: ${detail}`; statusEl.className = 'refresh-status warn'; timeEl.textContent = fmtTimestamp(); }
+  } catch (e) {
+    const detail = e && e.message ? e.message.slice(0,80) : String(e).slice(0,80);
+    statusEl.textContent = `רענון נכשל: ${detail}`; statusEl.className = 'refresh-status warn';
+    timeEl.textContent = fmtTimestamp();
+  }
+  if (btn) { btn.disabled = false; btn.querySelector('.icon').textContent = '🔄'; }
   renderAll();
+}
+function doManualRefresh() { fetchFreshPolls(); }
+async function tryRefresh() {
+  const statusEl = document.getElementById('refreshStatus');
+  const timeEl = document.getElementById('lastUpdateTime');
+  statusEl.textContent = `נתונים מעודכנים ל-${BAKED_DATE}`; statusEl.className = 'refresh-status ok';
+  timeEl.textContent = '';
 }
 
 const BLOC_DEFAULTS = {};
