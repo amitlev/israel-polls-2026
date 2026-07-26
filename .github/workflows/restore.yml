@@ -1,0 +1,30 @@
+name: Restore HTML Files from Chunks
+on:
+  push:
+    paths:
+      - '.restore/READY'
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore index.html
+        run: |
+          cat $(ls .restore/index_chunk_*.b64 | sort) | tr -d '\n' | base64 -d > docs/index.html
+          echo "Restored index.html: $(wc -c < docs/index.html) bytes"
+      - name: Restore dashboard.html
+        run: |
+          cat $(ls .restore/dashboard_chunk_*.b64 | sort) | tr -d '\n' | base64 -d > plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html
+          echo "Restored dashboard.html: $(wc -c < plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html) bytes"
+      - name: Commit restored files
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add docs/index.html
+          git add plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html
+          git commit -m "תיקון: fmtTimestamp — שחזור קובץ GitHub Pages"
+          git push
