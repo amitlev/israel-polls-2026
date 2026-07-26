@@ -14,11 +14,11 @@ jobs:
           fetch-depth: 0
       - name: Restore index.html
         run: |
-          cat $(ls .restore/index_chunk_*.b64 | sort) | tr -d '\n' | base64 -d > docs/index.html
+          cat $(ls .restore/index_chunk_*.b64 | sort) | tr -d '\n\r' | base64 -d -i > docs/index.html
           echo "Restored index.html: $(wc -c < docs/index.html) bytes"
       - name: Restore dashboard.html
         run: |
-          cat $(ls .restore/dashboard_chunk_*.b64 | sort) | tr -d '\n' | base64 -d > plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html
+          cat $(ls .restore/dashboard_chunk_*.b64 | sort) | tr -d '\n\r' | base64 -d -i > plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html
           echo "Restored dashboard.html: $(wc -c < plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html) bytes"
       - name: Commit restored files
         run: |
