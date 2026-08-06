@@ -121,7 +121,7 @@
   footer { color:var(--faint); font-size:10.5px; margin-top:16px; line-height:1.6; }
   footer summary { cursor:pointer; font-weight:600; }
   /* ── Tooltip ── */
-  .tt { position:fixed; z-index:900; background:#0c1f3f; color:#fff; font-size:11.5px; border-radius:10px; padding:9px 14px; pointer-events:none; opacity:0; transition:opacity .1s; max-width:270px; line-height:1.75; box-shadow:0 4px 20px rgba(0,0,0,.35); direction:rtl; }
+  .tt { position:fixed; z-index:960; background:#0c1f3f; color:#fff; font-size:11.5px; border-radius:10px; padding:9px 14px; pointer-events:none; opacity:0; transition:opacity .1s; max-width:270px; line-height:1.75; box-shadow:0 4px 20px rgba(0,0,0,.35); direction:rtl; }
   .tt.show { opacity:1; }
   .tt-head { font-weight:800; font-size:12.5px; margin-bottom:5px; color:#a8d4f5; }
   .tt-row { display:flex; justify-content:space-between; gap:14px; }
@@ -130,7 +130,7 @@
   .tt-sep { border:none; border-top:1px solid rgba(255,255,255,.15); margin:6px 0; }
   .tt-sub { font-size:10px; color:rgba(255,255,255,.4); margin-top:4px; }
   /* ── Modal ── */
-  .modal-ov { position:fixed; inset:0; background:rgba(5,15,40,.55); z-index:800; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .18s; }
+  .modal-ov { position:fixed; inset:0; background:rgba(5,15,40,.55); z-index:870; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .18s; }
   .modal-ov.show { opacity:1; pointer-events:auto; }
   .modal-box { background:#fff; border-radius:18px; box-shadow:0 12px 48px rgba(12,31,63,.25); width:min(580px,93vw); max-height:84vh; overflow-y:auto; padding:22px 24px 24px; }
   .modal-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
@@ -149,6 +149,42 @@
   .modal-pi .pn { font-weight:800; font-variant-numeric:tabular-nums; }
   /* Chart cursor */
   svg.interactive { cursor:crosshair; }
+  /* ── Query-the-data widget (local, no LLM) ── */
+  .q-builder { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .q-inputs { display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .q-builder select, .q-builder input { font:inherit; font-size:12.5px; color:var(--ink); background:#fff; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .q-builder select:focus, .q-builder input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  #qType { font-weight:700; }
+  .q-chips { display:flex; gap:7px; flex-wrap:wrap; margin-top:11px; }
+  .q-chip { font:inherit; font-size:11.5px; font-weight:700; border:1.5px solid var(--border); background:#fff; color:var(--muted); border-radius:20px; padding:5px 12px; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .q-chip:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .q-answer { margin-top:14px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fafbfd; }
+  .q-answer.empty { color:var(--faint); font-size:12.5px; background:none; border-style:dashed; }
+  .q-big { font-size:15px; font-weight:800; color:var(--ink); line-height:1.5; margin-bottom:8px; }
+  .q-big b { font-size:26px; font-variant-numeric:tabular-nums; }
+  .q-sub { font-size:11px; font-weight:800; margin:8px 0 2px; }
+  .q-row { display:flex; justify-content:space-between; gap:14px; font-size:12.5px; padding:4px 0; border-top:1px solid var(--line); }
+  .q-row:first-child { border-top:none; }
+  .q-row .ql { color:var(--muted); display:flex; align-items:center; }
+  .q-row .qv { font-weight:700; font-variant-numeric:tabular-nums; text-align:left; direction:ltr; }
+  .q-pos { color:#128a54; } .q-neg { color:#c0392b; }
+  .q-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-inline-end:6px; flex-shrink:0; }
+  .ask-hint { font-size:10.5px; color:var(--faint); margin-top:10px; line-height:1.6; }
+  /* ── Maximize / fullscreen panels ── */
+  .maxbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); font-size:15px; line-height:1; padding:2px 4px; border-radius:6px; transition:color .15s, background .15s; flex-shrink:0; }
+  .maxbtn:hover { color:var(--accent); background:var(--accent-soft); }
+  .panel-ov { position:fixed; inset:0; background:rgba(5,15,40,.55); z-index:850; display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .18s; }
+  .panel-ov.show { opacity:1; pointer-events:auto; }
+  .panel-ov .panel.fullscreen { width:min(1100px,96vw); max-height:92vh; overflow:auto; box-shadow:0 12px 48px rgba(12,31,63,.32); margin:0; }
+  .panel-ov .panel.fullscreen .maxbtn { color:var(--accent); }
+  /* ── Bloc-majority forecast ── */
+  .fc-probs { display:flex; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+  .fc-prob { flex:1; min-width:118px; text-align:center; border-radius:11px; padding:11px 8px; }
+  .fc-prob .pct { font-size:28px; font-weight:900; font-variant-numeric:tabular-nums; line-height:1; direction:ltr; }
+  .fc-prob .lbl { font-size:11px; font-weight:700; margin-top:5px; }
+  .fc-ctl { display:flex; align-items:center; gap:10px; margin-top:10px; font-size:11.5px; color:var(--muted); font-weight:600; }
+  .fc-ctl input[type=range] { flex:1; max-width:240px; accent-color:var(--accent); }
+  .fc-sigval { font-variant-numeric:tabular-nums; color:var(--faint); }
 </style>
 </head>
 <body>
@@ -184,6 +220,23 @@
       <button class="logbtn" id="toggleLog">הצג סקרים כלולים</button>
     </div>
     <div class="poll-log" id="pollLog" style="flex-basis:100%"></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-accent" style="background:var(--accent)"></div>
+    <div class="panel-head">
+      <span class="panel-title">שאל את הנתונים</span>
+      <span class="panel-badge">ללא עלות</span>
+    </div>
+    <div class="panel-body">
+      <div class="q-builder">
+        <select id="qType"></select>
+        <span class="q-inputs" id="qInputs"></span>
+      </div>
+      <div class="q-chips" id="qChips"></div>
+      <div class="q-answer empty" id="qAnswer">בחרו שאלה, או לחצו על אחת ההצעות, לקבלת תשובה מיידית המחושבת מכלל הסקרים.</div>
+      <div class="ask-hint">התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא התחברות, ללא חשבון חיצוני וללא עלות.</div>
+    </div>
   </div>
 
   <div class="main-grid">
@@ -250,6 +303,24 @@
     </div>
   </div>
 
+  <div class="panel" id="forecastPanel" style="margin-top:16px">
+    <div class="panel-accent" style="background:linear-gradient(to left,var(--red) 50%,var(--blue) 50%)"></div>
+    <div class="panel-head">
+      <span class="panel-title">הסתברות לרוב (61+)</span>
+      <span class="panel-badge" id="fcBadge"></span>
+    </div>
+    <div class="panel-body">
+      <div class="fc-probs" id="fcProbs"></div>
+      <div class="chart-wrap"><svg id="fcHist" viewBox="0 0 560 240" style="width:100%;height:auto;"></svg></div>
+      <div class="fc-ctl">
+        <label for="fcSigma">רמת אי‑ודאות</label>
+        <input type="range" id="fcSigma" min="0.6" max="2" step="0.1" value="1">
+        <span id="fcSigmaVal" class="fc-sigval"></span>
+      </div>
+      <div class="note" id="fcNote"></div>
+    </div>
+  </div>
+
   <footer>
     <details>
       <summary>מקורות והערות מתודולוגיות</summary>
@@ -269,6 +340,7 @@
     <div id="modalContent"></div>
   </div>
 </div>
+<div class="panel-ov" id="panelOv"></div>
 <script>
 window.PHOTOS_DATA = {"Benjamin Netanyahu": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwUBBAYCB//EADAQAAIBAwMBBQcEAwAAAAAAAAECAwAEEQUSITEGEyJRgRQyQWFxkaEHUrHRIzPB/8QAGQEAAgMBAAAAAAAAAAAAAAAAAwQBAgUA/8QAHhEBAAIDAAIDAAAAAAAAAAAAAQACAxEhMUESE1H/2gAMAwEAAhEDEQA/AH7abq08byC0RZXn7xHLjcgHu45qJNXv7mO3jukiRJJCjBAd+5ecY9PzWnsLiO7sILiE5SVAw9aVatBp2n3h1W7uIrcbSo3nGWPxHmcU19xarW508RcxNblqPN9nG6VZUjWItGer5GB+f+etU5VluFcSx7UJ248wfLn+qNb3a3dqtxbs8kLKSuwe9zjOD9Kp6zf+x6ZJK++JVKjJPK5OPhWWVW2psbCu5hNcsbqylllgk3QHmIBecc8GltvbatdxCSJV2lgnzyQSOPSn2p39tcxWYVlkjYsG5GBig6ZdTWeme0RRh+7niByeACpGfzTOTHWofEi1FsKviWLntTqem6Taadp8/c+EuzhQWGTwBn6H71lp7i4vbjvry4lnk/dIxY/c1Oozb7jP7QF+1cKMUzmRyWT9ieETGDPUNCuYouwNtOyuTEzJuXqviPXkZqn+pFzFBo1hYQh1adu+cP72AMDd88n8VR0O439jDbZPF4wIz8NgP8mlnbDVHu9dhmO12ggiXDKGBONxyDweSa5whQv7VlzItmm+Eyhjbc2G4PWmVlqFyLdrIBHSRgx8POV6VRnPLucLubJCjAH0qInxKrYIFAubIWjp1OLh/D1yTRI3DDrQ2iDDyphY9nNXu4faLSzkkiPRshdw+WasuusoC8Iw0G92rJbE4U/5B9cc/wAUouZzPM8jdWOf6FaKw7Ga5/tZYYdylcPJyMjHOKQ32h6va3htHsZ3k6ju0LhvmCOtEtnralaHrcgxWLNki+V8tiibh60NreRHKygoynBUjBBqT4RQ5M//2Q==", "Avigdor Lieberman": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAwEBAQEAAAAAAAAAAAAABAUGAgcBA//EAC8QAAIBAwIDBwEJAAAAAAAAAAECAwAEEQUhBhJBMVFhcZGh0RMUFSIjUoGyweH/xAAYAQADAQEAAAAAAAAAAAAAAAAAAwQCAf/EAB0RAAIDAQEAAwAAAAAAAAAAAAABAhEhEwMSMWH/2gAMAwEAAhEDEQA/AOdCM91U/CMEeJ2dNy64PkD80sRYutPtBZUWQRgFQct4Uj53g6MdRSx6lbxcsZLZbYEKcE0Jf6nAZWgZDkbHmYD9sda9aCzi/Oitw82M5GMgeZrEd5BeSO7QBRnbJBOe/HdXKwqv9IriC2CamxRcBwGwKWfTPUVX6xHAbgPId2z20qdLboRR0rCWUNM6faCSNWcDcZ3IHzTqxiNtLlHjVG2cYJyPQVNW7Tw45XwB0NMBfXVyEtcqA7BTgbnejjNytB0ikUsMAvWNvK6rybjfZvmtSWNtaI8ztHmMZUqgXevtxDa2cCvPDJKs4HMUiXmC56n9NA6Lb/eL5vRO6Rtg8qZQnxPb7VRwd0Y75Yvuolu5QWZeZVGQ2c77/wB0r1SzFvbmRMbHo2aJ4j5k1+4aNiuMcpU4wMClrl5RiV2bzNLfg1LGC9U1qNDsBozSAG1mzB6zp/IUAhyooi1n+zXkFxjP0pFfHkc1ShLOq6wy22i3DBQcryjPjtS3hKQtaz25x+BgUOOjZ29R70TxJMj6FE0bBklkUqR1GCRS/hBsXlwvfGCPX/aavowSnFJDcR3gHYr49hSjqaM1adbjV7yZWBR5nKkdRnb2oF2IHZSmaR//2Q==", "Yair Lapid": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAABQECAwQGBwD/xAAvEAACAQMCAwcEAQUAAAAAAAABAgMABBEFEgYhMRMiQWGRobEUI3HBURUy0eHx/8QAGQEAAwEBAQAAAAAAAAAAAAAAAQIDAAUE/8QAHhEAAgICAwEBAAAAAAAAAAAAAAECERJBAxMxITL/2gAMAwEAAhEDEQA/ADrcRSmCILZTC4bEQOBt7THTrmsRrSPbW5S4hnQRShw0q7ckjvDP5HvXRP6TGuvrf7u7tBCeAfoW9MUD45BSznkBAKgkEjNX5eSGOPGvROOMruTHWJSPToEXJzGhyeRPdBqQmIqySruR/wC4HnkePyaGW722r6fBcSxFsHoT0PjUs0Nskkt0kWJdhAJ/B9K5zbs6aisTJw8QxW+oR3aRJujTYFLHHTHP1pYeKHt7mKeMR9pEpUE56EAfqmR29svEFvBJAjI8yqVxnrj/AHVriC3tobq1SGKNQS4ICjoFGPmr1qzy3ujovEGvWOhCGS9LkyDuJGuS2AM/IrnfE3GD6yzRW9sIbdhht53M36FVeLNVfUtQh7TrbwrETnqRzJ9/agZqsoYtp6IxlatG50B4Tws1wHRTauyyq/IHPMEetM4hKw8Mx3IdN9y6iLsmyABzJz7UC0a5RNL1OF+ZZFZB55wT6GrvEV0q2OjGJYx9oyGPaNueS5x57TQ64/oftlWJnre+liu47hhvaOQOD0OR/wAohPfx3csMzhy8Yw249TtA+RQctgjz51bsShl2uoOR40k3StaDD66ZFcymaV5HPec5NQhvWpWQMMY50iWNy7fZjL7ugHU/5p27+sRLSPQylH5HAPI/irWp3Im+mQHIihCe5P7psWi6pPzSylAxz3Db816bSNQEqoLcyMwzmM7hnzI5UM15YcJe0D2OZBVq3fY6keFNuNPurRx9TEY8nAz/AD/FIqedb1GVpn//2Q==", "Moshe Gafni": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUCAwYHAf/EAC8QAAIBAwIEAwcFAQAAAAAAAAECAwAEEQUhBhIxQRNR8BQiYYGhscEVMnFy0fH/xAAWAQEBAQAAAAAAAAAAAAAAAAACAwT/xAAbEQACAgMBAAAAAAAAAAAAAAAAAQIREhMhMf/aAAwDAQACEQMRAD8A6BSrWXVpba3YjDEuR54xj18Ka0h4hif2q0njcIwDJlhkb+vrWWXhqj6Wq6KeXmXOOmare7tfEMJmTxOhXO9KI9OmW8R2uCCTuFAG3f8A7Xv6PCt6/iTO/OcgOx6fmpUjVTNLpdws1u0YPvQtyEeXl9KMNI+HREZbs268qK3KQO5wP8p2aqnwyyVMlSniaJ5dGlaMHnjIYEdt6L1DU7PTYg95OsYPRepb+BWF1vja4u3lttOjEVvgguwyzfgUlFsGVBds9zfAkOOYqPeyRjzx86ldWcltb+IZzj946kn45zQ2jzk6YL1sLG7lGPYNnofXejI5hflLRHIMmzt2QbdaOHaLbeF3CN/Y28VwLi7giknkUhXcKTsfOtaa4trCw+3XkdqMQrIUj3zspwKJ07V7+1t19mvJkUDZQ5wPl0qushnbBLm9nupzLcyvK7dWY5NDRnDtnuag7bA5qa7iqk7NLwpeMpudNZVkhuSjFG6HB3HzH2p7cCfQbC9MuGgLhrV+bLf1Pr71jNGmEOq27scKXCk+Wdq23GZA0dpWOeZ1jjB7dyfoaLXRKVKjn2OVMCq1conKuwzVkh2qgnekE//Z", "Aryeh Deri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAgIDAQAAAAAAAAAAAAAABAUGBwACAwH/xAAwEAACAQMBBgUDAwUAAAAAAAABAgMABBEhBQYSMVFxExQiQWGBkbEkM9EyQqGywf/EABgBAAMBAQAAAAAAAAAAAAAAAAIDBAAF/8QAGxEAAwEBAAMAAAAAAAAAAAAAAAERAkEDIjH/2gAMAwEAAhEDEQA/AOVnHll7U2ntFmsmjYaMRn51FA2S+pOwp+IBNb8GvtyoLFQkq4b2ogt7JOPhjXGNdKGvmha1cs6cJ5EnFbXqQ3MLM05CAAMoJBH259qW7Whg8tapHMAEJXR+RPY/FSo6HCPXWUgnkGgjXw0PyeZ/H2pAtpJIccJHpyc++c4qVTWwZILUHxA0pDnrqAf9qywsC6q+OSqO4yn8N96pz8OfpezD7PR4+wp15yC3EaGVTLI4REByWJOOX1qumuLjg4fHl4QMY4jii93jwbdsXY5JuEye7CmrxwCkv2wkPgRXEMjqs7K4xzwcGkG07aFZ/EPiqc6sRgNUs29axw3ccZ/bOXUKf6R75HTpSG5/XeaiSRFdbZmRScMcDTCnXmOdJWayh7mTzZ0McLjUvJIcj3wOvbP/ACm0KIi8K4BGNKryx2pe2LZgmJXTKv6lOPx9KkWz96IZmWK/hEZJ/cU5XPyPamPDEUj7j0D5oiwbgv7ZuXDKh+zCh31xWyvwMGH9pzTwS1N5tkW02y7i7J4LmGNnWX3zg6fx0oLdHYdrBslp3xNLOSxlI15kDB6aUw3zuPL7vyZQukjKjgdPeg9wrkTbuvCG4vLuyg9VOo/P+KXw3SqpYjDI8Z5oxU/SubcmHSme8EXg7d2hHyxcOR9STStjrnqtEY//2Q==", "Benny Gantz": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAwEBAAMAAAAAAAAAAAAAAwQFAgYAAQf/xAAyEAACAQMCAgcFCQAAAAAAAAABAgMABBEFIRIxBhNBUWGRoSIkQnGxFCMzUnKBwdHh/8QAGQEAAgMBAAAAAAAAAAAAAAAAAwQAAQUC/8QAHREAAgMBAQADAAAAAAAAAAAAAAECAxESEwQhMv/aAAwDAQACEQMRAD8AvdlP32OqjJO3s/Q1PpjUblUSOIggmNW4sbcjt61xY8Wkpj08AJDHKxaReInv7PCt3FpB1JUKo22I7KT+1tBwgRh3OOeQD++DRbm/EfD1sTAMASw3AzSWtmoopIDO2NFVO1HYbfpNQr8+8Lvn2BVSS4V7Zo15tlh3AYP91G1I5utjzUczUpjlgC38nVA0xqcam0hkZT+Go9KVBouqXMSw2loH4ri4VQkQ5kcJ3+VPWR1YJUScZahaNyIV+7VmwME/xQxOZJQrW8i4GCXOPLFLLJGAYLlA8XMFgCKzPNZwESwiMyDZeFACKRw2DePd5JyOEMxUb+FRdSfF4N85UHOc1bLE6JG+MZkOfI1zmqvm6BznKDeq+O27GK3v6AXnSTULjIjYQJ2BBv50HSr9oNatLyaR3KSrxsxJOOR9Kmt4c685jwNaQklh9k1nTLZ7V7rjSJlGSWOFb/akaRo9rdIb1pY3RSQEQg7jv7vlVG4ure56Jpf3eXVrUNwg/GR9c0j0KtozDcyk4mMnDKo5YwCNvP1oflFroKrpJc6cENcvbeV4WbjgEhPVt8O55GvV1erczLIoK+yAQe+p8r9ZK8n5iW86yp7qvzjupHHbzD//2Q==", "Gadi Eisenkot": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAAAwABAgQGBwX/xAAuEAACAQMBBgUCBwAAAAAAAAABAgMABBEFBhIhMUFhBxMyUYEiYhUzcXKhwfD/xAAXAQADAQAAAAAAAAAAAAAAAAAAAwQB/8QAGxEAAgIDAQAAAAAAAAAAAAAAAAECEQMSMSH/2gAMAwEAAhEDEQA/AOc0gKcDNEVaakKbo9HRNAutZdvI3UjT1O3IdqNq2zlxpoyWDr7da1OyEbx6EPImRC0hZyVz2xjPaoa6XnilmEqlFYqBunPb4qeWRqVFccMXC305/u1EirU0QSRlU5AOM0IrVNEd06GRc0UPGvM5/SorwQmmCjHChuuAo7dNTsnfyJ56bjNbIAxwfqUk44f7pRdoL3FpcSW6ybgIyznOD0FT8PYEubu/hkZgphBwDzOSP7peIUkdqLXSoGJCjzXB6dB8njn4pLhb2ZRHJrDRGUFzDIMnKnrmk6AjKnI9xVTAA70S1z5+70IPCnRnfjJ5Y0laGLekZ70kfgKHzJz7Uy8GxS2/RkVSNr4bzBdelUkANbtz7MtZ/aDUfxTXLq7BJRnIQ/aOA/igWGoPp7zPF6pYXiB9t4YqlnAob8Nr0Zj9VEgJFzGfuxQObcKLF+dH+4ULoPh//9k=", "Yair Golan": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwQCBQYAAf/EACwQAAIBAwMCBQIHAAAAAAAAAAECAwAEEQUSITFBEyJRUqEyQmFxgZGx0fD/xAAYAQADAQEAAAAAAAAAAAAAAAABAgMABP/EAB4RAAICAgIDAAAAAAAAAAAAAAABAhEDMRJRFCEi/9oADAMBAAIRAxEAPwBw1HNetQycVAsTtrOK4kZ5WO4nHFGuNLsgq7Ad47k80usUDozsh3qfKR2pp44C0kwXzt9w6Go27O1QXEGAVAVvqAwalXOQ0hK9K6rI42qYFqCxorms5qN/O08kcchSNW2+Xgn9aZRctCuSRfRTBW24DqThgOcH/H5p1n32s8yJ4ccSFmYjuBwKz2li4ttAuL2NY3VpQNsgPlx3GO5z8U9rV7dRaXBYTNFunAlcRqRtXspOefz/AAorB9W9DeTUOK2HsryC7TMTebGSh6imqxJLeJuUlSOhHBFW2natOjiO5PiR+7uP7ppY+ian2WlxL4UTye1Sayr8qSTk55rQaq+LCXHUgD5rOrzG3OeTRxL02DIWtzdNHoul2MRxvDTyD1ySF/hvigX1wbi5Z8kqAFTPtAwPgUs7+LLFjpHEE/apA5OeMdqsTPAMDJokYIHpk80N2+kepowIHJPArGP/2Q==", "Yoaz Hendel": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAwADAQAAAAAAAAAAAAAAAwUGAgQHAf/EAC0QAAEDAgQCCgMBAAAAAAAAAAECAwQAEQUSITETYQYUIjJBUXGBkbFiocHh/8QAGAEAAwEBAAAAAAAAAAAAAAAAAgMEAQX/xAAdEQACAgIDAQAAAAAAAAAAAAAAAQIREiEDMTKB/9oADAMBAAIRAxEAPwBfKVnhH0VWUTWG0eVABzxCPxI/VFgrQmAhS1BIF9Sa3k8oVw+pfBih3hNFZZUoA2sB3v8AKaYQ8DiTLfUyz2SoKuPEbUmekBuPGdbWoNPo73MGxBpngHEdl8QPKW22Dmuq4F9h91LK92dFVjofzTmJHMH7rxhWVm3OsXlXWfQf2hZsulDHoVLs5u9McYYS0kDe501rSdkF1uwJFvCsXHVvIzG29ayTZz2q1k8VSKnAZHWsFfhOMqc4TgUFi3YCuW+4PzTNKjg8JyUiSi6gEoQgZrH8uXOlHQhwJxstHZ1tSfcWI+qtsSwxE/CZDBbSlbieyUixzDUH5Fbgns3NrQLC5jmJQxKEdYT3SU6gm/gN7eoor+ZLgBFtKmOj81t7C3MPjSODPVHLTYWCNcyiSCAfP18hXuDTJsXj4Y5AXIei20SsAAX1NyRfcVO4JdB5WR6LhoZiQLX2vQXFDNcfdbDKVqSCo3tsPKgPoKXBfY04AZdGpIYx+ItV7ZwDbxvp/a6i5JDcVx9RytpSom4sU1yDDzw8RjLBUMrqT2TY7jY1fTU8KK8VPTb2uptYz5vPc66UyG0DIjG5nU8ZTMbGfI7nASdxeq+KW1dK0yWyeHMhB1NxbxGh+L1BP8MPrS0VFF9M2/vVBgWI8Gdh4fJDbHESF6nRQGnsQfmkckb2hsJVpn//2Q==", "Naftali Bennett": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAAAQUCAwQGAAf/xAAxEAABAwMDAQYEBgMAAAAAAAABAgMRAAQFEiExEwYiMlFhwRVxgaEHFEFCgpKx4fD/xAAZAQEAAwEBAAAAAAAAAAAAAAACAwQFAAH/xAAcEQADAQEAAwEAAAAAAAAAAAAAAQIRAxIhMRP/2gAMAwEAAhEDEQA/AGuVxDljikXlteXSls6dXeE6NyqNvWaxvY1d/bfEHrh9aTqS0lZErQDtJjaTXVJebucSy8ndDqUmPmKT5/N4rHWQtw+2XEDSlhsyRH6Hy+tT/rTly/pXnjKtUvhBpLgdQQ+nplPgjeaz3LXUtXBfPpW0TJ0jTAFU276lWFu69KQ80laVhMpUY3H0O1Zc9ddDG9VYV0FOBoqjeSCfb7iqKlusNOrSnRE3ZXaFKSLhtJQQCFA8kehrQ2L9LIWLhjSePF5T51H8+yXXOi8h3UZCognbyqZuylspCRH+o96VPGdz4upTFd5nskbb4ei5Wi2bJAQgxPzPNKZj5V55ZW8tzkEzQBBEirdPabM+FkpH0TsLk+v2dyONUG1u2yFPMhzwgEex/wA1ly16rJ/h6VOtoQ7a3SUqKR4jxJ9e9XNdnL02WT5hL7a2FfyED7xTZperstmGTxLLif7EH2rxSsbF5PUjlIppjX7hbSmkkK0me8eB/wAKWcGp2L/Tup/ae6aj6LZJOdZRSeKDShojyMURuNzUOmUklBn0pgLZpkq9Ix7iAdn0hJ+hB9qVbxuDRLoLQRI2JNKa9NBa+BURzVLKpFB0qgAA78GKklsIJAMidjxQ3WLPR//Z", "Ayman Odeh": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwUEBgcCAP/EAC8QAAIBAwIEBAMJAAAAAAAAAAECAwAEESExBQYSQRMiUcEycZEUNFJhgYKh0eH/xAAYAQEBAAMAAAAAAAAAAAAAAAAAAgEDBP/EABoRAQEAAgMAAAAAAAAAAAAAAAABAhEDEjH/2gAMAwEAAhEDEQA/AMwolvJ4NxHJ+BgaHR1tXOC3lFNbGn8EeFpmWOBDHNEMnfP91G5+u1g5eWCKIATOqHp0CDf2oHK8DwxWcYvTD4o83V2GdDROeJrdnHCYstFCeqRidWk/ytePFezpy5p01Ga16ps/D5EHVFl19O9Qq2WacwkAzMudhrTmztmu7qC3T4pXVB8yaWWaaO52AwKs/J6qeNQTPqsCtKf2qTVTxhb45reyvr6cIphsovDjU7EjQD61SLmVpnklc5ZiSfmaZ8SvGXhwiJ89xIZH/MDb+SfpSORwqE96sFiIKZ7UhvPvcumPNTqFT0AZ7b0mviDdyY9anLwg0KH7L5d9zTvluQpFMw+IxFB+pHtmktm+Y+k/KmnCj4Mky9tCKQE4pMGu+gHSNQvv70tmcnAAzk7V07tLK7AasSSa6YLHnXUaE4rIKHKxHrJXpGwpG7dbs3qc1NuZgI2CknOmpqBU5Uj/2Q==", "Bezalel Smotrich": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABQYBAgQDB//EADIQAAIBAwEFBQUJAAAAAAAAAAECAwAEEQUGEiExQRNRYYHBFHGRodEWIiMyQlKx4fD/xAAYAQADAQEAAAAAAAAAAAAAAAADBAUBAP/EACIRAAIBAwMFAQAAAAAAAAAAAAABAgMRIQQiMRITMkFRcf/aAAwDAQACEQMRAD8AMbT2AvLJpVA7W3y4Ph1H+7qUHhk1bWopbpi0pAAJHMAf1TJtZqJVk022y0sxG+B3dB5mrPYewm3hn3WlhAOR4g58vpRajcdOk/bx+GUoqVU0wW9qiBUhjBxjIUZrM9lZm5XtYIQh57wAzUvZq0yzqzDuGeHwrNe2Yku0mmc4J4Lnljn/ADU5FNrHAU0u2S2geJCTiQ5z34HpiutwKvAECkx8Vbr5Y9KpOadh4om1FuYnaJoNzqzPMkqxIhwGYE7x8KNHRJtJmaaS7Sd1hZjGoO9u5Az8TV7vaHSdnLdbOBvaZohjcjP6uuTyHH30saXtXN9rBqmoEGGYdjKg4hIz0Hu50xV1U53S4YOFKMbN8h+C4TUGKwzHEajI/dWO8XssXBdvzADA4t4c+NH9V2QVnN9os5jEg3t1TkHPUd4rFZabKLiWefNxPbRs6IV3QhCkgnzwBU/pyPdy8QvaKUtY1YFTu8QelUnoFBtjaP8AdubaWI96kMPSiEOp2d8cW06s2M7p4H4UwsCjyeU5qVNVFT7q409O2C2jeXQ5tNc5ubZfwS3Ebh+h9K5RLdw62sM90WmdgyylsBiePkDyxSPoeotperW94MlFbDgdVPOm/aKVV1FZoHBDKroQeGMcCKFUxkc0e6Th9Qr6ramxv57Ns5gcqM88dPlWeG5ktpI54jho2DDyo5tsoOqxXqHKXcIcHvI4H5YpaLYGKIhNqx//2Q==", "Itamar Ben-Gvir": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGgABAAMBAQEAAAAAAAAAAAAABAIFBgABA//EAC8QAAIBAwIDBgUFAQAAAAAAAAECAwAEERIhBTFBBhMUUXGBFSJhkcEyM0JS0fD/xAAXAQEAAwAAAAAAAAAAAAAAAAADAQIE/8QAHBEAAwACAwEAAAAAAAAAAAAAAAERAjEDIUES/9oADAMBAAIRAxEAPwDO4pdg3h5PFd0HMf7Yblr6euKPinWwMlqkaAMyyFsddwP8q+iEqzpouJcbm13808kf8Y9WFHsNq5uHixzJbSzQSrnDK2lgfUVfcLVsHMgVs7+tIvreKWIl9LZ8qJZv00PiXhhMzGZxOMknIcDAbzqWKVeqq3bxomkLj3o5FKnVQGo4fXFO4bbpKk7uMCPSSRsevX2omKkszQxyAZww3xUvRC2Ns+H6ZoXWT5mYEA5Bxnr9Kbd2K/EZSZ9LMSdxnC55jb26VXPHJdLG8LuybMAqnUD6g/inAdxa6pXdNJJyxJZifXl/3KgpriKq7j0PIC5fcYPtRsVNpBM7MpyM7V5imxXRmzdZC6vIbbZ2y39V50L4sBNG5jBjDDUuc5XrvQGB58zXaAd/OlgdNLNa3/CV72GRmtW3WRRkYPLNM4Xw6/7RyAySOLZDhpSNvQeZpdrJeXHYBpLWbungQqzDmQvT6bVc9h4OIRcLWWecS2shPdxt+qPG2x8j5VR8a2XWbkMX2rVeHce8PZfLHBEiY5567/egxcSjYYlUofMbikdqJO+7SX7jkJSv22/FVBG9J89B0//Z", "Mansour Abbas": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAABAUGAwEH/8QALxAAAgEDAgUCBQMFAAAAAAAAAQIDAAQRBRITITFBUQZhFCIjgaFxkcEVYtHw8f/EABcBAQEBAQAAAAAAAAAAAAAAAAMCAAT/xAAeEQACAgMBAAMAAAAAAAAAAAAAAQIREiExQQMTMv/aAAwDAQACEQMRAD8ARhssSeu1unjH/aovTd5FZ2t281wkKuyrljzPXpUzGRxWyT0Ipxp9rbXOn3LXVy0CoQSV6sPH4qPCofpDPU9VgttiqGmMgyHZ9igec96VC7+KdjtXaB1Vtyn71rqGpaVbfD20S8bhRBFBzj350Lc6rHcwrHawCOLwo5VB0MFn4ShkQEHIJxzFCznnREpQIxxhyo/ahJTzqnsBpJ6NFl33LELgE8vamFksUxeKZ8BxyHk/6aJ1fRLTTrdZ7a4kkYyBSHXAwc9PPShNPtGurjA3BFXc7DsKXDwKMq2hg2ghY4pFMATaPqOSzN9jypXfXMdrMYLcDbt5+5ppetK3FgWNsQtjCseXIH+aCsdBuL+cu6mKAH5nP8eTU47xXR8tW+GVlave2t1O/wAsUELNuPdgM4/FKRMsihh17jxVnrwTTfTckVtHtjb6QJ7k9f1OM1CRDBHvTv4FST6c32278G7W/wAPcMpkMiEAqT39/anfpR5J9VntVTMHC3SNjuOg6e9T4d9u7BdzgKBzJPYV6Z6Y0f8Ao+krFNg3Ep4kx/uPb7UtKEaDbsGOlcLjXLGPa53nc34rSztbq4VROwEY6YGDjxTT4SKSXiyLubqoJ5L+grmpXcem6dNduBtiQsB5PYVMWot11mlJyST8ID11eiXUI9PiP0bVfmA7uf8AAx+5qVCASDmT368hRE87zyy3M7bnkYux8k1gpwCzdTSGR//Z", "Sami Abou Shehadeh": null};
 </script>
@@ -548,12 +620,24 @@ function renderBlocDonut(filtered) {
   note.textContent = `ממוצע על ${b.n} סקרים. "אחרים" כולל קולות מתחת לאחוז החסימה.`;
 }
 
+/* אירועים מרכזיים שעשויים להשפיע על הסקרים — התאריכים לאימות לפני פרסום.
+   מקור: דיווחי תקשורת על מערכת הבחירות 2026 (ינואר–אוגוסט 2026). ניתן לערוך/להוסיף כאן. */
+const EVENTS = [
+  { date: '2026-01-15', label: 'השבת גופת החטוף האחרון', cat: 'security' },
+  { date: '2026-04-08', label: 'הפסקת אש עם איראן', cat: 'military' },
+  { date: '2026-04-27', label: 'איחוד מחנה היריבים (בנט–לפיד)', cat: 'political' },
+  { date: '2026-05-20', label: 'הכנסת מצביעה על פיזורה', cat: 'political' },
+  { date: '2026-06-10', label: 'רשימה ערבית משותפת (חד״ש-תע״ל-בל״ד)', cat: 'political' },
+  { date: '2026-06-15', label: 'אייזנקוט/ישר משיק קמפיין לראשות הממשלה', cat: 'political' },
+  { date: '2026-07-17', label: 'הכנסת מתפזרת רשמית', cat: 'political' },
+];
 function drawLineChart(svgEl, series, opts) {
   const W = opts.W, H = opts.H, ML = 28, MR = 36, MT = 10, MB = 22;
   if (!series.length || series.every(x => !x.pts.length)) { svgEl.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="#94a3b8">אין נתונים בטווח</text>`; return; }
   const allDates = [...new Set(series.flatMap(x => x.pts.map(p => p[0])))].sort();
   const t0 = isoToT(allDates[0]), t1 = isoToT(allDates[allDates.length-1]), span = Math.max(t1 - t0, 1);
   const X = iso => ML + (isoToT(iso) - t0) / span * (W - ML - MR);
+  const evs = (opts.events || []).filter(ev => { const t = isoToT(ev.date); return t >= t0 && t <= t1; });
   let yMax = opts.yMin || 10;
   series.forEach(x => x.pts.forEach(p => yMax = Math.max(yMax, p[1])));
   yMax = Math.ceil(yMax / 5) * 5;
@@ -567,6 +651,7 @@ function drawLineChart(svgEl, series, opts) {
   if (opts.line61 && yMax >= 61) { s += `<line x1="${ML}" y1="${Y(61)}" x2="${W-MR}" y2="${Y(61)}" stroke="#0f1729" stroke-width="1" stroke-dasharray="3 3"/><text x="${W-MR+3}" y="${Y(61)+3.5}" font-size="9" font-weight="700" fill="#0f1729">61</text>`; }
   const nTicks = Math.min(6, allDates.length);
   for (let i = 0; i < nTicks; i++) { const d = allDates[Math.round(i * (allDates.length-1) / Math.max(nTicks-1,1))]; s += `<text x="${X(d)}" y="${H-7}" text-anchor="middle" font-size="9.5" fill="#94a3b8">${heDateShort(d)}</text>`; }
+  evs.forEach(ev => { const ex = X(ev.date); s += `<line x1="${ex.toFixed(1)}" y1="${MT+5}" x2="${ex.toFixed(1)}" y2="${H-MB}" stroke="#d97706" stroke-width="1" stroke-dasharray="2 3" opacity="0.5" pointer-events="none"/>`; });
   series.forEach(({name, color, pts, thick}) => {
     if (!pts.length) return;
     const path = pts.map(([d,v], i) => (i ? 'L' : 'M') + X(d).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
@@ -576,6 +661,26 @@ function drawLineChart(svgEl, series, opts) {
     s += `<text x="${(X(ld)+5).toFixed(1)}" y="${(Y(lv)+3.5).toFixed(1)}" font-size="10.5" font-weight="700" fill="${color}">${Math.round(lv)}</text>`;
   });
   svgEl.innerHTML = s;
+
+  /* ── Event flags (appended after innerHTML so they sit on top & carry listeners) ── */
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  evs.forEach(ev => {
+    const ex = X(ev.date);
+    const flag = document.createElementNS(SVGNS, 'path');
+    flag.setAttribute('d', `M${(ex-4).toFixed(1)} ${MT} L${(ex+4).toFixed(1)} ${MT} L${ex.toFixed(1)} ${MT+6} Z`);
+    flag.setAttribute('fill', '#d97706'); flag.setAttribute('cursor', 'pointer');
+    const hit = document.createElementNS(SVGNS, 'rect');
+    hit.setAttribute('x', (ex-6).toFixed(1)); hit.setAttribute('y', MT-3);
+    hit.setAttribute('width', 12); hit.setAttribute('height', 13);
+    hit.setAttribute('fill', 'transparent'); hit.setAttribute('cursor', 'pointer');
+    const show = e => { e.stopPropagation(); showTT(`<div class="tt-head" style="color:#f5c26b">${heDate(ev.date)}</div>${ev.label}`, e.clientX, e.clientY); };
+    [flag, hit].forEach(el => {
+      el.addEventListener('mouseenter', show);
+      el.addEventListener('mousemove', e => { e.stopPropagation(); moveTT(e.clientX, e.clientY); });
+      el.addEventListener('mouseleave', hideTT);
+    });
+    svgEl.appendChild(flag); svgEl.appendChild(hit);
+  });
 
   /* ── Interactivity ── */
   if (!opts.raw || !allDates.length) return;
@@ -681,7 +786,7 @@ function renderTable(filtered) {
 function renderPartyTrend(filtered) {
   const sel = partySel.get();
   const series = PARTIES.filter(p => sel.has(p.id)).map(p => ({ name: p.name, color: p.color, pts: perDateSeries(filtered, x => x[p.id]) }));
-  drawLineChart(document.getElementById('partyTrend'), series, { W:560, H:220, raw: filtered });
+  drawLineChart(document.getElementById('partyTrend'), series, { W:560, H:220, raw: filtered, events: EVENTS });
 }
 function renderBlocHalf(filtered) {
   document.getElementById('blocBadge').textContent = filtered.length ? `${filtered.length} סקרים` : '';
@@ -691,7 +796,7 @@ function renderBlocHalf(filtered) {
     { name:'האופוזיציה', color:'#1d5fa8', thick:true, pts: perDateSeries(filtered, p => { const b = pollBlocs(p); return b ? b.opp : null; }) },
     { name:'אחרים', color:'#94a3b8', thick:true, pts: perDateSeries(filtered, p => { const b = pollBlocs(p); return b ? b.other : null; }) },
   ];
-  drawLineChart(document.getElementById('blocTrend'), series, { W:480, H:220, line61:true, yMin:65, raw: filtered });
+  drawLineChart(document.getElementById('blocTrend'), series, { W:480, H:220, line61:true, yMin:65, raw: filtered, events: EVENTS });
 }
 /* ─── Tooltip helpers ─── */
 function _ttPos(tt, cx, cy) {
@@ -794,6 +899,285 @@ outletSel = makeMultiSelect('outletDD', 'outletSummary', 'outletList', outletIte
 partySel = makeMultiSelect('partyDD', 'partySelSummary', 'partySelList', PARTIES.map(p => ({ id: p.id, name: p.name, color: p.color })), ["Likud","Yashar","Together","The Democrats","Shas","Yisrael Beiteinu"], 'ilpolls_trendparties', 'כל המפלגות', () => renderPartyTrend(getFiltered()));
 renderAll();
 tryRefresh();
+</script>
+<script>
+/* ===== Query-the-data widget (local, zero-cost, no LLM) ===== */
+(function(){
+  const activeParties = PARTIES.filter(p => p.active !== false);
+  const allDates = POLLS.map(p => p.date).sort();
+  const MIND = allDates[0], MAXD = allDates[allDates.length - 1];
+  function monthAgo(){ const d = new Date(MAXD + 'T00:00:00Z'); d.setUTCMonth(d.getUTCMonth() - 1); return d.toISOString().slice(0, 10); }
+
+  const QTYPES = [
+    { id:'partyAvg',    label:'ממוצע מנדטים למפלגה',           inputs:['party'] },
+    { id:'lastN',       label:'ממוצע ב-N הסקרים האחרונים',      inputs:['party','n'] },
+    { id:'partyChange', label:'שינוי במפלגה מאז תאריך',         inputs:['party','date'] },
+    { id:'topMovers',   label:'מי עלה / ירד הכי הרבה מאז תאריך', inputs:['date'] },
+    { id:'byOutlet',    label:'ממוצע למפלגה לפי סוקר',          inputs:['party','outlet'] },
+    { id:'biggest',     label:'המפלגות הגדולות ביותר',          inputs:[] },
+    { id:'bloc',        label:'מצב הגושים ורוב (61)',           inputs:[] },
+  ];
+  const CHIPS = [
+    { label:'המפלגה הגדולה ביותר', type:'biggest' },
+    { label:'יש רוב לקואליציה?',   type:'bloc' },
+    { label:'מי עלה החודש?',       type:'topMovers', vals:{ date: monthAgo() } },
+    { label:'ממוצע הליכוד',        type:'partyAvg',  vals:{ party:'Likud' } },
+  ];
+
+  /* ── data helpers (reuse global mean/median/pollBlocs/heDate/outletDisplay) ── */
+  const pById   = id => PARTIES.find(p => p.id === id);
+  const withVal = id => POLLS.filter(p => p[id] !== null && p[id] !== undefined);
+  const valsFor = (polls, id) => polls.map(p => p[id]).filter(v => v !== null && v !== undefined);
+  const byDate  = polls => [...polls].sort((a,b) => a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
+  const f1 = x => (Math.round(x * 10) / 10).toFixed(1);
+  function splitAvg(id, since){
+    const wv = byDate(withVal(id));
+    if (!wv.length) return null;
+    let thenP = wv.filter(p => p.date <= since).slice(-5);
+    if (!thenP.length) thenP = wv.slice(0, 5);
+    const nowP = wv.slice(-5);
+    return { then: mean(thenP.map(p => p[id])), now: mean(nowP.map(p => p[id])) };
+  }
+  const empty = p => `<div class="q-big">אין נתונים עבור ${p.name}.</div>`;
+  const dot = c => `<span class="q-dot" style="background:${c}"></span>`;
+
+  /* ── computations, each returns answer HTML ── */
+  const COMPUTE = {
+    partyAvg(){
+      const p = pById(v('qParty')), rec = withVal(p.id);
+      if (!rec.length) return empty(p);
+      const vals = rec.map(x => x[p.id]), sorted = [...rec].sort((a,b) => a[p.id] - b[p.id]);
+      const mn = sorted[0], mx = sorted[sorted.length - 1];
+      return `<div class="q-big">${dot(p.color)}${p.name}: <b style="color:${p.color}">${f1(mean(vals))}</b> מנדטים בממוצע</div>
+        <div class="q-row"><span class="ql">חציון</span><span class="qv">${median(vals)}</span></div>
+        <div class="q-row"><span class="ql">מספר סקרים</span><span class="qv">${vals.length}</span></div>
+        <div class="q-row"><span class="ql">הכי גבוה</span><span class="qv">${mx[p.id]} — ${heDate(mx.date)}, ${outletDisplay(mx.outlet)}</span></div>
+        <div class="q-row"><span class="ql">הכי נמוך</span><span class="qv">${mn[p.id]} — ${heDate(mn.date)}, ${outletDisplay(mn.outlet)}</span></div>`;
+    },
+    lastN(){
+      const p = pById(v('qParty'));
+      let N = parseInt(v('qN'), 10) || 10; N = Math.max(1, Math.min(N, POLLS.length));
+      const subset = byDate(POLLS).slice(-N), vals = valsFor(subset, p.id);
+      if (!vals.length) return empty(p);
+      return `<div class="q-big">${dot(p.color)}${p.name}: <b style="color:${p.color}">${f1(mean(vals))}</b> מנדטים בממוצע ב-${N} הסקרים האחרונים</div>
+        <div class="q-row"><span class="ql">טווח הסקרים</span><span class="qv">${heDate(subset[0].date)}–${heDate(subset[subset.length-1].date)}</span></div>
+        <div class="q-row"><span class="ql">סקרים עם נתון למפלגה</span><span class="qv">${vals.length} מתוך ${N}</span></div>`;
+    },
+    partyChange(){
+      const p = pById(v('qParty')), since = v('qDate'), s = splitAvg(p.id, since);
+      if (!s) return empty(p);
+      const d = s.now - s.then, cls = d > 0 ? 'q-pos' : (d < 0 ? 'q-neg' : ''), sign = d > 0 ? '+' : '';
+      return `<div class="q-big">${dot(p.color)}${p.name}: <b class="${cls}">${sign}${f1(d)}</b> מנדטים מאז ${heDate(since)}</div>
+        <div class="q-row"><span class="ql">אז (סביב ${heDate(since)})</span><span class="qv">${f1(s.then)}</span></div>
+        <div class="q-row"><span class="ql">היום (5 סקרים אחרונים)</span><span class="qv">${f1(s.now)}</span></div>`;
+    },
+    topMovers(){
+      const since = v('qDate');
+      const rows = activeParties.map(p => { const s = splitAvg(p.id, since); return s ? { p, d: s.now - s.then } : null; })
+        .filter(r => r && !isNaN(r.d));
+      const gain = rows.filter(r => r.d > 0.05).sort((a,b) => b.d - a.d).slice(0, 4);
+      const lose = rows.filter(r => r.d < -0.05).sort((a,b) => a.d - b.d).slice(0, 4);
+      const line = r => `<div class="q-row"><span class="ql">${dot(r.p.color)}${r.p.name}</span><span class="qv ${r.d>0?'q-pos':'q-neg'}">${r.d>0?'+':''}${f1(r.d)}</span></div>`;
+      return `<div class="q-big">שינוי מאז ${heDate(since)}</div>` +
+        (gain.length ? `<div class="q-sub q-pos">עלייה</div>` + gain.map(line).join('') : '') +
+        (lose.length ? `<div class="q-sub q-neg">ירידה</div>` + lose.map(line).join('') : '') +
+        (!gain.length && !lose.length ? `<div class="q-row"><span class="ql">אין שינוי משמעותי בטווח זה.</span></div>` : '');
+    },
+    byOutlet(){
+      const p = pById(v('qParty')), o = v('qOutlet');
+      const vals = valsFor(POLLS.filter(x => x.outlet === o), p.id);
+      if (!vals.length) return `<div class="q-big">אין נתון ל${p.name} אצל ${outletDisplay(o)}.</div>`;
+      const avg = mean(vals), oAvg = mean(valsFor(POLLS, p.id)), diff = avg - oAvg;
+      const cls = diff > 0 ? 'q-pos' : (diff < 0 ? 'q-neg' : ''), sign = diff > 0 ? '+' : '';
+      return `<div class="q-big">${dot(p.color)}${outletDisplay(o)} נותן ל${p.name}: <b style="color:${p.color}">${f1(avg)}</b> מנדטים בממוצע</div>
+        <div class="q-row"><span class="ql">ממוצע כללי (כל הסוקרים)</span><span class="qv">${f1(oAvg)}</span></div>
+        <div class="q-row"><span class="ql">הפרש מהממוצע הכללי</span><span class="qv ${cls}">${sign}${f1(diff)}</span></div>
+        <div class="q-row"><span class="ql">מספר סקרים של ${outletDisplay(o)}</span><span class="qv">${vals.length}</span></div>`;
+    },
+    biggest(){
+      const rows = activeParties.map(p => { const vv = valsFor(POLLS, p.id); return vv.length ? { p, avg: mean(vv) } : null; })
+        .filter(Boolean).sort((a,b) => b.avg - a.avg).slice(0, 6);
+      return `<div class="q-big">המפלגות הגדולות ביותר (ממוצע על פני כל הסקרים)</div>` +
+        rows.map((r,i) => `<div class="q-row"><span class="ql">${dot(r.p.color)}${i+1}. ${r.p.name}</span><span class="qv" style="color:${r.p.color}">${f1(r.avg)}</span></div>`).join('');
+    },
+    bloc(){
+      const bls = POLLS.map(pollBlocs).filter(Boolean);
+      if (!bls.length) return `<div class="q-big">אין נתוני גושים.</div>`;
+      const g = mean(bls.map(b => b.gov)), o = mean(bls.map(b => b.opp)), ot = mean(bls.map(b => b.other));
+      return `<div class="q-big">${g>=61?'לקואליציה יש רוב':'לקואליציה אין רוב'}: <b style="color:#c0392b">${f1(g)}</b> מנדטים בממוצע ${g>=61?'≥':'<'} 61</div>
+        <div class="q-row"><span class="ql">${dot('#c0392b')}קואליציה</span><span class="qv">${f1(g)}</span></div>
+        <div class="q-row"><span class="ql">${dot('#1d5fa8')}אופוזיציה</span><span class="qv">${f1(o)}</span></div>
+        <div class="q-row"><span class="ql">${dot('#94a3b8')}אחרים</span><span class="qv">${f1(ot)}</span></div>
+        <div class="ask-hint" style="margin-top:8px">מבוסס על שיוך הגושים הנוכחי שלך (ניתן לשנות בטבלת המפלגות).</div>`;
+    },
+  };
+
+  /* ── DOM plumbing ── */
+  function el(tag, attrs){ const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function v(id){ const e = document.getElementById(id); return e ? e.value : null; }
+  function partySelect(id){ const s = el('select', {id}); activeParties.forEach(p => { const o = el('option', {value:p.id}); o.textContent = p.name; s.appendChild(o); }); return s; }
+  function outletSelect(id){ const s = el('select', {id}); [...new Set(POLLS.map(p => p.outlet))].sort().forEach(o => { const op = el('option', {value:o}); op.textContent = outletDisplay(o); s.appendChild(op); }); return s; }
+  function renderInputs(type){
+    const box = document.getElementById('qInputs'); box.innerHTML = '';
+    (QTYPES.find(q => q.id === type) || {}).inputs.forEach(inp => {
+      if (inp === 'party')       box.appendChild(partySelect('qParty'));
+      else if (inp === 'outlet') box.appendChild(outletSelect('qOutlet'));
+      else if (inp === 'date')   { box.appendChild(document.createTextNode(' מאז ')); box.appendChild(el('input', {type:'date', id:'qDate', min:MIND, max:MAXD, value:monthAgo()})); }
+      else if (inp === 'n')      box.appendChild(el('input', {type:'number', id:'qN', min:1, max:POLLS.length, value:10, style:'width:64px'}));
+    });
+    box.querySelectorAll('select,input').forEach(x => x.addEventListener('input', compute));
+  }
+  function compute(){
+    const ans = document.getElementById('qAnswer');
+    let html; try { html = COMPUTE[v('qType')](); } catch(e){ html = '<div class="q-big">לא ניתן לחשב.</div>'; }
+    ans.classList.remove('empty'); ans.innerHTML = html;
+  }
+
+  const sel = document.getElementById('qType');
+  QTYPES.forEach(q => { const o = el('option', {value:q.id}); o.textContent = q.label; sel.appendChild(o); });
+  sel.addEventListener('change', () => { renderInputs(sel.value); compute(); });
+  const chipBox = document.getElementById('qChips'), MAP = { party:'qParty', date:'qDate', outlet:'qOutlet', n:'qN' };
+  CHIPS.forEach(c => {
+    const b = el('button', {class:'q-chip', type:'button'}); b.textContent = c.label;
+    b.addEventListener('click', () => {
+      sel.value = c.type; renderInputs(c.type);
+      if (c.vals) for (const k in c.vals) { const e = document.getElementById(MAP[k]); if (e) e.value = c.vals[k]; }
+      compute();
+    });
+    chipBox.appendChild(b);
+  });
+  renderInputs(QTYPES[0].id); compute();
+})();
+
+/* ===== Click-to-fullscreen panels ===== */
+(function(){
+  const ov = document.getElementById('panelOv');
+  let active = null, home = null;
+  function open(panel){
+    if (active) return;
+    home = { parent: panel.parentNode, next: panel.nextSibling };
+    active = panel;
+    panel.classList.add('fullscreen');
+    ov.appendChild(panel);
+    ov.classList.add('show');
+  }
+  function close(){
+    if (!active) return;
+    active.classList.remove('fullscreen');
+    if (home.next) home.parent.insertBefore(active, home.next); else home.parent.appendChild(active);
+    ov.classList.remove('show');
+    active = null; home = null;
+  }
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  document.querySelectorAll('.panel-head').forEach(head => {
+    const panel = head.closest('.panel');
+    const btn = document.createElement('button');
+    btn.className = 'maxbtn'; btn.type = 'button'; btn.title = 'הגדל למסך מלא'; btn.setAttribute('aria-label', 'הגדל למסך מלא');
+    btn.textContent = '⤢';
+    btn.addEventListener('click', e => { e.stopPropagation(); active === panel ? close() : open(panel); });
+    head.appendChild(btn);
+  });
+})();
+
+/* ===== Bloc-majority forecast (Monte Carlo, local) ===== */
+(function(){
+  const N = 4000;                 // simulations
+  const RECENT_DAYS = 21;         // window for the central estimate
+  const THRESH = 0.0325 * 120;    // 3.25% electoral threshold in seats (~3.9)
+  // Calibrated from historical Israeli final-poll error (see fcNote): the right/coalition
+  // bloc total has missed by ~3–6 seats. These base sigmas yield a coalition-total SD ≈ 6.
+  const SIGMA_PARTY_BASE = 1.8;   // idiosyncratic per-party (seats)
+  const SIGMA_SWING_BASE = 4.5;   // correlated coalition↔opposition national swing (seats)
+
+  function gauss(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+  function recentWindow(){
+    const desc = [...POLLS].sort((a,b)=> a.date<b.date?1:-1);
+    const maxd = desc[0].date, cut = new Date(maxd+'T00:00:00Z');
+    cut.setUTCDate(cut.getUTCDate()-RECENT_DAYS);
+    const cutIso = cut.toISOString().slice(0,10);
+    let w = POLLS.filter(p=>p.date>=cutIso);
+    if (w.length<5) w = desc.slice(0,5);
+    const ds = w.map(p=>p.date).sort();
+    return { polls:w, from:ds[0], to:ds[ds.length-1] };
+  }
+
+  function simulate(sigMul){
+    const win = recentWindow(), assign = loadBlocAssign();
+    const parties = PARTIES.filter(p=>p.active!==false).map(p=>{
+      const vals = win.polls.map(x=>x[p.id]).filter(v=>v!==null&&v!==undefined);
+      return vals.length ? { id:p.id, mu:mean(vals), bloc:assign[p.id] } : null;
+    }).filter(r=>r && r.mu>0);
+    const nCoal = Math.max(1, parties.filter(p=>p.bloc==='coal').length);
+    const nOpp  = Math.max(1, parties.filter(p=>p.bloc==='opp').length);
+    const sp = SIGMA_PARTY_BASE*sigMul, ss = SIGMA_SWING_BASE*sigMul;
+    const coalArr = new Int16Array(N), oppArr = new Int16Array(N);
+    let pc=0, po=0, ph=0;
+    for (let s=0;s<N;s++){
+      const swing = gauss()*ss;
+      let sum=0; const draws=[];
+      for (const p of parties){
+        let val = p.mu + gauss()*sp;
+        if (p.bloc==='coal') val += swing/nCoal; else if (p.bloc==='opp') val -= swing/nOpp;
+        if (val < THRESH) val = 0;               // sub-threshold → 0
+        draws.push(val); sum += val;
+      }
+      const k = sum>0 ? 120/sum : 0;             // renormalize to 120 seats
+      let coal=0, opp=0;
+      for (let i=0;i<parties.length;i++){ const v=draws[i]*k; if(parties[i].bloc==='coal')coal+=v; else if(parties[i].bloc==='opp')opp+=v; }
+      const cR=Math.round(coal), oR=Math.round(opp);
+      coalArr[s]=cR; oppArr[s]=oR;
+      if (cR>=61) pc++; else if (oR>=61) po++; else ph++;
+    }
+    return { coalArr, oppArr, pCoal:pc/N, pOpp:po/N, pHung:ph/N, from:win.from, to:win.to, nPolls:win.polls.length };
+  }
+
+  const RED='#c0392b', BLUE='#1d5fa8';
+  function drawHist(svg, res){
+    const W=560, H=240, ML=30, MR=14, MT=12, MB=26;
+    const counts=(arr)=>{ const m={}; for(let i=0;i<arr.length;i++) m[arr[i]]=(m[arr[i]]||0)+1; return m; };
+    const cC=counts(res.coalArr), cO=counts(res.oppArr);
+    const keys=[...Object.keys(cC),...Object.keys(cO)].map(Number);
+    let lo=Math.min(...keys), hi=Math.max(...keys);
+    lo=Math.floor(lo/5)*5; hi=Math.ceil(hi/5)*5; if(hi-lo<20){hi=lo+20;}
+    const span=hi-lo, bw=(W-ML-MR)/(span+1);
+    let peak=0; for(let s=lo;s<=hi;s++){ peak=Math.max(peak, cC[s]||0, cO[s]||0); }
+    const X=s=> ML+(s-lo)*bw, Y=c=> MT+(1-c/peak)*(H-MT-MB);
+    const bars=(cnt,color)=>{ let out=''; for(let s=lo;s<=hi;s++){ const c=cnt[s]||0; if(!c)continue; const h=(H-MT-MB)*(c/peak); out+=`<rect x="${(X(s)+bw*0.12).toFixed(1)}" y="${(H-MB-h).toFixed(1)}" width="${(bw*0.76).toFixed(1)}" height="${h.toFixed(1)}" fill="${color}" opacity="0.55" rx="1"/>`; } return out; };
+    let s = bars(cO,BLUE) + bars(cC,RED);
+    const x61=X(61)+bw/2;
+    s += `<line x1="${x61.toFixed(1)}" y1="${MT}" x2="${x61.toFixed(1)}" y2="${H-MB}" stroke="#0f1729" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    s += `<text x="${x61.toFixed(1)}" y="${MT+9}" text-anchor="middle" font-size="10" font-weight="800" fill="#0f1729">61 = רוב</text>`;
+    for(let s0=lo;s0<=hi;s0+=5){ s += `<text x="${X(s0)+bw/2}" y="${H-9}" text-anchor="middle" font-size="9.5" fill="#94a3b8">${s0}</text>`; }
+    s += `<text x="${ML}" y="${H-9}" font-size="9.5" fill="#94a3b8"></text>`;
+    // legend
+    s += `<g font-size="10.5" font-weight="700"><rect x="${W-MR-150}" y="${MT-2}" width="10" height="10" fill="${RED}" opacity="0.6" rx="2"/><text x="${W-MR-136}" y="${MT+7}" fill="${RED}">קואליציה</text><rect x="${W-MR-78}" y="${MT-2}" width="10" height="10" fill="${BLUE}" opacity="0.6" rx="2"/><text x="${W-MR-64}" y="${MT+7}" fill="${BLUE}">אופוזיציה</text></g>`;
+    svg.innerHTML = s;
+  }
+
+  function pct(x){ return Math.round(x*100)+'%'; }
+  function render(){
+    const sigMul = parseFloat(document.getElementById('fcSigma').value)||1;
+    document.getElementById('fcSigmaVal').textContent = '×'+sigMul.toFixed(1);
+    const res = simulate(sigMul);
+    document.getElementById('fcProbs').innerHTML =
+      `<div class="fc-prob" style="background:#fff0f0"><div class="pct" style="color:${RED}">${pct(res.pCoal)}</div><div class="lbl" style="color:${RED}">רוב לקואליציה</div></div>`+
+      `<div class="fc-prob" style="background:#f0f4ff"><div class="pct" style="color:${BLUE}">${pct(res.pOpp)}</div><div class="lbl" style="color:${BLUE}">רוב לאופוזיציה</div></div>`+
+      `<div class="fc-prob" style="background:#f5f5f5"><div class="pct" style="color:#555">${pct(res.pHung)}</div><div class="lbl" style="color:#555">ללא הכרעה</div></div>`;
+    drawHist(document.getElementById('fcHist'), res);
+    document.getElementById('fcBadge').textContent = `${res.nPolls} סקרים אחרונים`;
+    document.getElementById('fcNote').innerHTML =
+      `המודל מריץ ${N.toLocaleString()} סימולציות על בסיס ממוצע הסקרים מ‑${heDate(res.from)}–${heDate(res.to)}, עם אי‑ודאות המשקפת שגיאות סקרים היסטוריות בישראל `+
+      `(בבחירות 2015–2022 הסקרים הסופיים תת‑העריכו את גוש הימין בכ‑5.7 מנדטים בממוצע ועל‑העריכו את גוש המרכז‑שמאל‑ערבי בכ‑2.5). `+
+      `הגושים לפי השיוך הנוכחי שלך. זהו מודל הסתברותי ולא תחזית ודאית — ניתן להרחיב/לצמצם את אי‑הוודאות במחוון.`;
+  }
+
+  document.getElementById('fcSigma').addEventListener('input', render);
+  // recompute when the user reassigns a party to a different bloc
+  document.getElementById('resultsBody').addEventListener('click', e => { if (e.target.closest('button[data-bloc]')) render(); });
+  render();
+})();
 </script>
 <script>
 
