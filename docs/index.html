@@ -481,33 +481,41 @@ function opdrtsDate(cell){ const m=cell.match(/\{\{\s*Opdrts\s*\|([^}]*)\}\}/i);
   if(!day||!mon||!year) return null;
   return year+'-'+String(mon).padStart(2,'0')+'-'+String(day).padStart(2,'0'); }
 function parseWikiText(wikitext){
-  const results=[]; let sec=wikitext; const s26=wikitext.search(/===\s*2026\s*===/); if(s26>=0) sec=wikitext.slice(s26);
-  const tStart=sec.indexOf('{|'); const tEnd=sec.indexOf('\n|}',tStart); if(tStart<0||tEnd<0) return results;
-  const table=sec.slice(tStart,tEnd); const chunks=table.split(/\n\|-/);
-  let cols=null;
-  for(const ch of chunks){ if(/\{\{\s*Opdrts/i.test(ch)) continue;
-    const hcells=ch.split('\n').filter(l=>/^\s*!/.test(l)); if(hcells.length<8) continue;
-    const order=[];
-    for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
-      const content=bar>=0?txt.slice(bar+1):txt; const key=headerKey(wikiPlain(content));
-      if(key==='JOINT2'){ order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
-    if(order.length>=10){ cols=order; break; } }
-  if(!cols) return results;
+  const results=[]; const seen=new Set();
+  let sec=wikitext; const s26=wikitext.search(/===\s*2026\s*===/); if(s26>=0) sec=wikitext.slice(s26);
   const todayISO=new Date().toISOString().slice(0,10);
-  for(const ch of chunks){ if(!/\{\{\s*Opdrts/i.test(ch)) continue;
-    const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
-    if(cellLines.length < cols.length+4) continue;
-    const iso=opdrtsDate(cellContent(cellLines[0])); if(!iso || iso>todayISO) continue;
-    const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
-    const publisher=wikiPlain(cellContent(cellLines[2]));
-    const seatCells=cellLines.slice(4).map(cellContent); if(seatCells.length<cols.length) continue;
-    const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher }; ALL_KEYS.forEach(k=>rec[k]=null);
-    cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
-    const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
-    const tail=seatCells.slice(cols.length).map(convSeat);
-    const gv=tail.find(t=>t!==null && Math.abs(t-govsum)<=1);
-    const total=ALL_KEYS.reduce((a,p)=>a+(rec[p]||0),0);
-    if(gv!==undefined && total>=95 && total<=122){ rec._govTotal=gv; results.push(rec); } }
+  // The 2026 section holds many sub-tables (monthly breakdowns, etc.) — scan them all,
+  // detecting the column header per-table and collecting poll rows from each.
+  let ti=0;
+  while((ti=sec.indexOf('{|',ti))>=0){
+    const te=sec.indexOf('\n|}',ti); if(te<0) break;
+    const table=sec.slice(ti,te); ti=te+3;
+    const chunks=table.split(/\n\|-/);
+    let cols=null;
+    for(const ch of chunks){ if(/\{\{\s*Opdrts/i.test(ch)) continue;
+      const hcells=ch.split('\n').filter(l=>/^\s*!/.test(l)); if(hcells.length<8) continue;
+      const order=[];
+      for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
+        const content=bar>=0?txt.slice(bar+1):txt; const key=headerKey(wikiPlain(content));
+        if(key==='JOINT2'){ order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
+      if(order.length>=10){ cols=order; break; } }
+    if(!cols) continue;
+    for(const ch of chunks){ if(!/\{\{\s*Opdrts/i.test(ch)) continue;
+      const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
+      if(cellLines.length < cols.length+4) continue;
+      const iso=opdrtsDate(cellContent(cellLines[0])); if(!iso || iso>todayISO) continue;
+      const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
+      const dk=iso+'|'+firm; if(seen.has(dk)) continue;
+      const publisher=wikiPlain(cellContent(cellLines[2]));
+      const seatCells=cellLines.slice(4).map(cellContent); if(seatCells.length<cols.length) continue;
+      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher }; ALL_KEYS.forEach(k=>rec[k]=null);
+      cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
+      const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
+      const tail=seatCells.slice(cols.length).map(convSeat);
+      const gv=tail.find(t=>t!==null && Math.abs(t-govsum)<=1);
+      const total=ALL_KEYS.reduce((a,p)=>a+(rec[p]||0),0);
+      if(gv!==undefined && total>=95 && total<=122){ rec._govTotal=gv; seen.add(dk); results.push(rec); } }
+  }
   return results;
 }
 function doManualRefresh() {
@@ -550,8 +558,11 @@ async function fetchFreshPolls() {
     const fresh = parsed.filter(p => p.date > MAX_BAKED_DATE && p.date <= today && !keys.has(p.date + '|' + p.pollster));
     fresh.forEach(p => p._new = true);
     if (fresh.length > 0) {
+      const oldMax = POLLS.map(p => p.date).sort().pop();
+      const wasAtEnd = dateSlider.getHiIso() === oldMax;   // only auto-extend if the user was viewing up to the latest
       POLLS = [...POLLS, ...fresh].sort((a,b) => a.date < b.date ? -1 : 1);
       initBounds(true); rebuildOutlets();
+      if (wasAtEnd) dateSlider.setRange(dateSlider.getLoIso(), POLLS[POLLS.length-1].date, true); // reveal the new polls
       statusEl.textContent = `רענון הצליח — ${fresh.length} סקרים חדשים ✓`; statusEl.className = 'refresh-status ok';
     } else {
       statusEl.textContent = 'אין סקרים חדשים'; statusEl.className = 'refresh-status ok';
@@ -622,16 +633,23 @@ function renderBlocDonut(filtered) {
   note.textContent = `ממוצע על ${b.n} סקרים. "אחרים" כולל קולות מתחת לאחוז החסימה.`;
 }
 
-/* אירועים מרכזיים שעשויים להשפיע על הסקרים — התאריכים לאימות לפני פרסום.
-   מקור: דיווחי תקשורת על מערכת הבחירות 2026 (ינואר–אוגוסט 2026). ניתן לערוך/להוסיף כאן. */
+/* אירועים מרכזיים שעשויים להשפיע על הסקרים — מקורם בשורות האירועים שבטבלת הסקרים בוויקיפדיה
+   ("Opinion polling for the 2026 Israeli legislative election"). ניתן לערוך/להוסיף כאן. */
 const EVENTS = [
-  { date: '2026-01-15', label: 'השבת גופת החטוף האחרון', cat: 'security' },
-  { date: '2026-04-08', label: 'הפסקת אש עם איראן', cat: 'military' },
-  { date: '2026-04-27', label: 'איחוד מחנה היריבים (בנט–לפיד)', cat: 'political' },
-  { date: '2026-05-20', label: 'הכנסת מצביעה על פיזורה', cat: 'political' },
-  { date: '2026-06-10', label: 'רשימה ערבית משותפת (חד״ש-תע״ל-בל״ד)', cat: 'political' },
-  { date: '2026-06-15', label: 'אייזנקוט/ישר משיק קמפיין לראשות הממשלה', cat: 'political' },
-  { date: '2026-07-17', label: 'הכנסת מתפזרת רשמית', cat: 'political' },
+  { date: '2026-01-22', label: 'רע״ם, חד״ש-תע״ל ובל״ד מתחייבים לחדש את הרשימה המשותפת', cat: 'political' },
+  { date: '2026-02-28', label: 'תחילת מלחמת איראן', cat: 'military' },
+  { date: '2026-03-02', label: 'תחילת מלחמת לבנון', cat: 'military' },
+  { date: '2026-03-30', label: 'אושר תקציב חדש — נמנעו בחירות מוקדמות', cat: 'political' },
+  { date: '2026-04-16', label: 'הפסקת אש ישראל–לבנון נכנסת לתוקף', cat: 'military' },
+  { date: '2026-04-26', label: 'בנט ולפיד מקימים את "יחד" (בראשות בנט)', cat: 'political' },
+  { date: '2026-05-13', label: 'הצעות לפיזור הכנסת מוגשות', cat: 'political' },
+  { date: '2026-05-16', label: 'יוסף ג׳בארין נבחר להוביל את חד״ש', cat: 'political' },
+  { date: '2026-06-10', label: 'חד״ש-תע״ל ובל״ד מחדשים את הרשימה המשותפת (בלי רע״ם)', cat: 'political' },
+  { date: '2026-06-17', label: 'נחתם מזכר איסלמאבאד — לקראת סיום מלחמת איראן', cat: 'military' },
+  { date: '2026-07-07', label: 'הנדל, טרופר והמילואימניקים מתאחדים ("יסודות ישראל")', cat: 'political' },
+  { date: '2026-07-17', label: 'הכנסת מאשרת את פיזורה', cat: 'political' },
+  { date: '2026-07-20', label: 'הדמוקרטים עורכים פריימריז לרשימה', cat: 'political' },
+  { date: '2026-08-06', label: 'ארדן ואדלשטיין מקימים מפלגה חדשה', cat: 'political' },
 ];
 function drawLineChart(svgEl, series, opts) {
   const W = opts.W, H = opts.H, ML = 28, MR = 36, MT = 10, MB = 22;
