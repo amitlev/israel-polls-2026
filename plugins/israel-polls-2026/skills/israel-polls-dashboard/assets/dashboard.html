@@ -563,6 +563,7 @@ async function fetchFreshPolls() {
       POLLS = [...POLLS, ...fresh].sort((a,b) => a.date < b.date ? -1 : 1);
       initBounds(true); rebuildOutlets();
       if (wasAtEnd) dateSlider.setRange(dateSlider.getLoIso(), POLLS[POLLS.length-1].date, true); // reveal the new polls
+      if (typeof window.updateForecast === 'function') window.updateForecast(); // re-run the bloc-majority forecast on the new data
       statusEl.textContent = `רענון הצליח — ${fresh.length} סקרים חדשים ✓`; statusEl.className = 'refresh-status ok';
     } else {
       statusEl.textContent = 'אין סקרים חדשים'; statusEl.className = 'refresh-status ok';
@@ -1202,6 +1203,7 @@ tryRefresh();
   })();
   // recompute when the user reassigns a party to a different bloc
   document.getElementById('resultsBody').addEventListener('click', e => { if (e.target.closest('button[data-bloc]')) render(); });
+  window.updateForecast = render;   // let a data refresh re-run the simulation
   render();
 })();
 </script>
