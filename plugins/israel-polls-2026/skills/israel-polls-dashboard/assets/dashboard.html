@@ -12,15 +12,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>לוח סקרי הבחירות לכנסת 2026</title>
+<script>
+  /* Apply saved/OS theme before first paint to avoid a flash */
+  (function(){ try { var t = localStorage.getItem('ilpolls_theme');
+    if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+  } catch(e){} })();
+</script>
 <style>
-  :root {
+  :root, :root[data-theme="light"] {
     color-scheme: light;
-    --bg:#f0f4f9; --card:#ffffff; --ink:#0c1f3f; --muted:#5a6e8a; --faint:#9aacbf;
-    --border:#dce4ee; --line:#edf2f7; --accent:#1258a8; --accent-soft:#e5edf8;
-    --red:#b83028; --blue:#1758a0; --gray:#8fa3b8;
-    --header:#0c1f3f;
+    --bg:#f0f4f9; --card:#ffffff; --card-2:#fafbfd; --ink:#0c1f3f; --muted:#5a6e8a; --faint:#9aacbf;
+    --border:#dce4ee; --line:#edf2f7; --field:#ffffff; --avatar-bg:#e2e8f0;
+    --accent:#1258a8; --accent-soft:#e5edf8;
+    --red:#b83028; --blue:#1758a0; --gray:#8fa3b8; --coal:#c0392b; --opp:#1d5fa8;
+    --tile-red:#fff0f0; --tile-blue:#f0f4ff; --tile-gray:#f5f5f5;
+    --chart-grid:#eef2f7; --chart-axis:#94a3b8; --chart-ink:#0f1729;
+    --header:#0c1f3f; --hero-1:#0c1f3f; --hero-2:#153a6e; --on-header:#ffffff;
     --shadow:0 1px 3px rgba(12,31,63,.07), 0 2px 4px rgba(12,31,63,.05);
     --shadow-lg:0 6px 24px rgba(12,31,63,.13);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:#0b0f17; --card:#141b26; --card-2:#171f2c; --ink:#e8ecf3; --muted:#9aa6ba; --faint:#69748a;
+    --border:#242e3d; --line:#1e2733; --field:#0f1722; --avatar-bg:#2a3546;
+    --accent:#5b8def; --accent-soft:#18222f;
+    --red:#e05a4c; --blue:#5b8def; --gray:#7d8ba0; --coal:#e05a4c; --opp:#5b8def;
+    --tile-red:#241519; --tile-blue:#141d2b; --tile-gray:#1a212b;
+    --chart-grid:#212b39; --chart-axis:#69748a; --chart-ink:#c7d1e0;
+    --header:#0a0e15; --hero-1:#0a0e15; --hero-2:#132241; --on-header:#ffffff;
+    --shadow:0 1px 3px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.55);
+  }
+  @media (prefers-color-scheme:dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:#0b0f17; --card:#141b26; --card-2:#171f2c; --ink:#e8ecf3; --muted:#9aa6ba; --faint:#69748a;
+      --border:#242e3d; --line:#1e2733; --field:#0f1722; --avatar-bg:#2a3546;
+      --accent:#5b8def; --accent-soft:#18222f;
+      --red:#e05a4c; --blue:#5b8def; --gray:#7d8ba0; --coal:#e05a4c; --opp:#5b8def;
+      --tile-red:#241519; --tile-blue:#141d2b; --tile-gray:#1a212b;
+      --chart-grid:#212b39; --chart-axis:#69748a; --chart-ink:#c7d1e0;
+      --header:#0a0e15; --hero-1:#0a0e15; --hero-2:#132241; --on-header:#ffffff;
+      --shadow:0 1px 3px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.55);
+    }
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:"Assistant","Heebo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; }
@@ -55,12 +88,12 @@
   .range-caption { font-size:11.5px; font-weight:700; direction:ltr; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
   .dd { position:relative; }
-  .dd summary { list-style:none; cursor:pointer; font-size:12.5px; font-weight:600; border:1.5px solid var(--border); border-radius:10px; background:#fff; padding:6px 12px; user-select:none; white-space:nowrap; display:flex; align-items:center; gap:7px; min-width:160px; transition:border-color .15s,box-shadow .15s; }
+  .dd summary { list-style:none; cursor:pointer; font-size:12.5px; font-weight:600; border:1.5px solid var(--border); border-radius:10px; background:var(--field); color:var(--ink); padding:6px 12px; user-select:none; white-space:nowrap; display:flex; align-items:center; gap:7px; min-width:160px; transition:border-color .15s,box-shadow .15s; }
   .dd summary:hover { border-color:var(--accent); }
   .dd summary::-webkit-details-marker { display:none; }
   .dd summary::after { content:"⌄"; color:var(--faint); margin-inline-start:auto; font-size:14px; line-height:0; }
   .dd[open] summary { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
-  .dd-menu { position:absolute; z-index:40; top:calc(100% + 6px); inset-inline-start:0; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-lg); padding:7px; min-width:230px; max-height:280px; overflow-y:auto; }
+  .dd-menu { position:absolute; z-index:40; top:calc(100% + 6px); inset-inline-start:0; background:var(--card); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-lg); padding:7px; min-width:230px; max-height:280px; overflow-y:auto; }
   .dd-item { display:flex; align-items:center; gap:8px; font-size:12.5px; padding:5px 9px; border-radius:8px; cursor:pointer; white-space:nowrap; }
   .dd-item:hover { background:var(--accent-soft); }
   .dd-item .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
@@ -72,7 +105,7 @@
   .col { display:flex; flex-direction:column; gap:16px; }
   .panel { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
   .panel-accent { height:3px; width:100%; }
-  .panel-head { display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:#fafbfd; }
+  .panel-head { display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:var(--card-2); }
   .panel-title { font-size:13px; font-weight:800; letter-spacing:-.01em; }
   .panel-badge { font-size:10.5px; font-weight:700; color:var(--accent); background:var(--accent-soft); border-radius:20px; padding:2px 9px; }
   .panel-head .spacer { margin-inline-start:auto; }
@@ -87,7 +120,7 @@
   tbody tr:hover { background:var(--accent-soft); }
   .party-cell { display:flex; align-items:center; gap:9px; }
   .rank { font-size:10.5px; font-weight:700; color:var(--faint); width:16px; text-align:center; font-variant-numeric:tabular-nums; flex-shrink:0; }
-  .avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; background:#e2e8f0; display:block; box-shadow:0 0 0 1.5px rgba(12,31,63,.09); }
+  .avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--avatar-bg); display:block; box-shadow:0 0 0 1.5px rgba(12,31,63,.09); }
   .avatar-fallback { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:10px; flex-shrink:0; }
   .party-info { display:flex; flex-direction:column; min-width:0; line-height:1.3; }
   .party-name { font-weight:700; font-size:13px; white-space:nowrap; }
@@ -99,7 +132,7 @@
   td.med { font-variant-numeric:tabular-nums; font-weight:600; font-size:12.5px; color:var(--muted); text-align:center; direction:ltr; }
   td.n { font-variant-numeric:tabular-nums; color:var(--faint); font-size:11.5px; text-align:center; direction:ltr; }
   .bloc-seg { display:inline-flex; border:1px solid var(--border); border-radius:7px; overflow:hidden; margin-inline-start:auto; flex-shrink:0; }
-  .bloc-seg button { font-size:9px; font-weight:600; padding:2px 5px; border:none; background:#fff; color:var(--faint); cursor:pointer; line-height:1.6; transition:background .12s; }
+  .bloc-seg button { font-size:9px; font-weight:600; padding:2px 5px; border:none; background:var(--field); color:var(--faint); cursor:pointer; line-height:1.6; transition:background .12s; }
   .bloc-seg button:not(:last-child) { border-inline-end:1px solid var(--border); }
   .bloc-seg button:hover { background:var(--line); }
   .bloc-seg button.sel-coal { background:var(--red); color:#fff; }
@@ -116,7 +149,7 @@
   .poll-log.show { display:block; }
   .poll-log div { padding:2px 0; display:flex; justify-content:space-between; gap:10px; }
   .poll-log .newpoll { color:#128a54; font-weight:700; }
-  .logbtn { font-size:11px; font-weight:600; border:1.5px solid var(--border); background:#fff; border-radius:8px; padding:5px 12px; cursor:pointer; color:var(--muted); transition:border-color .15s,color .15s; white-space:nowrap; }
+  .logbtn { font-size:11px; font-weight:600; border:1.5px solid var(--border); background:var(--field); border-radius:8px; padding:5px 12px; cursor:pointer; color:var(--muted); transition:border-color .15s,color .15s; white-space:nowrap; }
   .logbtn:hover { border-color:var(--accent); color:var(--accent); }
   footer { color:var(--faint); font-size:10.5px; margin-top:16px; line-height:1.6; }
   footer summary { cursor:pointer; font-weight:600; }
@@ -132,7 +165,7 @@
   /* ── Modal ── */
   .modal-ov { position:fixed; inset:0; background:rgba(5,15,40,.55); z-index:870; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .18s; }
   .modal-ov.show { opacity:1; pointer-events:auto; }
-  .modal-box { background:#fff; border-radius:18px; box-shadow:0 12px 48px rgba(12,31,63,.25); width:min(580px,93vw); max-height:84vh; overflow-y:auto; padding:22px 24px 24px; }
+  .modal-box { background:var(--card); border-radius:18px; box-shadow:0 12px 48px rgba(0,0,0,.4); width:min(580px,93vw); max-height:84vh; overflow-y:auto; padding:22px 24px 24px; }
   .modal-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
   .modal-date { font-size:17px; font-weight:800; color:var(--ink); }
   .modal-close { background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:var(--faint); padding:0; flex-shrink:0; }
@@ -154,13 +187,13 @@
   /* ── Query-the-data widget (local, no LLM) ── */
   .q-builder { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .q-inputs { display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .q-builder select, .q-builder input { font:inherit; font-size:12.5px; color:var(--ink); background:#fff; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .q-builder select, .q-builder input { font:inherit; font-size:12.5px; color:var(--ink); background:var(--field); border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; outline:none; transition:border-color .15s, box-shadow .15s; }
   .q-builder select:focus, .q-builder input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   #qType { font-weight:700; }
   .q-chips { display:flex; gap:7px; flex-wrap:wrap; margin-top:11px; }
-  .q-chip { font:inherit; font-size:11.5px; font-weight:700; border:1.5px solid var(--border); background:#fff; color:var(--muted); border-radius:20px; padding:5px 12px; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .q-chip { font:inherit; font-size:11.5px; font-weight:700; border:1.5px solid var(--border); background:var(--field); color:var(--muted); border-radius:20px; padding:5px 12px; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
   .q-chip:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
-  .q-answer { margin-top:14px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fafbfd; }
+  .q-answer { margin-top:14px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--card-2); }
   .q-answer.empty { color:var(--faint); font-size:12.5px; background:none; border-style:dashed; }
   .q-big { font-size:15px; font-weight:800; color:var(--ink); line-height:1.5; margin-bottom:8px; }
   .q-big b { font-size:26px; font-variant-numeric:tabular-nums; }
@@ -187,9 +220,46 @@
   .fc-ctl { display:flex; align-items:center; gap:10px; margin-top:10px; font-size:11.5px; color:var(--muted); font-weight:600; }
   .fc-ctl input[type=range] { flex:1; max-width:240px; accent-color:var(--accent); }
   .fc-sigval { font-variant-numeric:tabular-nums; color:var(--faint); }
+  /* ── Theme toggle ── */
+  .theme-btn { margin-inline-start:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:14px; line-height:1; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; }
+  .theme-btn:hover { background:rgba(255,255,255,.24); }
+  /* ── Editorial hero ── */
+  .hero { background:var(--card); border-bottom:1px solid var(--border); }
+  .hero-inner { max-width:1280px; margin:0 auto; padding:24px 20px 6px; display:grid; grid-template-columns:1.25fr 1fr; gap:34px; align-items:center; }
+  .hero-eyebrow { font-size:12px; font-weight:800; letter-spacing:.04em; color:var(--coal); text-transform:uppercase; }
+  .hero-headline { font-size:clamp(24px,3.6vw,37px); font-weight:900; letter-spacing:-.02em; line-height:1.1; margin:.14em 0 .2em; text-wrap:balance; color:var(--ink); }
+  .hero-sub { color:var(--muted); font-size:14.5px; line-height:1.6; margin:0 0 14px; max-width:48ch; }
+  .hero-forecast { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--muted); background:var(--card-2); border:1px solid var(--border); border-radius:30px; padding:7px 15px; }
+  .hero-forecast .hf-pct { font-size:19px; font-weight:900; }
+  .hero-tug { display:flex; flex-direction:column; gap:6px; }
+  .tug-top { display:flex; justify-content:space-between; font-size:13px; font-weight:800; }
+  .tug-top .tug-mid { color:var(--faint); font-weight:600; }
+  .tug-svg { width:100%; height:16px; display:block; }
+  .tug-cap { font-size:10.5px; color:var(--faint); text-align:center; font-weight:600; }
+  .hero-kpis { max-width:1280px; margin:0 auto; padding:8px 20px 22px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .hero-kpi { background:var(--card-2); border:1px solid var(--border); border-radius:13px; padding:12px 16px; }
+  .hero-kpi .kv { font-size:19px; font-weight:900; letter-spacing:-.01em; color:var(--ink); }
+  .hero-kpi .kl { font-size:11px; color:var(--faint); font-weight:600; margin-top:4px; line-height:1.5; }
+  /* ── Sticky mobile summary (hidden on wide screens) ── */
+  .m-summary { display:none; }
+  @media (max-width:720px){
+    .hero-inner { grid-template-columns:1fr; gap:16px; padding:18px 16px 4px; }
+    .hero-kpis { grid-template-columns:1fr; padding:8px 16px 16px; }
+    .wrap { padding:14px 14px; }
+    .controls { gap:10px 16px; }
+    .range-slider { width:100%; }
+    .ctl-group { width:100%; }
+    .dd summary { min-width:0; width:100%; }
+    .site-header .sub { display:none; }
+    .m-summary { display:flex; position:fixed; top:0; inset-inline:0; z-index:80; align-items:center; gap:8px; background:var(--card); border-bottom:1px solid var(--border); padding:9px 14px; font-size:12.5px; font-weight:700; color:var(--ink); box-shadow:var(--shadow); transform:translateY(-100%); transition:transform .22s; }
+    .m-summary.show { transform:translateY(0); }
+    .m-summary .ms-pill { margin-inline-start:auto; font-size:11px; font-weight:800; padding:3px 10px; border-radius:14px; background:var(--tile-blue); color:var(--opp); }
+    .maxbtn { display:none; }  /* fullscreen expand not useful on mobile */
+  }
 </style>
 </head>
 <body>
+<div class="m-summary" id="mSummary"></div>
 <header class="site-header">
   <div class="inner">
     <h1>סקרי הבחירות לכנסת 2026</h1>
@@ -199,8 +269,22 @@
     <button class="refresh-btn" id="refreshBtn" onclick="doManualRefresh()" title="בדוק סקרים חדשים מוויקיפדיה">
       <span class="icon">↻</span> רענן
     </button>
+    <button class="theme-btn" id="themeBtn" title="החלף בין מצב בהיר לכהה" aria-label="החלף מצב תצוגה">🌙</button>
   </div>
 </header>
+
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="hero-lead">
+      <div class="hero-eyebrow">אם הבחירות היו נערכות היום</div>
+      <h2 class="hero-headline" id="heroHeadline">—</h2>
+      <p class="hero-sub" id="heroSub"></p>
+      <div class="hero-forecast" id="heroForecast"></div>
+    </div>
+    <div class="hero-tug" id="heroTug"></div>
+  </div>
+  <div class="hero-kpis" id="heroKpis"></div>
+</section>
 
 <div class="wrap">
   <div class="controls">
@@ -609,6 +693,12 @@ function donutSegment(cx, cy, rOut, rIn, f1, f2) {
   const [x1i,y1i] = polar(cx,cy,rIn,f1), [x2i,y2i] = polar(cx,cy,rIn,f2);
   return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rOut} ${rOut} 0 0 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rIn} ${rIn} 0 0 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
 }
+/* Theme-aware colors for the SVG charts, read from the active CSS variables. */
+function chartTheme(){
+  const s = getComputedStyle(document.documentElement), g = n => s.getPropertyValue(n).trim();
+  return { grid:g('--chart-grid'), axis:g('--chart-axis'), ink:g('--chart-ink'), coal:g('--coal'), opp:g('--opp'), gray:g('--gray'),
+           tileRed:g('--tile-red'), tileBlue:g('--tile-blue'), tileGray:g('--tile-gray'), card:g('--card') };
+}
 function renderBlocDonut(filtered) {
   const svg = document.getElementById('blocChart'), note = document.getElementById('blocNote');
   const eligible = filtered.map(pollBlocs).filter(Boolean);
@@ -616,20 +706,20 @@ function renderBlocDonut(filtered) {
   let g = Math.round(mean(eligible.map(e => e.gov))), o = Math.round(mean(eligible.map(e => e.opp)));
   if (g + o > 120) o = 120 - g;
   const b = { gov: g, opp: o, other: Math.max(0, 120 - g - o), n: eligible.length };
-  const RED='#c0392b', BLUE='#1d5fa8', GRAY='#94a3b8';
+  const CT = chartTheme(), RED=CT.coal, BLUE=CT.opp, GRAY=CT.gray;
   const cx=210, cy=200, rOut=150, rIn=96;
   const fOpp = Math.max(0, Math.min(1, b.opp/120)), fOther = Math.max(0, Math.min(1 - fOpp, b.other/120));
   const segs = [ {f1:0,f2:fOpp,color:BLUE,seats:b.opp}, {f1:fOpp,f2:fOpp+fOther,color:GRAY,seats:b.other}, {f1:fOpp+fOther,f2:1,color:RED,seats:b.gov} ];
   let s = segs.filter(x => x.f2 - x.f1 > 0.0005).map(x => `<path d="${donutSegment(cx,cy,rOut,rIn,x.f1,x.f2)}" fill="${x.color}"/>`).join('');
   const [mx1,my1] = polar(cx,cy,rIn-8,0.5), [mx2,my2] = polar(cx,cy,rOut+8,0.5);
-  s += `<line x1="${mx1}" y1="${my1}" x2="${mx2}" y2="${my2}" stroke="#0f1729" stroke-width="2" stroke-dasharray="3 3"/>`;
-  s += `<text x="${cx}" y="${my2-9}" text-anchor="middle" font-size="12" font-weight="700" fill="#0f1729">61</text>`;
+  s += `<line x1="${mx1}" y1="${my1}" x2="${mx2}" y2="${my2}" stroke="${CT.ink}" stroke-width="2" stroke-dasharray="3 3"/>`;
+  s += `<text x="${cx}" y="${my2-9}" text-anchor="middle" font-size="12" font-weight="700" fill="${CT.ink}">61</text>`;
   const rMid = (rIn+rOut)/2;
   segs.forEach(x => { if (x.f2 - x.f1 >= 0.1) { const [nx, ny] = polar(cx, cy, rMid, (x.f1 + x.f2) / 2); s += `<text x="${nx.toFixed(1)}" y="${(ny+11).toFixed(1)}" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">${x.seats}</text>`; } });
   s += `<text x="${cx+rMid}" y="${cy+26}" text-anchor="middle" font-size="13" font-weight="700" fill="${RED}">הקואליציה ${b.gov}</text>`;
   s += `<text x="${cx-rMid}" y="${cy+26}" text-anchor="middle" font-size="13" font-weight="700" fill="${BLUE}">האופוזיציה ${b.opp}</text>`;
-  s += `<text x="${cx}" y="${cy-34}" text-anchor="middle" font-size="17" font-weight="800" fill="#64748b">${b.other}</text>`;
-  s += `<text x="${cx}" y="${cy-18}" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">אחרים</text>`;
+  s += `<text x="${cx}" y="${cy-34}" text-anchor="middle" font-size="17" font-weight="800" fill="${CT.axis}">${b.other}</text>`;
+  s += `<text x="${cx}" y="${cy-18}" text-anchor="middle" font-size="11" font-weight="600" fill="${CT.axis}">אחרים</text>`;
   svg.innerHTML = s;
   note.textContent = `ממוצע על ${b.n} סקרים. "אחרים" כולל קולות מתחת לאחוז החסימה.`;
 }
@@ -654,7 +744,8 @@ const EVENTS = [
 ];
 function drawLineChart(svgEl, series, opts) {
   const W = opts.W, H = opts.H, ML = 28, MR = 36, MT = 10, MB = 22;
-  if (!series.length || series.every(x => !x.dots.length)) { svgEl.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="#94a3b8">אין נתונים בטווח</text>`; return; }
+  const CT = chartTheme();
+  if (!series.length || series.every(x => !x.dots.length)) { svgEl.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="${CT.axis}">אין נתונים בטווח</text>`; return; }
   const allDates = [...new Set(series.flatMap(x => x.dots.map(p => p.d)))].sort();
   const t0 = isoToT(allDates[0]), t1 = isoToT(allDates[allDates.length-1]), span = Math.max(t1 - t0, 1);
   const X = iso => ML + (isoToT(iso) - t0) / span * (W - ML - MR);
@@ -666,12 +757,12 @@ function drawLineChart(svgEl, series, opts) {
   const gStep = yMax > 40 ? 10 : 5;
   let s = '';
   for (let g = 0; g <= yMax; g += gStep) {
-    s += `<line x1="${ML}" y1="${Y(g)}" x2="${W-MR}" y2="${Y(g)}" stroke="#eef2f7" stroke-width="1"/>`;
-    s += `<text x="${ML-6}" y="${Y(g)+3.5}" text-anchor="end" font-size="9.5" fill="#94a3b8">${g}</text>`;
+    s += `<line x1="${ML}" y1="${Y(g)}" x2="${W-MR}" y2="${Y(g)}" stroke="${CT.grid}" stroke-width="1"/>`;
+    s += `<text x="${ML-6}" y="${Y(g)+3.5}" text-anchor="end" font-size="9.5" fill="${CT.axis}">${g}</text>`;
   }
-  if (opts.line61 && yMax >= 61) { s += `<line x1="${ML}" y1="${Y(61)}" x2="${W-MR}" y2="${Y(61)}" stroke="#0f1729" stroke-width="1" stroke-dasharray="3 3"/><text x="${W-MR+3}" y="${Y(61)+3.5}" font-size="9" font-weight="700" fill="#0f1729">61</text>`; }
+  if (opts.line61 && yMax >= 61) { s += `<line x1="${ML}" y1="${Y(61)}" x2="${W-MR}" y2="${Y(61)}" stroke="${CT.ink}" stroke-width="1" stroke-dasharray="3 3"/><text x="${W-MR+3}" y="${Y(61)+3.5}" font-size="9" font-weight="700" fill="${CT.ink}">61</text>`; }
   const nTicks = Math.min(6, allDates.length);
-  for (let i = 0; i < nTicks; i++) { const d = allDates[Math.round(i * (allDates.length-1) / Math.max(nTicks-1,1))]; s += `<text x="${X(d)}" y="${H-7}" text-anchor="middle" font-size="9.5" fill="#94a3b8">${heDateShort(d)}</text>`; }
+  for (let i = 0; i < nTicks; i++) { const d = allDates[Math.round(i * (allDates.length-1) / Math.max(nTicks-1,1))]; s += `<text x="${X(d)}" y="${H-7}" text-anchor="middle" font-size="9.5" fill="${CT.axis}">${heDateShort(d)}</text>`; }
   evs.forEach(ev => { const ex = X(ev.date); s += `<line x1="${ex.toFixed(1)}" y1="${MT+5}" x2="${ex.toFixed(1)}" y2="${H-MB}" stroke="#d97706" stroke-width="1" stroke-dasharray="2 3" opacity="0.5" pointer-events="none"/>`; });
   // Scatter dots (one per individual poll) — drawn first so the trend line sits on top
   series.forEach(({name, color, dots}) => {
@@ -806,10 +897,11 @@ function renderBlocHalf(filtered) {
   document.getElementById('blocBadge').textContent = filtered.length ? `${filtered.length} סקרים` : '';
   renderBlocDonut(filtered);
   const blocPts = (getter) => { const dots = perPollSeries(filtered, p => { const b = pollBlocs(p); return b ? getter(b) : null; }); return { dots, trend: smoothTrend(dots) }; };
+  const _ct = chartTheme();
   const series = [
-    { name:'הקואליציה', color:'#c0392b', thick:true, ...blocPts(b => b.gov) },
-    { name:'האופוזיציה', color:'#1d5fa8', thick:true, ...blocPts(b => b.opp) },
-    { name:'אחרים', color:'#94a3b8', thick:true, ...blocPts(b => b.other) },
+    { name:'הקואליציה', color:_ct.coal, thick:true, ...blocPts(b => b.gov) },
+    { name:'האופוזיציה', color:_ct.opp, thick:true, ...blocPts(b => b.opp) },
+    { name:'אחרים', color:_ct.gray, thick:true, ...blocPts(b => b.other) },
   ];
   drawLineChart(document.getElementById('blocTrend'), series, { W:480, H:220, line61:true, yMin:65, events: EVENTS });
 }
@@ -844,11 +936,11 @@ function openModal(dateIso) {
       <div class="modal-poll-head">${p.pollster} · ${outletDisplay(p.outlet)}</div>`;
     if (blocs) {
       html += `<div class="modal-blocs">
-        <div class="modal-bloc" style="background:#fff0f0;color:#c0392b">
+        <div class="modal-bloc" style="background:var(--tile-red);color:var(--coal)">
           <div class="bn">${blocs.gov}</div><div class="bl">קואליציה</div></div>
-        <div class="modal-bloc" style="background:#f0f4ff;color:#1d5fa8">
+        <div class="modal-bloc" style="background:var(--tile-blue);color:var(--opp)">
           <div class="bn">${blocs.opp}</div><div class="bl">אופוזיציה</div></div>
-        <div class="modal-bloc" style="background:#f5f5f5;color:#666">
+        <div class="modal-bloc" style="background:var(--tile-gray);color:var(--muted)">
           <div class="bn">${blocs.other}</div><div class="bl">אחרים</div></div>
       </div>`;
     }
@@ -867,7 +959,54 @@ function renderPollLog(filtered) {
   document.getElementById('pollLog').innerHTML = [...filtered].sort((a,b) => a.date < b.date ? 1 : -1)
     .map(p => `<div${p._new ? ' class="newpoll"' : ''}><span>${heDate(p.date)}</span><span>${p.pollster} · ${outletDisplay(p.outlet)}${p._new ? ' (חדש)' : ''}</span></div>`).join('');
 }
-function renderAll() { const f = getFiltered(); lastFiltered = f; renderTable(f); renderPartyTrend(f); renderBlocHalf(f); renderPollLog(f); }
+function renderAll() { const f = getFiltered(); lastFiltered = f; renderTable(f); renderPartyTrend(f); renderBlocHalf(f); renderPollLog(f); renderHero(f); }
+
+/* ─── Editorial hero band ─── */
+function renderHero(filtered) {
+  const hero = document.getElementById('hero'); if (!hero) return;
+  const bl = filtered.map(pollBlocs).filter(Boolean);
+  if (!bl.length) { hero.style.display = 'none'; return; }
+  hero.style.display = '';
+  const gov = Math.round(mean(bl.map(b => b.gov))), opp = Math.round(mean(bl.map(b => b.opp)));
+  const other = Math.max(0, 120 - gov - opp), diff = Math.abs(opp - gov);
+  const lead = opp > gov ? 'האופוזיציה' : (gov > opp ? 'הקואליציה' : 'הגושים');
+  const top = Math.max(gov, opp);
+  document.getElementById('heroHeadline').textContent = gov >= 61 ? 'רוב לקואליציה' : (opp >= 61 ? 'רוב לאופוזיציה' : 'אין רוב לאף גוש');
+  document.getElementById('heroSub').textContent = (gov >= 61 || opp >= 61)
+    ? `${lead} מגיעה ל‑${top} מנדטים בממוצע — די להרכבת קואליציה.`
+    : `${lead} מובילה עם ${top} מנדטים (פער של ${diff}), אך רחוקה מ‑61 המנדטים הדרושים.`;
+  // KPIs
+  const rows = PARTIES.filter(p => p.active !== false).map(p => { const v = filtered.map(x => x[p.id]).filter(x => x != null); return v.length ? { p, avg: mean(v) } : null; }).filter(Boolean).sort((a,b) => b.avg - a.avg);
+  const t = rows[0];
+  document.getElementById('heroKpis').innerHTML =
+    `<div class="hero-kpi"><div class="kv">${filtered.length}</div><div class="kl">סקרים בטווח הנבחר</div></div>` +
+    (t ? `<div class="hero-kpi"><div class="kv" style="color:${t.p.color}">${t.p.name} · ${Math.round(t.avg)}</div><div class="kl">המפלגה הגדולה ביותר</div></div>` : '') +
+    `<div class="hero-kpi"><div class="kv">${lead === 'הגושים' ? 'תיקו' : lead + ' +' + diff}</div><div class="kl">הפרש בין הגושים</div></div>`;
+  // tug-of-war bar
+  const CT = chartTheme(), Wt = 200, x = s => (s / 120 * Wt).toFixed(1);
+  document.getElementById('heroTug').innerHTML =
+    `<div class="tug-top"><span style="color:${CT.opp}">אופוזיציה ${opp}</span><span class="tug-mid">${other ? 'אחרים ' + other : ''}</span><span style="color:${CT.coal}">קואליציה ${gov}</span></div>` +
+    `<svg viewBox="0 0 200 16" class="tug-svg" preserveAspectRatio="none">` +
+      `<rect x="0" y="4" width="200" height="9" rx="4.5" fill="${CT.grid}"/>` +
+      `<rect x="0" y="4" width="${x(opp)}" height="9" rx="4.5" fill="${CT.opp}"/>` +
+      `<rect x="${(Wt - x(gov)).toFixed(1)}" y="4" width="${x(gov)}" height="9" rx="4.5" fill="${CT.coal}"/>` +
+      `<line x1="${x(61)}" y1="0" x2="${x(61)}" y2="16" stroke="${CT.ink}" stroke-width="1.5" stroke-dasharray="2 2"/>` +
+    `</svg>` +
+    `<div class="tug-cap">רוב דורש 61 מנדטים · הקו המקווקו</div>`;
+  // mobile sticky summary content
+  const ms = document.getElementById('mSummary');
+  if (ms) ms.innerHTML = `<span>${document.getElementById('heroHeadline').textContent}</span><span style="color:var(--opp)">אופ׳ ${opp}</span><span style="color:var(--coal)">קוא׳ ${gov}</span>` +
+    (window.lastForecast ? `<span class="ms-pill">${Math.round(Math.max(window.lastForecast.pOpp, window.lastForecast.pCoal)*100)}% ${window.lastForecast.pOpp>=window.lastForecast.pCoal?'לאופ׳':'לקוא׳'}</span>` : '');
+  renderHeroForecast();
+}
+window.renderHeroForecast = function() {
+  const el = document.getElementById('heroForecast'); if (!el) return;
+  const f = window.lastForecast; if (!f) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const CT = chartTheme();
+  const majP = Math.max(f.pCoal, f.pOpp), opp = f.pOpp >= f.pCoal;
+  el.innerHTML = `<span class="hf-pct" style="color:${opp ? CT.opp : CT.coal}">${Math.round(majP*100)}%</span> סיכוי לרוב ${opp ? 'לאופוזיציה' : 'לקואליציה'} על פי המודל`;
+};
 
 const dateSlider = makeSlider('dateRange', 'dateCaption', renderAll);
 let outletSel = null, partySel = null;
@@ -1148,9 +1287,10 @@ tryRefresh();
     return { coalArr, oppArr, pCoal:pc/N, pOpp:po/N, pHung:ph/N, from:win.from, to:win.to, nPolls:win.polls.length };
   }
 
-  const RED='#c0392b', BLUE='#1d5fa8';
+  let RED='#c0392b', BLUE='#1d5fa8';   // refreshed from the theme on each render()
   function drawHist(svg, res){
     const W=560, H=240, ML=30, MR=14, MT=12, MB=26;
+    const CT=chartTheme();
     const counts=(arr)=>{ const m={}; for(let i=0;i<arr.length;i++) m[arr[i]]=(m[arr[i]]||0)+1; return m; };
     const cC=counts(res.coalArr), cO=counts(res.oppArr);
     const keys=[...Object.keys(cC),...Object.keys(cO)].map(Number);
@@ -1163,10 +1303,10 @@ tryRefresh();
     const NSIM = res.coalArr.length;
     let s = bars(cO,BLUE,'האופוזיציה',NSIM) + bars(cC,RED,'הקואליציה',NSIM);
     const x61=X(61)+bw/2;
-    s += `<line x1="${x61.toFixed(1)}" y1="${MT}" x2="${x61.toFixed(1)}" y2="${H-MB}" stroke="#0f1729" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-    s += `<text x="${x61.toFixed(1)}" y="${MT+9}" text-anchor="middle" font-size="10" font-weight="800" fill="#0f1729">61 = רוב</text>`;
-    for(let s0=lo;s0<=hi;s0+=5){ s += `<text x="${X(s0)+bw/2}" y="${H-9}" text-anchor="middle" font-size="9.5" fill="#94a3b8">${s0}</text>`; }
-    s += `<text x="${ML}" y="${H-9}" font-size="9.5" fill="#94a3b8"></text>`;
+    s += `<line x1="${x61.toFixed(1)}" y1="${MT}" x2="${x61.toFixed(1)}" y2="${H-MB}" stroke="${CT.ink}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    s += `<text x="${x61.toFixed(1)}" y="${MT+9}" text-anchor="middle" font-size="10" font-weight="800" fill="${CT.ink}">61 = רוב</text>`;
+    for(let s0=lo;s0<=hi;s0+=5){ s += `<text x="${X(s0)+bw/2}" y="${H-9}" text-anchor="middle" font-size="9.5" fill="${CT.axis}">${s0}</text>`; }
+    s += `<text x="${ML}" y="${H-9}" font-size="9.5" fill="${CT.axis}"></text>`;
     // legend
     s += `<g font-size="10.5" font-weight="700"><rect x="${W-MR-150}" y="${MT-2}" width="10" height="10" fill="${RED}" opacity="0.6" rx="2"/><text x="${W-MR-136}" y="${MT+7}" fill="${RED}">קואליציה</text><rect x="${W-MR-78}" y="${MT-2}" width="10" height="10" fill="${BLUE}" opacity="0.6" rx="2"/><text x="${W-MR-64}" y="${MT+7}" fill="${BLUE}">אופוזיציה</text></g>`;
     svg.innerHTML = s;
@@ -1174,15 +1314,18 @@ tryRefresh();
 
   function pct(x){ return Math.round(x*100)+'%'; }
   function render(){
+    const CT = chartTheme(); RED = CT.coal; BLUE = CT.opp;
     const sigMul = parseFloat(document.getElementById('fcSigma').value)||1;
     document.getElementById('fcSigmaVal').textContent = '×'+sigMul.toFixed(1);
     const res = simulate(sigMul);
+    window.lastForecast = { pCoal:res.pCoal, pOpp:res.pOpp, pHung:res.pHung };  // exposed for the hero band
     const simTxt = N.toLocaleString();
     document.getElementById('fcProbs').innerHTML =
-      `<div class="fc-prob" style="background:#fff0f0" title="בכ‑${pct(res.pCoal)} מ‑${simTxt} הסימולציות הקואליציה מגיעה ל‑61+ מנדטים"><div class="pct" style="color:${RED}">${pct(res.pCoal)}</div><div class="lbl" style="color:${RED}">רוב לקואליציה</div></div>`+
-      `<div class="fc-prob" style="background:#f0f4ff" title="בכ‑${pct(res.pOpp)} מ‑${simTxt} הסימולציות האופוזיציה מגיעה ל‑61+ מנדטים"><div class="pct" style="color:${BLUE}">${pct(res.pOpp)}</div><div class="lbl" style="color:${BLUE}">רוב לאופוזיציה</div></div>`+
-      `<div class="fc-prob" style="background:#f5f5f5" title="בכ‑${pct(res.pHung)} מ‑${simTxt} הסימולציות אף גוש לא מגיע ל‑61 (תיקו/ללא הכרעה)"><div class="pct" style="color:#555">${pct(res.pHung)}</div><div class="lbl" style="color:#555">ללא הכרעה</div></div>`;
+      `<div class="fc-prob" style="background:var(--tile-red)" title="בכ‑${pct(res.pCoal)} מ‑${simTxt} הסימולציות הקואליציה מגיעה ל‑61+ מנדטים"><div class="pct" style="color:${RED}">${pct(res.pCoal)}</div><div class="lbl" style="color:${RED}">רוב לקואליציה</div></div>`+
+      `<div class="fc-prob" style="background:var(--tile-blue)" title="בכ‑${pct(res.pOpp)} מ‑${simTxt} הסימולציות האופוזיציה מגיעה ל‑61+ מנדטים"><div class="pct" style="color:${BLUE}">${pct(res.pOpp)}</div><div class="lbl" style="color:${BLUE}">רוב לאופוזיציה</div></div>`+
+      `<div class="fc-prob" style="background:var(--tile-gray)" title="בכ‑${pct(res.pHung)} מ‑${simTxt} הסימולציות אף גוש לא מגיע ל‑61 (תיקו/ללא הכרעה)"><div class="pct" style="color:var(--muted)">${pct(res.pHung)}</div><div class="lbl" style="color:var(--muted)">ללא הכרעה</div></div>`;
     drawHist(document.getElementById('fcHist'), res);
+    if (typeof window.renderHeroForecast === 'function') window.renderHeroForecast();
     document.getElementById('fcBadge').textContent = `${res.nPolls} סקרים אחרונים`;
     document.getElementById('fcNote').innerHTML =
       `המודל מריץ ${N.toLocaleString()} סימולציות על בסיס ממוצע הסקרים מ‑${heDate(res.from)}–${heDate(res.to)}, עם אי‑ודאות המשקפת שגיאות סקרים היסטוריות בישראל `+
@@ -1248,7 +1391,40 @@ tryRefresh();
   }
   if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded',wire);
 })();
+</script>
+<script>
+/* ===== Theme toggle ===== */
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const mq = window.matchMedia('(prefers-color-scheme:dark)');
+  const current = () => document.documentElement.dataset.theme || (mq.matches ? 'dark' : 'light');
+  const setIcon = () => { btn.textContent = current() === 'dark' ? '☀️' : '🌙'; };
+  setIcon();
+  btn.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('ilpolls_theme', next); } catch(e){}
+    setIcon();
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof window.updateForecast === 'function') window.updateForecast();
+  });
+  // follow OS changes only while the user hasn't set an explicit preference
+  mq.addEventListener && mq.addEventListener('change', () => {
+    if (!document.documentElement.dataset.theme) { setIcon(); if (typeof renderAll==='function') renderAll(); if (typeof window.updateForecast==='function') window.updateForecast(); }
+  });
+})();
 
+/* ===== Mobile sticky summary: reveal after the hero scrolls off ===== */
+(function(){
+  const ms = document.getElementById('mSummary'), hero = document.getElementById('hero');
+  if (!ms || !hero) return;
+  const onScroll = () => {
+    const y = window.scrollY || document.documentElement.scrollTop;
+    ms.classList.toggle('show', y > hero.offsetTop + hero.offsetHeight - 12);
+  };
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+})();
 </script>
 </body>
 </html>
