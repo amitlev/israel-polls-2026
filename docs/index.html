@@ -1012,10 +1012,20 @@ const dateSlider = makeSlider('dateRange', 'dateCaption', renderAll);
 let outletSel = null, partySel = null;
 function outletItems() { return [...new Set(POLLS.map(p => p.outlet))].sort().map(o => ({ id: o, name: outletDisplay(o) })); }
 function rebuildOutlets() { outletSel.setItems(outletItems()); }
+/* Oldest date to include so the default view holds at most the latest 10 polls
+   (walks back date-by-date, never crossing 10; always keeps at least the most recent date). */
+function latest10FromIso() {
+  const byDate = {};
+  POLLS.forEach(p => { byDate[p.date] = (byDate[p.date] || 0) + 1; });
+  const desc = Object.keys(byDate).sort().reverse();
+  let count = 0, from = desc[0];
+  for (const d of desc) { if (count > 0 && count + byDate[d] > 10) break; count += byDate[d]; from = d; }
+  return from;
+}
 function initBounds(keep) {
   const dates = POLLS.map(p => p.date).sort(), minD = dates[0], maxD = dates[dates.length-1];
   dateSlider.setBounds(minD, maxD, keep);
-  if (!keep) dateSlider.setRange(minD, maxD, true);
+  if (!keep) dateSlider.setRange(latest10FromIso(), maxD, true);   // default: latest ≤10 polls (full range still draggable)
 }
 
 document.getElementById('resultsBody').addEventListener('click', e => {
@@ -1024,7 +1034,7 @@ document.getElementById('resultsBody').addEventListener('click', e => {
   loadBlocAssign(); blocAssign[segEl.getAttribute('data-party')] = btn.getAttribute('data-bloc'); saveBlocAssign();
   segEl.querySelectorAll('button').forEach(b => b.className = '');
   btn.className = 'sel-' + btn.getAttribute('data-bloc');
-  renderBlocHalf(getFiltered());
+  const f = getFiltered(); renderBlocHalf(f); renderHero(f);   // donut, bloc trend, and hero all depend on the assignment
 });
 document.getElementById('toggleLog').addEventListener('click', () => {
   const log = document.getElementById('pollLog'); log.classList.toggle('show');
