@@ -256,6 +256,10 @@
     .m-summary .ms-pill { margin-inline-start:auto; font-size:11px; font-weight:800; padding:3px 10px; border-radius:14px; background:var(--tile-blue); color:var(--opp); }
     .maxbtn { display:none; }  /* fullscreen expand not useful on mobile */
   }
+  /* ── Per-widget methodology info icon ── */
+  .infobtn { font-size:13px; line-height:1; color:var(--faint); cursor:help; user-select:none; margin-inline-start:3px; flex-shrink:0; transition:color .15s; }
+  .infobtn:hover, .infobtn:focus { color:var(--accent); outline:none; }
+  .tt-method { font-size:11px; line-height:1.75; color:rgba(255,255,255,.88); }
 </style>
 </head>
 <body>
@@ -1434,6 +1438,32 @@ tryRefresh();
   };
   window.addEventListener('scroll', onScroll, { passive:true });
   onScroll();
+})();
+
+/* ===== Per-widget methodology (ⓘ hover) ===== */
+(function(){
+  const METHOD = {
+    'שאל את הנתונים': 'התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא בינה מלאכותית, ללא התחברות וללא עלות. בחרו שאלה או לחצו על הצעה מהירה.',
+    'לפי מפלגה': 'ממוצע וחציון המנדטים לכל מפלגה, מחושבים רק על הסקרים שדיווחו נתון עבורה בטווח הנבחר. מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0. בכפתורים ניתן לשייך כל מפלגה לגוש.',
+    'מגמות מפלגות': 'כל נקודה היא סקר בודד (כדי להראות את הפיזור), והקו הוא מגמה מוחלקת — ממוצע נע משוקלל שמראה כיוון. בחרו אילו מפלגות להציג; הסמנים הכתומים הם אירועים.',
+    'חלוקה לגושים': 'ממוצע סך המנדטים לכל גוש על פני הסקרים בטווח, לפי שיוך המפלגות שקבעתם בטבלה. "אחרים" = ההשלמה ל‑120. הקו המקווקו מסמן רוב של 61.',
+    'מגמת הגושים': 'כמו מגמות המפלגות, אך לפי גושים: כל נקודה היא סך מנדטי הגוש בסקר בודד, והקו הוא מגמה מוחלקת לאורך זמן. הקו המקווקו = רוב של 61.',
+    'הסתברות לרוב (61+)': 'מודל מונטה־קרלו: 4,000 סימולציות סביב ממוצע הסקרים האחרונים, עם אי‑ודאות המכוילת לשגיאות סקרים היסטוריות בישראל (2015–2022). נספר בכמה מהן כל גוש עובר 61. זהו מודל הסתברותי — לא תחזית ודאית.',
+  };
+  document.querySelectorAll('.panel-head').forEach(head => {
+    const titleEl = head.querySelector('.panel-title'); if (!titleEl) return;
+    const key = titleEl.textContent.trim(), text = METHOD[key]; if (!text) return;
+    const info = document.createElement('span');
+    info.className = 'infobtn'; info.textContent = 'ⓘ'; info.tabIndex = 0;
+    info.setAttribute('role', 'img'); info.setAttribute('aria-label', 'מתודולוגיה: ' + text);
+    const html = `<div class="tt-head">${key}</div><div class="tt-method">${text}</div>`;
+    info.addEventListener('mouseenter', e => showTT(html, e.clientX, e.clientY));
+    info.addEventListener('mousemove', e => moveTT(e.clientX, e.clientY));
+    info.addEventListener('mouseleave', hideTT);
+    info.addEventListener('focus', () => { const r = info.getBoundingClientRect(); showTT(html, r.left + r.width/2, r.bottom + 6); });
+    info.addEventListener('blur', hideTT);
+    titleEl.insertAdjacentElement('afterend', info);
+  });
 })();
 </script>
 </body>
