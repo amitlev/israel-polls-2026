@@ -1,0 +1,152 @@
+#!/usr/bin/env node
+/*
+ * Fetch the Wikipedia polling page, parse any polls newer than the baked
+ * MAX_BAKED_DATE, splice them into window.BASE_POLLS_DATA in both HTML files,
+ * and regenerate the .restore chunks. Prints what it did; writes nothing when
+ * DRY_RUN is set. Mirrors the multi-table parser used in the dashboard itself.
+ */
+import fs from 'node:fs';
+
+const FILES = [
+  'docs/index.html',
+  'plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html',
+];
+const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
+const DRY = !!process.env.DRY_RUN;
+
+/* ── parser (ported from docs/index.html) ── */
+const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists"];
+const GOV_PARTIES = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ"];
+const MONTHNAMES = {january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,jan:1,feb:2,mar:3,apr:4,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
+const FIRM_OUTLET = {
+  'Midgam':'Channel 12 (HaHadashot 12)','Lazar':'Maariv',
+  'Yossi Taktika':'Zman Israel / Times of Israel','Yossi Tatika':'Zman Israel / Times of Israel',
+  'Filber':'Channel 14 (Direct Polls)','Maagar Mochot':'Channel 13',
+  'Kantar':'Israel Hayom','Direct Polls':'i24NEWS',
+};
+function headerKey(txt){ const t=txt.toLowerCase();
+  if(/joint list/.test(t)) return 'JOINT2';
+  if(/hadash/.test(t)) return "Hadash-Ta'al";
+  if(/\bbalad\b/.test(t)) return 'Balad';
+  if(/\blikud\b/.test(t)) return 'Likud';
+  if(/together/.test(t)) return 'Together';
+  if(/yesh atid/.test(t)) return 'Yesh Atid';
+  if(/religious zionis|\brzp\b/.test(t)) return 'Religious Zionism';
+  if(/otzma/.test(t)) return 'Otzma Yehudit';
+  if(/blue and white|blue & white|national unity/.test(t)) return 'National Unity';
+  if(/\bshas\b/.test(t)) return 'Shas';
+  if(/torah judaism|\butj\b/.test(t)) return 'UTJ';
+  if(/yisrael beiteinu/.test(t)) return 'Yisrael Beiteinu';
+  if(/arab list|ra'?am|raam/.test(t)) return "Ra'am";
+  if(/democrats|\bdems\b/.test(t)) return 'The Democrats';
+  if(/bennett/.test(t)) return 'Bennett 2026';
+  if(/yashar/.test(t)) return 'Yashar';
+  if(/yesodot/.test(t)) return 'Yesodot Yisrael';
+  if(/reservists|zionist home/.test(t)) return 'Reservists';
+  return null; }
+function wikiPlain(s){ return s.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'')
+  .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g,'$1').replace(/\[\[([^\]]*)\]\]/g,'$1')
+  .replace(/\{\{small\|([^}]*)\}\}/gi,'$1').replace(/'''/g,'').replace(/''/g,'')
+  .replace(/\{\{[^}]*\}\}/g,'').replace(/<[^>]+>/g,'').trim(); }
+function cellContent(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
+  for(let i=0;i<s.length-1;i++){ const two=s[i]+s[i+1];
+    if(two==='{{'||two==='[['){depth++;i++;continue;}
+    if(two==='}}'||two===']]'){depth--;i++;continue;}
+    if(depth===0 && s[i]==='|') sep=i; }
+  if(sep>=0) s=s.slice(sep+1); return s.trim(); }
+function convSeat(raw){ let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'').replace(/\{\{efn[^}]*\}\}/gi,'').replace(/'''/g,'').trim();
+  if(/\{\{\s*n\/?a\s*\}\}/i.test(v)) return null;
+  if(/^[–—-]$/.test(v)) return null;
+  if(/\{\{small\|\s*\(?[\d.]+%\)?\s*\}\}/i.test(v)) return 0;
+  if(/^\(?[\d.]+%\)?$/.test(v)) return 0;
+  const m=v.match(/^(\d{1,2})\b/); if(m) return parseInt(m[1],10); return null; }
+function opdrtsDate(cell){ const m=cell.match(/\{\{\s*Opdrts\s*\|([^}]*)\}\}/i); if(!m) return null;
+  const p=m[1].split('|').map(x=>x.trim()); if(p.length<4) return null;
+  const day=parseInt(p[1]||p[0],10); const mon=MONTHNAMES[(p[2]||'').toLowerCase()]; const year=parseInt(p[3],10);
+  if(!day||!mon||!year) return null;
+  return year+'-'+String(mon).padStart(2,'0')+'-'+String(day).padStart(2,'0'); }
+function parseWikiText(wikitext){
+  const results=[]; const seen=new Set();
+  let sec=wikitext; const s26=wikitext.search(/===\s*2026\s*===/); if(s26>=0) sec=wikitext.slice(s26);
+  const todayISO=new Date().toISOString().slice(0,10);
+  let ti=0;
+  while((ti=sec.indexOf('{|',ti))>=0){
+    const te=sec.indexOf('\n|}',ti); if(te<0) break;
+    const table=sec.slice(ti,te); ti=te+3;
+    const chunks=table.split(/\n\|-/);
+    let cols=null;
+    for(const ch of chunks){ if(/\{\{\s*Opdrts/i.test(ch)) continue;
+      const hcells=ch.split('\n').filter(l=>/^\s*!/.test(l)); if(hcells.length<8) continue;
+      const order=[];
+      for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
+        const content=bar>=0?txt.slice(bar+1):txt; const key=headerKey(wikiPlain(content));
+        if(key==='JOINT2'){ order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
+      if(order.length>=10){ cols=order; break; } }
+    if(!cols) continue;
+    for(const ch of chunks){ if(!/\{\{\s*Opdrts/i.test(ch)) continue;
+      const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
+      if(cellLines.length < cols.length+4) continue;
+      const iso=opdrtsDate(cellContent(cellLines[0])); if(!iso || iso>todayISO) continue;
+      const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
+      const dk=iso+'|'+firm; if(seen.has(dk)) continue;
+      const publisher=wikiPlain(cellContent(cellLines[2]));
+      const seatCells=cellLines.slice(4).map(cellContent); if(seatCells.length<cols.length) continue;
+      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher }; ALL_KEYS.forEach(k=>rec[k]=null);
+      cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
+      const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
+      const tail=seatCells.slice(cols.length).map(convSeat);
+      const gv=tail.find(t=>t!==null && Math.abs(t-govsum)<=1);
+      const total=ALL_KEYS.reduce((a,p)=>a+(rec[p]||0),0);
+      if(gv!==undefined && total>=95 && total<=122){ rec._govTotal=gv; seen.add(dk); results.push(rec); } }
+  }
+  return results;
+}
+
+/* ── .restore chunk regeneration (10 chunks, base64) ── */
+function regen(srcFile, prefix){
+  const b64 = fs.readFileSync(srcFile).toString('base64');
+  const n = 10, size = Math.ceil(b64.length / n);
+  for (const f of fs.readdirSync('.restore')) if (f.startsWith(prefix + '_chunk_')) fs.unlinkSync('.restore/' + f);
+  for (let i = 0; i < n; i++) fs.writeFileSync(`.restore/${prefix}_chunk_${String(i).padStart(2,'0')}.b64`, b64.slice(i*size, (i+1)*size));
+}
+
+/* ── main ── */
+const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${PAGE}&prop=wikitext&format=json&origin=*&_=${Date.now()}`;
+const resp = await fetch(url, { headers: { 'User-Agent': 'israel-polls-2026-updater/1.0 (github actions)' } });
+if (!resp.ok) throw new Error('Wikipedia HTTP ' + resp.status);
+const json = await resp.json();
+const wikitext = json?.parse?.wikitext?.['*'];
+if (!wikitext || wikitext.length < 5000) throw new Error('Empty/short wikitext');
+const parsed = parseWikiText(wikitext);
+
+const srcHtml = fs.readFileSync(FILES[0], 'utf8');
+const arrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
+if (!arrText) throw new Error('BASE_POLLS_DATA array not found in ' + FILES[0]);
+const existing = JSON.parse(arrText);
+const maxDate = existing.map(p => p.date).sort().pop();
+const seen = new Set(existing.map(p => p.date + '|' + p.pollster));
+const today = new Date().toISOString().slice(0, 10);
+const fresh = parsed
+  .filter(p => p.date > maxDate && p.date <= today && !seen.has(p.date + '|' + p.pollster))
+  .sort((a, b) => a.date < b.date ? -1 : 1);
+
+if (!fresh.length) { console.log(`No new polls (baked up to ${maxDate}).`); process.exit(0); }
+
+const summary = fresh.map(p => `${p.date} ${p.pollster}`).join(', ');
+console.log(`${fresh.length} new poll(s): ${summary}`);
+if (DRY) { console.log('DRY_RUN — no files written.'); process.exit(0); }
+
+const insertion = fresh.map(p => ', ' + JSON.stringify(p)).join('');   // append only new objects (minimal diff)
+for (const f of FILES) {
+  const html = fs.readFileSync(f, 'utf8');
+  const arr = html.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
+  if (!arr) throw new Error('BASE_POLLS_DATA array not found in ' + f);
+  fs.writeFileSync(f, html.replace(arr, arr.slice(0, -1) + insertion + ']'));
+}
+regen('docs/index.html', 'index');
+regen('plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html', 'dashboard');
+
+if (process.env.GITHUB_OUTPUT) {
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `added=${fresh.length}\nsummary=${summary}\n`);
+}
+console.log('Files updated.');
