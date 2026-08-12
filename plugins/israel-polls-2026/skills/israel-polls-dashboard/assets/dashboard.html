@@ -985,7 +985,7 @@ function renderHero(filtered) {
   // tug-of-war bar
   const CT = chartTheme(), Wt = 200, x = s => (s / 120 * Wt).toFixed(1);
   document.getElementById('heroTug').innerHTML =
-    `<div class="tug-top"><span style="color:${CT.opp}">אופוזיציה ${opp}</span><span class="tug-mid">${other ? 'אחרים ' + other : ''}</span><span style="color:${CT.coal}">קואליציה ${gov}</span></div>` +
+    `<div class="tug-top"><span style="color:${CT.coal}">קואליציה ${gov}</span><span class="tug-mid">${other ? 'אחרים ' + other : ''}</span><span style="color:${CT.opp}">אופוזיציה ${opp}</span></div>` +
     `<svg viewBox="0 0 200 16" class="tug-svg" preserveAspectRatio="none">` +
       `<rect x="0" y="4" width="200" height="9" rx="4.5" fill="${CT.grid}"/>` +
       `<rect x="0" y="4" width="${x(opp)}" height="9" rx="4.5" fill="${CT.opp}"/>` +
@@ -1024,7 +1024,7 @@ document.getElementById('resultsBody').addEventListener('click', e => {
   loadBlocAssign(); blocAssign[segEl.getAttribute('data-party')] = btn.getAttribute('data-bloc'); saveBlocAssign();
   segEl.querySelectorAll('button').forEach(b => b.className = '');
   btn.className = 'sel-' + btn.getAttribute('data-bloc');
-  renderBlocHalf(getFiltered());
+  const f = getFiltered(); renderBlocHalf(f); renderHero(f);   // donut, bloc trend, and hero all depend on the assignment
 });
 document.getElementById('toggleLog').addEventListener('click', () => {
   const log = document.getElementById('pollLog'); log.classList.toggle('show');
