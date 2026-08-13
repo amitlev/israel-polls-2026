@@ -1,0 +1,14 @@
+{
+  "name": "israel-polls-2026",
+  "private": true,
+  "type": "module",
+  "description": "Data-update scripts for the Israel 2026 election polls dashboard",
+  "scripts": {
+    "update:polls": "node .github/scripts/update-polls.mjs",
+    "update:govil": "node .github/scripts/update-govil-polls.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1",
+    "pdf-parse": "^2.4.5"
+  }
+}
