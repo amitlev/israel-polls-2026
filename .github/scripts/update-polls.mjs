@@ -54,6 +54,12 @@ function cellContent(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
     if(two==='}}'||two===']]'){depth--;i++;continue;}
     if(depth===0 && s[i]==='|') sep=i; }
   if(sep>=0) s=s.slice(sep+1); return s.trim(); }
+function cellSpan(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
+  for(let i=0;i<s.length-1;i++){ const two=s[i]+s[i+1];
+    if(two==='{{'||two==='[['){depth++;i++;continue;}
+    if(two==='}}'||two===']]'){depth--;i++;continue;}
+    if(depth===0 && s[i]==='|') sep=i; }
+  const m=(sep>=0?s.slice(0,sep):'').match(/colspan\s*=\s*"?(\d+)"?/i); return m?parseInt(m[1],10):1; }
 function convSeat(raw){ let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'').replace(/\{\{efn[^}]*\}\}/gi,'').replace(/'''/g,'').trim();
   if(/\{\{\s*n\/?a\s*\}\}/i.test(v)) return null;
   if(/^[–—-]$/.test(v)) return null;
@@ -80,7 +86,7 @@ function parseWikiText(wikitext){
       const order=[];
       for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
         const content=bar>=0?txt.slice(bar+1):txt; const key=headerKey(wikiPlain(content));
-        if(key==='JOINT2'){ order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
+        if(key==='JOINT2'){ const cs=parseInt((hc.match(/colspan\s*=\s*"?(\d+)"?/i)||[])[1]||'2',10); if(cs>=3) order.push("Ra'am"); order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
       if(order.length>=10){ cols=order; break; } }
     if(!cols) continue;
     for(const ch of chunks){ if(!/\{\{\s*Opdrts/i.test(ch)) continue;
@@ -90,7 +96,8 @@ function parseWikiText(wikitext){
       const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
       const dk=iso+'|'+firm; if(seen.has(dk)) continue;
       const publisher=wikiPlain(cellContent(cellLines[2]));
-      const seatCells=cellLines.slice(4).map(cellContent); if(seatCells.length<cols.length) continue;
+      const seatCells=[]; cellLines.slice(4).forEach(l=>{ const sp=cellSpan(l); seatCells.push(cellContent(l)); for(let k=1;k<sp;k++) seatCells.push(''); }); // expand colspan cells (e.g. combined Joint List) so columns align with the header
+      if(seatCells.length<cols.length) continue;
       const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher }; ALL_KEYS.forEach(k=>rec[k]=null);
       cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
