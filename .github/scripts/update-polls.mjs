@@ -6,11 +6,8 @@
  * DRY_RUN is set. Mirrors the multi-table parser used in the dashboard itself.
  */
 import fs from 'node:fs';
+import { FILES, regenAll } from './lib/restore-chunks.mjs';
 
-const FILES = [
-  'docs/index.html',
-  'plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html',
-];
 const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
 const DRY = !!process.env.DRY_RUN;
 
@@ -66,6 +63,14 @@ function convSeat(raw){ let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*
   if(/\{\{small\|\s*\(?[\d.]+%\)?\s*\}\}/i.test(v)) return 0;
   if(/^\(?[\d.]+%\)?$/.test(v)) return 0;
   const m=v.match(/^(\d{1,2})\b/); if(m) return parseInt(m[1],10); return null; }
+function convSampleSize(raw){
+  let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'').replace(/\{\{efn[^}]*\}\}/gi,'').replace(/'''/g,'').trim();
+  v=v.replace(/[\u200e\u200f\u00a0]/g,' ').replace(/\[[^\]]*\]/g,'').trim();
+  if(!v || /^[–—-]$/.test(v) || /^n\/?a$/i.test(v) || /\{\{\s*n\/?a\s*\}\}/i.test(v)) return null;
+  const range=v.match(/(\d[\d,]*)\s*[–—-]\s*(\d[\d,]*)/);
+  if(range){ const a=parseInt(range[1].replace(/,/g,''),10), b=parseInt(range[2].replace(/,/g,''),10);
+    return (a&&b)?Math.round((a+b)/2):null; }
+  const m=v.replace(/,/g,'').match(/(\d{2,6})/); return m?parseInt(m[1],10):null; }
 function opdrtsDate(cell){ const m=cell.match(/\{\{\s*Opdrts\s*\|([^}]*)\}\}/i); if(!m) return null;
   const p=m[1].split('|').map(x=>x.trim()); if(p.length<4) return null;
   const day=parseInt(p[1]||p[0],10); const mon=MONTHNAMES[(p[2]||'').toLowerCase()]; const year=parseInt(p[3],10);
@@ -96,9 +101,10 @@ function parseWikiText(wikitext){
       const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
       const dk=iso+'|'+firm; if(seen.has(dk)) continue;
       const publisher=wikiPlain(cellContent(cellLines[2]));
+      const sampleSize=convSampleSize(cellContent(cellLines[3]));
       const seatCells=[]; cellLines.slice(4).forEach(l=>{ const sp=cellSpan(l); seatCells.push(cellContent(l)); for(let k=1;k<sp;k++) seatCells.push(''); }); // expand colspan cells (e.g. combined Joint List) so columns align with the header
       if(seatCells.length<cols.length) continue;
-      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher }; ALL_KEYS.forEach(k=>rec[k]=null);
+      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
       cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
       const tail=seatCells.slice(cols.length).map(convSeat);
@@ -107,14 +113,6 @@ function parseWikiText(wikitext){
       if(gv!==undefined && total>=95 && total<=122){ rec._govTotal=gv; seen.add(dk); results.push(rec); } }
   }
   return results;
-}
-
-/* ── .restore chunk regeneration (10 chunks, base64) ── */
-function regen(srcFile, prefix){
-  const b64 = fs.readFileSync(srcFile).toString('base64');
-  const n = 10, size = Math.ceil(b64.length / n);
-  for (const f of fs.readdirSync('.restore')) if (f.startsWith(prefix + '_chunk_')) fs.unlinkSync('.restore/' + f);
-  for (let i = 0; i < n; i++) fs.writeFileSync(`.restore/${prefix}_chunk_${String(i).padStart(2,'0')}.b64`, b64.slice(i*size, (i+1)*size));
 }
 
 /* ── main ── */
@@ -150,8 +148,7 @@ for (const f of FILES) {
   if (!arr) throw new Error('BASE_POLLS_DATA array not found in ' + f);
   fs.writeFileSync(f, html.replace(arr, arr.slice(0, -1) + insertion + ']'));
 }
-regen('docs/index.html', 'index');
-regen('plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html', 'dashboard');
+regenAll();
 
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `added=${fresh.length}\nsummary=${summary}\n`);

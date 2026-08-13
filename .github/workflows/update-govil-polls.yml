@@ -1,0 +1,65 @@
+name: Enrich polls from gov.il disclosures
+
+# gov.il's Central Elections Committee publishes far fewer filings than
+# Wikipedia (14 total for this cycle, vs 167+ baked polls), so this runs
+# weekly rather than twice daily. The listing page is Cloudflare-protected,
+# so discovery uses a real headless browser (see update-govil-polls.mjs).
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      write:
+        description: 'Commit changes (unchecked = review-only, prints proposed changes and exits)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-govil-polls
+  cancel-in-progress: false
+
+env:
+  # Flip to 'true' once several scheduled runs have been spot-checked across
+  # different pollsters' PDF templates against their source PDFs (see the
+  # parsing-risk note in .github/scripts/lib/govil-pdf-parser.mjs). Until
+  # then, scheduled runs stay review-only regardless of this value; only a
+  # manual workflow_dispatch run with "write" checked will actually commit.
+  GOVIL_AUTO_WRITE: 'false'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Fetch & merge gov.il enrichment
+        env:
+          WRITE: ${{ (github.event_name == 'workflow_dispatch' && inputs.write) && '1' || (github.event_name == 'schedule' && env.GOVIL_AUTO_WRITE == 'true') && '1' || '' }}
+        run: node .github/scripts/update-govil-polls.mjs
+
+      - name: Commit & push if data changed
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit (review-only run, or nothing new)."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html \
+                  plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html \
+                  .restore/
+          git commit -m "data: enrich polls from gov.il disclosures [skip ci]"
+          git push

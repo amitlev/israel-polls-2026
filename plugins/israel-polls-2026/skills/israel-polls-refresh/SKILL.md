@@ -74,6 +74,16 @@ def conv(v):
     if re.fullmatch(r'\([\d.]+%\)', v): return 0
     return None
 
+def conv_sample(v):
+    v = v.strip().replace('\u200e', '').replace('\u200f', '').replace('\xa0', ' ')
+    if not v or v in ('N/A', 'n/a', '-', '–', '—'): return None
+    m = re.search(r'(\d[\d,]*)\s*[–—-]\s*(\d[\d,]*)', v)
+    if m:
+        a, b = int(m.group(1).replace(',', '')), int(m.group(2).replace(',', ''))
+        return round((a + b) / 2) if a and b else None
+    m = re.search(r'(\d{2,6})', v.replace(',', ''))
+    return int(m.group(1)) if m else None
+
 def parse_date(s):
     s = re.sub(r'[–—]', '-', s).strip()
     parts = s.split('-'); last = parts[-1].strip()
@@ -103,10 +113,11 @@ for line in WIKI_TEXT.split('\n'):
     pub = fields[1]
     for layout in LAYOUTS:
         start = 3 if layout['sample'] else 2
+        sample_size = conv_sample(fields[2]) if layout['sample'] else None
         vals = [conv(f) for f in fields[start:]]
         if len(vals) < len(layout['cols']): continue
         rec = {c: None for c in ALL_COLS}
-        rec.update({'date':iso,'pollster':firm,'outlet':FIRM_OUTLET.get(firm,pub)})
+        rec.update({'date':iso,'pollster':firm,'outlet':FIRM_OUTLET.get(firm,pub),'sampleSize':sample_size})
         for i,c in enumerate(layout['cols']): rec[c] = vals[i]
         gov = sum(rec.get(p,0) or 0 for p in GOV)
         tail = vals[len(layout['cols']):]
