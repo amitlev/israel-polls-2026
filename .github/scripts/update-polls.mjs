@@ -12,7 +12,7 @@ const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
 const DRY = !!process.env.DRY_RUN;
 
 /* ── parser (ported from docs/index.html) ── */
-const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists"];
+const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists","Unity","Amcha Yisrael"];
 const GOV_PARTIES = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ"];
 const MONTHNAMES = {january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,jan:1,feb:2,mar:3,apr:4,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
 const FIRM_OUTLET = {
@@ -40,6 +40,8 @@ function headerKey(txt){ const t=txt.toLowerCase();
   if(/yashar/.test(t)) return 'Yashar';
   if(/yesodot/.test(t)) return 'Yesodot Yisrael';
   if(/reservists|zionist home/.test(t)) return 'Reservists';
+  if(/amcha yisrael|winter party/.test(t)) return 'Amcha Yisrael';
+  if(/\bunity\b/.test(t)) return 'Unity';
   return null; }
 function wikiPlain(s){ return s.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'')
   .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g,'$1').replace(/\[\[([^\]]*)\]\]/g,'$1')
@@ -76,11 +78,13 @@ function opdrtsDate(cell){ const m=cell.match(/\{\{\s*Opdrts\s*\|([^}]*)\}\}/i);
   const day=parseInt(p[1]||p[0],10); const mon=MONTHNAMES[(p[2]||'').toLowerCase()]; const year=parseInt(p[3],10);
   if(!day||!mon||!year) return null;
   return year+'-'+String(mon).padStart(2,'0')+'-'+String(day).padStart(2,'0'); }
+const NON_PARTY_HEADER = /^(fieldwork\s*date|polling\s*firm|publisher|sample\s*size|others|gov\.?)$/i;
+const unrecognizedParties = new Set();   // populated by parseWikiText; checked by main() below
 function parseWikiText(wikitext){
   const results=[]; const seen=new Set();
   let sec=wikitext; const s26=wikitext.search(/===\s*2026\s*===/); if(s26>=0) sec=wikitext.slice(s26);
   const todayISO=new Date().toISOString().slice(0,10);
-  let ti=0;
+  let ti=0; let sawFirstQualifyingTable=false;
   while((ti=sec.indexOf('{|',ti))>=0){
     const te=sec.indexOf('\n|}',ti); if(te<0) break;
     const table=sec.slice(ti,te); ti=te+3;
@@ -88,11 +92,34 @@ function parseWikiText(wikitext){
     let cols=null;
     for(const ch of chunks){ if(/\{\{\s*Opdrts/i.test(ch)) continue;
       const hcells=ch.split('\n').filter(l=>/^\s*!/.test(l)); if(hcells.length<8) continue;
-      const order=[];
+      const order=[]; const unrecognizedHere=[];
       for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
-        const content=bar>=0?txt.slice(bar+1):txt; const key=headerKey(wikiPlain(content));
-        if(key==='JOINT2'){ const cs=parseInt((hc.match(/colspan\s*=\s*"?(\d+)"?/i)||[])[1]||'2',10); if(cs>=3) order.push("Ra'am"); order.push("Hadash-Ta'al"); order.push('Balad'); } else if(key){ order.push(key); } }
-      if(order.length>=10){ cols=order; break; } }
+        const content=bar>=0?txt.slice(bar+1):txt; const plain=wikiPlain(content); const key=headerKey(plain);
+        if(key==='JOINT2'){ const csm=hc.match(/colspan\s*=\s*"?(\d+)"?/i); const cs=csm?parseInt(csm[1],10):1;
+          // colspan tells us how many real data columns this header cell actually spans:
+          // no colspan (a single "Joint List" column, e.g. a merged-list scenario reported as one number) -> 1 key;
+          // colspan=2 (Hadash-Ta'al+Balad combined, Ra'am has its own column) -> 2 keys;
+          // colspan>=3 (Ra'am+Hadash-Ta'al+Balad all combined under one header) -> 3 keys.
+          // Pushing a fixed number of keys regardless of colspan silently shifted every later column
+          // (Dems/Yashar/Reservists/etc.) whenever "Joint List" appeared as a single real column.
+          if(cs>=3){ order.push("Ra'am"); order.push("Hadash-Ta'al"); order.push('Balad'); }
+          else if(cs===2){ order.push("Hadash-Ta'al"); order.push('Balad'); }
+          else { order.push('Joint List'); }
+        } else if(key){ order.push(key); }
+        else if(plain && !NON_PARTY_HEADER.test(plain)){
+          // A piped wikilink's own "|" (e.g. "[[Unity (Israel)|Unity]]") can be the last "|" on the
+          // line, so the crude header-cell split above sometimes leaves a stray "]]"/"}}" — cosmetic
+          // only (headerKey's word-boundary regexes still match fine either way), trimmed for the warning.
+          unrecognizedHere.push(plain.replace(/[\]}]+$/, '').trim());
+        } }
+      if(order.length>=10){
+        cols=order;
+        // Only the first qualifying table encountered is the currently-active one
+        // (tables appear in reverse-chronological order) — older frozen sub-tables
+        // may have their own historical unrecognized labels that aren't actionable.
+        if(!sawFirstQualifyingTable){ sawFirstQualifyingTable=true; unrecognizedHere.forEach(l=>unrecognizedParties.add(l)); }
+        break;
+      } }
     if(!cols) continue;
     for(const ch of chunks){ if(!/\{\{\s*Opdrts/i.test(ch)) continue;
       const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
@@ -123,6 +150,19 @@ const json = await resp.json();
 const wikitext = json?.parse?.wikitext?.['*'];
 if (!wikitext || wikitext.length < 5000) throw new Error('Empty/short wikitext');
 const parsed = parseWikiText(wikitext);
+
+// Surface (don't silently drop) any party column the current live table has that
+// headerKey()/ALL_KEYS/PARTIES don't recognize yet — this is exactly the class of
+// gap that let "Unity" and "Amcha Yisrael" go unnoticed until a user spotted it.
+if (unrecognizedParties.size) {
+  const list = [...unrecognizedParties].join(', ');
+  console.warn(`\n⚠️  UNRECOGNIZED PARTY COLUMN(S) in the current live Wikipedia table: ${list}`);
+  console.warn('   These are being silently dropped from every poll until headerKey()/ALL_KEYS/PARTIES (in both');
+  console.warn('   update-polls.mjs and docs/index.html) are updated to recognize them. See README for the pattern.\n');
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `unrecognized_parties=${list}\n`);
+  }
+}
 
 const srcHtml = fs.readFileSync(FILES[0], 'utf8');
 const arrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
