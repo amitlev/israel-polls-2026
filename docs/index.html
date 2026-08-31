@@ -211,6 +211,13 @@
   .q-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-inline-end:6px; flex-shrink:0; }
   .ask-hint { font-size:10.5px; color:var(--faint); margin-top:10px; line-height:1.6; }
   /* ── Maximize / fullscreen panels ── */
+  /* Export button sits next to the fullscreen one; the first of the two takes the
+     auto margin so they stay together at the end of the head. */
+  .expbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); font-size:15px; line-height:1; padding:2px 5px; border-radius:6px; transition:color .15s, background .15s; }
+  .expbtn:hover:not(:disabled) { color:var(--accent); background:var(--accent-soft); }
+  .expbtn:disabled { cursor:default; }
+  .expbtn-float { position:absolute; top:8px; inset-inline-start:8px; margin:0; }
+  .expbtn + .maxbtn { margin-inline-start:0; }
   .maxbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); font-size:15px; line-height:1; padding:2px 4px; border-radius:6px; transition:color .15s, background .15s; flex-shrink:0; }
   .maxbtn:hover { color:var(--accent); background:var(--accent-soft); }
   .panel-ov { position:fixed; inset:0; background:rgba(5,15,40,.55); z-index:850; display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .18s; }
@@ -501,6 +508,10 @@ function outletDisplay(o) { return OUTLET_HE[o] || o; }
 function heDate(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}.${y}`; }
 function heDateShort(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}`; }
 function initials(name) { return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
+/* Party names carry double quotes (ש"ס, רע"ם, חד"ש–תע"ל). Interpolating one raw into
+   an attribute truncates the value and invents a junk attribute whose name contains a
+   quote — which also makes the SVG unserialisable. */
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 const DAY = 24*60*60*1000;
 function isoToT(iso) { return new Date(iso + 'T00:00:00Z').getTime(); }
 function tToIso(t) { return new Date(t).toISOString().slice(0,10); }
@@ -857,7 +868,7 @@ function drawLineChart(svgEl, series, opts) {
   series.forEach(({name, color, dots}) => {
     dots.forEach(({d, v, poll}) => {
       const info = `${poll.pollster} · ${outletDisplay(poll.outlet)}`;
-      s += `<circle class="tdot" cx="${X(d).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="2.2" fill="${color}" opacity="0.45" data-date="${d}" data-name="${name}" data-color="${color}" data-val="${v}" data-info="${info}"/>`;
+      s += `<circle class="tdot" cx="${X(d).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="2.2" fill="${color}" opacity="0.45" data-date="${d}" data-name="${escAttr(name)}" data-color="${color}" data-val="${v}" data-info="${escAttr(info)}"/>`;
     });
   });
   // Smoothed trend line through the cloud
@@ -1266,7 +1277,6 @@ const SUIT_LIGHT = { jacket:'#2f3a4d', lapel:'#3e4b62', shirt:'#e9eef6', tie:'#8
 const SUIT_DARK  = { jacket:'#4b5871', lapel:'#5c6b87', shirt:'#dde5f1', tie:'#a8484a', trousers:'#3c4759', shoe:'#212936', hand:'#c99871', neutral:'#7d8ba0', edge:'#141b26' };
 let TC = TUG_WIDE;   /* active geometry, cloned per render: viewport picks it, crowding tunes FS */
 
-function tugEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function tugDark() { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches; }
 function tugHeadId(key) { return 'tugh-' + key.replace(/[^a-zA-Z0-9]/g, '-'); }
 /* Below this the faces stop being readable, so the scene switches to the tighter
@@ -1345,11 +1355,11 @@ function tugHead(party, pal, side) {
   const body = src
     ? `<rect x="${-half}" y="${TUG_HEAD_TOP}" width="${TUG_HEAD_W}" height="${TUG_HEAD_W}" fill="url(#${tugHeadId(party.photoKey)})" filter="url(#tugShadow)"/>`
     : `<circle cx="0" cy="${TUG_HEAD_TOP + half}" r="18.5" fill="${pal.neutral}" filter="url(#tugShadow)"/>` +
-      `<text x="0" y="${TUG_HEAD_TOP + half + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">${tugEsc(initials(party.leader))}</text>`;
+      `<text x="0" y="${TUG_HEAD_TOP + half + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">${escAttr(initials(party.leader))}</text>`;
   return side < 0 ? `<g transform="scale(-1,1)">${body}</g>` : body;
 }
 function tugTip(r) {
-  return ` class="tugfig" data-p="${tugEsc(r.p.name)}" data-l="${tugEsc(r.p.leader)}" data-a="${r.avg.toFixed(1)}" data-n="${r.n}"`;
+  return ` class="tugfig" data-p="${escAttr(r.p.name)}" data-l="${escAttr(r.p.leader)}" data-a="${r.avg.toFixed(1)}" data-n="${r.n}"`;
 }
 
 /* side: -1 opposition (left), +1 coalition (right). First = biggest = innermost. */
@@ -1663,6 +1673,7 @@ function renderTopicalSection(){
       <div style="font-size:11px;color:var(--muted);line-height:1.7;border-top:1px solid var(--card-2);padding-top:8px">${topicalPollInfo(g.records)}</div>
     </div>`;
   }).join('');
+  if (window.wireExportButtons) setTimeout(window.wireExportButtons, 0);
   groups.forEach((g, gi) => {
     const svg = document.getElementById(`topicalSvg${gi}`);
     const multiDate = new Set(g.records.map(r => r.date)).size > 1;
@@ -2232,6 +2243,216 @@ function switchView(view){
     info.addEventListener('blur', hideTT);
     titleEl.insertAdjacentElement('afterend', info);
   });
+})();
+</script>
+<script>
+/* ===== Export a widget as a PNG =====
+ * Self-contained: serialise the widget's own SVG (or, for the party table, walk
+ * the rendered rows) onto a canvas, stamp the credit line, hand back a file.
+ * No library — everything the charts reference is already a data URI, so the
+ * canvas never taints and toBlob() works.
+ */
+(function(){
+  const CREDIT = 'Exported from https://israel-polls-2026.vercel.app/ by Amit Lev';
+  const SCALE = 2;                       // export at 2x so it stays sharp when shared
+  const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
+  const PAD = 18, TITLE_H = 38, CREDIT_H = 34;
+
+  const theme = () => { const s = getComputedStyle(document.documentElement), g = n => s.getPropertyValue(n).trim();
+    return { card:g('--card'), ink:g('--ink'), faint:g('--faint'), border:g('--border'), muted:g('--muted'), line:g('--line') }; };
+
+  /* Titles run from a two-word panel name to a full survey question, so shrink and
+     then clip rather than letting a long one run off the canvas. */
+  function fitTitle(c, text, max) {
+    for (const size of [16, 15, 14, 13, 12]) {
+      c.font = '700 ' + size + 'px ' + FONT;
+      if (c.measureText(text).width <= max) return text;
+    }
+    let t = text;
+    while (t.length > 4 && c.measureText(t + '…').width > max) t = t.slice(0, -1);
+    return t + '…';
+  }
+  function frame(c, w, h, title, T) {
+    c.fillStyle = T.card; c.fillRect(0, 0, w, h);
+    c.direction = 'rtl'; c.textAlign = 'right'; c.textBaseline = 'alphabetic';
+    c.fillStyle = T.ink;
+    const shown = fitTitle(c, title, w - PAD * 2);
+    c.fillText(shown, w - PAD, PAD + 15);
+    c.strokeStyle = T.line; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(PAD, h - CREDIT_H + 4); c.lineTo(w - PAD, h - CREDIT_H + 4); c.stroke();
+    c.direction = 'ltr'; c.textAlign = 'center';
+    c.fillStyle = T.faint; c.font = '500 11.5px ' + FONT;
+    c.fillText(CREDIT, w / 2, h - 12);
+  }
+
+  function toCanvas(w, h) {
+    const cv = document.createElement('canvas');
+    cv.width = Math.ceil(w * SCALE); cv.height = Math.ceil(h * SCALE);
+    const c = cv.getContext('2d'); c.scale(SCALE, SCALE);
+    return { cv, c };
+  }
+
+  const loadImg = src => new Promise((res, rej) => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('image failed')); i.src = src;
+  });
+
+  /* ── SVG widgets ── */
+  async function fromSvg(svg, title) {
+    const vb = svg.viewBox.baseVal;
+    const W = (vb && vb.width) || svg.getBoundingClientRect().width || 900;
+    const H = (vb && vb.height) || svg.getBoundingClientRect().height || 400;
+    const T = theme();
+    const clone = svg.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', W); clone.setAttribute('height', H);
+    // the page has no webfonts, and SVG text carries no font-family — without this
+    // the standalone render falls back to the default serif
+    const st = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    st.textContent = 'text{font-family:' + FONT + '}';
+    clone.insertBefore(st, clone.firstChild);
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+    const img = await loadImg(url);
+    const w = W + PAD * 2, h = TITLE_H + H + CREDIT_H;
+    const { cv, c } = toCanvas(w, h);
+    frame(c, w, h, title, T);
+    c.drawImage(img, PAD, TITLE_H, W, H);
+    return cv;
+  }
+
+  /* ── the party table: walk what is actually on screen, so the export matches
+       the view including weighted mode ── */
+  async function fromTable(panel, title) {
+    const T = theme();
+    const heads = [...panel.querySelectorAll('thead th')].map(t => t.textContent.trim());
+    const rows = [...panel.querySelectorAll('tbody tr')].map(tr => ({
+      rank:   (tr.querySelector('.rank') || {}).textContent || '',
+      logo:   (tr.querySelector('.plogo img') || {}).src || '',
+      photo:  (tr.querySelector('img.avatar') || {}).src || '',
+      name:   (tr.querySelector('.party-name') || {}).textContent || '',
+      leader: (tr.querySelector('.leader-name') || {}).textContent || '',
+      seats:  (tr.querySelector('.seat-num') || {}).textContent || '',
+      colour: ((tr.querySelector('.seat-num') || {}).style || {}).color || T.ink,
+      barPct: parseFloat((((tr.querySelector('.bar-fill') || {}).style || {}).width || '0')) || 0,
+      med:    (tr.querySelector('td.med') || {}).textContent || '',
+      n:      (tr.querySelector('td.n') || {}).textContent || '',
+    }));
+    if (!rows.length) throw new Error('nothing to export');
+
+    const ROW = 40, W = 760, HEAD = 26;
+    const w = W + PAD * 2, h = TITLE_H + HEAD + rows.length * ROW + 10 + CREDIT_H;
+    const { cv, c } = toCanvas(w, h);
+    frame(c, w, h, title, T);
+
+    // RTL columns: rank and logo at the right, numbers stacked at the left, with the
+    // seat bar growing leftwards from its own number the way the table does
+    const right = w - PAD, left = PAD;
+    const xN = left + 35, xMed = left + 95;
+    const barX = left + 145, barW = 165, xSeatNum = left + 320;
+    let y = TITLE_H + 4;
+    c.direction = 'rtl'; c.textAlign = 'right';
+    c.font = '600 11.5px ' + FONT; c.fillStyle = T.faint;
+    c.fillText(heads[0] || '', right, y + 14);
+    c.textAlign = 'center';
+    if (heads[1]) c.fillText(heads[1], barX + barW / 2, y + 14);
+    if (heads[2]) c.fillText(heads[2], xMed, y + 14);
+    if (heads[3]) c.fillText(heads[3], xN, y + 14);
+    y += HEAD;
+
+    const marks = await Promise.all(rows.map(r => (r.logo || r.photo) ? loadImg(r.logo || r.photo).catch(() => null) : null));
+    rows.forEach((r, i) => {
+      const top = y + i * ROW, mid = top + ROW / 2;
+      c.strokeStyle = T.line; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(left, top); c.lineTo(right, top); c.stroke();
+      c.textAlign = 'right'; c.direction = 'rtl';
+      c.fillStyle = T.faint; c.font = '600 10.5px ' + FONT;
+      c.fillText(r.rank, right, mid + 4);
+      // logo tile, matching the light chip the table uses
+      const bw = 46, bh = 28, bx = right - 20 - bw;
+      const m = marks[i];
+      if (m) {
+        c.fillStyle = '#fff'; c.strokeStyle = T.border;
+        c.beginPath(); c.roundRect(bx, mid - bh / 2, bw, bh, 5); c.fill(); c.stroke();
+        const s = Math.min((bw - 6) / m.width, (bh - 6) / m.height);
+        c.drawImage(m, bx + (bw - m.width * s) / 2, mid - m.height * s / 2, m.width * s, m.height * s);
+      }
+      c.fillStyle = T.ink; c.font = '700 13px ' + FONT;
+      c.fillText(r.name, bx - 10, mid - 1);
+      c.fillStyle = T.muted; c.font = '400 10.5px ' + FONT;
+      c.fillText(r.leader, bx - 10, mid + 12);
+      // seat bar + number
+      c.fillStyle = T.line;
+      c.beginPath(); c.roundRect(barX, mid - 3, barW, 6, 3); c.fill();
+      c.fillStyle = r.colour;
+      const fillW = Math.max(0, Math.min(1, r.barPct / 100)) * barW;
+      c.beginPath(); c.roundRect(barX + barW - fillW, mid - 3, fillW, 6, 3); c.fill();
+      c.textAlign = 'left'; c.direction = 'ltr';
+      c.font = '800 15px ' + FONT; c.fillStyle = r.colour;
+      c.fillText(r.seats, xSeatNum, mid + 5);
+      c.textAlign = 'center'; c.fillStyle = T.ink; c.font = '600 12px ' + FONT;
+      c.fillText(r.med, xMed, mid + 4);
+      c.fillStyle = T.faint; c.font = '500 11.5px ' + FONT;
+      c.fillText(r.n, xN, mid + 4);
+    });
+    return cv;
+  }
+
+  function exportable(scope) {
+    const body = scope.querySelector('.panel-body') || scope;
+    const svg = body.querySelector('svg');
+    if (svg) return { kind: 'svg', node: svg };
+    if (body.querySelector('table tbody')) return { kind: 'table', node: scope };
+    return null;
+  }
+
+  async function run(panel, btn, titleFor) {
+    const target = exportable(panel);
+    const title = titleFor ? titleFor() : ((panel.querySelector('.panel-title') || {}).textContent || 'לוח סקרי הבחירות 2026');
+    if (!target) return;
+    const was = btn.textContent; btn.textContent = '…'; btn.disabled = true;
+    try {
+      const cv = target.kind === 'svg' ? await fromSvg(target.node, title) : await fromTable(target.node, title);
+      const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'israel-polls-2026-' + title.replace(/[^֐-׿a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      btn.textContent = '✓';
+      setTimeout(() => { btn.textContent = was; btn.disabled = false; }, 1200);
+    } catch (e) {
+      console.warn('export failed', e);
+      btn.textContent = '⚠'; setTimeout(() => { btn.textContent = was; btn.disabled = false; }, 1600);
+    }
+  }
+
+  function makeBtn(scope, titleFor) {
+    const btn = document.createElement('button');
+    btn.className = 'expbtn'; btn.type = 'button';
+    btn.title = 'הורד כתמונה'; btn.setAttribute('aria-label', 'הורד את הווידג׳ט כתמונה');
+    btn.textContent = '⭳';
+    btn.addEventListener('click', e => { e.stopPropagation(); run(scope, btn, titleFor); });
+    return btn;
+  }
+  function wire() {
+    document.querySelectorAll('.panel-head').forEach(head => {
+      if (head.querySelector('.expbtn')) return;
+      const panel = head.closest('.panel');
+      if (!exportable(panel)) return;          // the ask-the-data panel has no chart to export
+      const btn = makeBtn(panel, null);
+      const max = head.querySelector('.maxbtn');
+      if (max) head.insertBefore(btn, max); else head.appendChild(btn);
+    });
+    // the "beyond the headlines" cards are not .panels, so they get their own button
+    document.querySelectorAll('.topical-card').forEach(card => {
+      if (card.querySelector('.expbtn') || !exportable(card)) return;
+      card.style.position = 'relative';
+      const btn = makeBtn(card, () => (card.firstElementChild || {}).textContent || 'מעבר לכותרות');
+      btn.classList.add('expbtn-float');
+      card.appendChild(btn);
+    });
+  }
+  window.wireExportButtons = wire;
+  if (document.readyState !== 'loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
 })();
 </script>
 </body>
