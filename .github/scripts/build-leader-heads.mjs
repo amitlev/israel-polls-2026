@@ -52,6 +52,7 @@ const HEADS = {
   'Gadi Eisenkot':        { box: [0.274, 0.105, 0.335, 0.545] },
   'Yoaz Hendel':          { box: [0.470, 0.165, 0.205, 0.305], head: [0.425, 0.430, 0.455, 0.445] },
   'Youssef Jabarin':    { title: 'Yousef Jabareen', box: [0.415, 0.025, 0.210, 0.250] },
+  'Ahmad Tibi':         { title: 'Ahmad Tibi', box: [0.310, 0.030, 0.320, 0.290] },
   'Mansour Abbas':        { box: [0.269, 0.035, 0.450, 0.560] },
   'Sami Abou Shehadeh':   { title: 'Sami Abu Shehadeh', box: [0.411, 0.045, 0.215, 0.280] },
   'Yuli Edelstein':       { box: [0.223, 0.075, 0.395, 0.490] },
