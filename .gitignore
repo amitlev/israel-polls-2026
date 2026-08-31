@@ -1,1 +1,7 @@
 node_modules/
+.leaderheads/
+assets/leader-heads/originals/
+assets/leader-heads/source-crops/
+assets/leader-heads/auto-cutouts/
+.DS_Store
+.claude/launch.json
