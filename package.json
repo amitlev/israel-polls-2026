@@ -5,10 +5,13 @@
   "description": "Data-update scripts for the Israel 2026 election polls dashboard",
   "scripts": {
     "update:polls": "node .github/scripts/update-polls.mjs",
-    "update:govil": "node .github/scripts/update-govil-polls.mjs"
+    "update:govil": "node .github/scripts/update-govil-polls.mjs",
+    "build:heads": "node .github/scripts/build-leader-heads.mjs",
+    "build:logos": "node .github/scripts/build-party-logos.mjs"
   },
   "devDependencies": {
-    "playwright": "^1.62.1",
-    "pdf-parse": "^2.4.5"
+    "@napi-rs/canvas": "^0.1.80",
+    "pdf-parse": "^2.4.5",
+    "playwright": "^1.62.1"
   }
 }
