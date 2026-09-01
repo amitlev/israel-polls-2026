@@ -213,9 +213,14 @@
   /* ── Maximize / fullscreen panels ── */
   /* Export button sits next to the fullscreen one; the first of the two takes the
      auto margin so they stay together at the end of the head. */
-  .expbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); font-size:15px; line-height:1; padding:2px 5px; border-radius:6px; transition:color .15s, background .15s; }
+  .expbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); line-height:0; padding:4px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition:color .15s, background .15s, opacity .15s; }
   .expbtn:hover:not(:disabled) { color:var(--accent); background:var(--accent-soft); }
   .expbtn:disabled { cursor:default; }
+  .expbtn svg { display:block; }
+  .expbtn.busy { opacity:.5; animation:expPulse .9s ease-in-out infinite; }
+  .expbtn.done { color:#16a34a; }
+  .expbtn.failed { color:var(--coal); }
+  @keyframes expPulse { 50% { opacity:.9; } }
   .expbtn-float { position:absolute; top:8px; inset-inline-start:8px; margin:0; }
   .expbtn + .maxbtn { margin-inline-start:0; }
   .maxbtn { margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--faint); font-size:15px; line-height:1; padding:2px 4px; border-radius:6px; transition:color .15s, background .15s; flex-shrink:0; }
@@ -492,12 +497,24 @@ let POLLS = [...BASE_POLLS];
 let lastFiltered = [];
 const WIKI_URL = "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election";
 const MAX_BAKED_DATE = BASE_POLLS.map(p => p.date).sort().pop();
+const BACKFILL_DAYS = 45;   /* how far back a refresh re-checks Wikipedia for polls added after the fact */
 const BAKED_DATE = (() => { const d = MAX_BAKED_DATE; return d ? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : '—'; })();
 const FIRM_OUTLET = {
   'Midgam': 'Channel 12 (HaHadashot 12)', 'Lazar': 'Maariv',
   'Yossi Taktika': 'Zman Israel / Times of Israel', 'Yossi Tatika': 'Zman Israel / Times of Israel',
   'Filber': 'Channel 14 (Direct Polls)', 'Maagar Mochot': 'Channel 13',
   'Kantar': 'Israel Hayom', 'Direct Polls': 'i24NEWS',
+};
+/* Wikipedia occasionally renames a polling firm ("Midgam" became "Midgam R&C" for
+   Channel 12 and "Midgam Project" for Channel 13). Under the new name the same
+   pollster misses every name-keyed lookup here — FIRM_OUTLET, HE_LINEAGE, the
+   house-effect table, and the gov.il enrichment's `pollster ===` match — and, worse,
+   no longer matches its own already-stored rows, so a re-parse would duplicate them.
+   Canonicalise back to the name the dataset already uses. */
+const POLLSTER_ALIAS = {
+  'Midgam R&C':     { pollster: 'Midgam', outlet: 'Channel 12 (HaHadashot 12)' },
+  'Midgam Project': { pollster: 'Midgam', outlet: 'Channel 13' },
+  'Yossi Taktika':  { pollster: 'Yossi Tatika' },
 };
 const MONTHS = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
 const GOV_PARTIES = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ"];
@@ -670,13 +687,14 @@ function parseWikiText(wikitext){
       const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
       if(cellLines.length < cols.length+4) continue;
       const iso=opdrtsDate(cellContent(cellLines[0])); if(!iso || iso>todayISO) continue;
-      const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
+      const rawFirm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!rawFirm) continue;
+      const alias=POLLSTER_ALIAS[rawFirm]||{}; const firm=alias.pollster||rawFirm;
       const dk=iso+'|'+firm; if(seen.has(dk)) continue;
       const publisher=wikiPlain(cellContent(cellLines[2]));
       const sampleSize=convSampleSize(cellContent(cellLines[3]));
       const seatCells=[]; cellLines.slice(4).forEach(l=>{ const sp=cellSpan(l); seatCells.push(cellContent(l)); for(let k=1;k<sp;k++) seatCells.push(''); }); // expand colspan cells (e.g. combined Joint List) so columns align with the header
       if(seatCells.length<cols.length) continue;
-      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
+      const rec={ date:iso, pollster:firm, outlet:alias.outlet||FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
       cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
       const tail=seatCells.slice(cols.length).map(convSeat);
@@ -723,7 +741,14 @@ async function fetchFreshPolls() {
     const parsed = parseWikiText(wikitext);
     const today = new Date().toISOString().slice(0,10);
     const keys = new Set(POLLS.map(p => p.date + '|' + p.pollster));
-    const fresh = parsed.filter(p => p.date > MAX_BAKED_DATE && p.date <= today && !keys.has(p.date + '|' + p.pollster));
+    // Wikipedia's editors add a poll a day or two after its fieldwork date, so a
+    // just-published poll is routinely OLDER than the newest row already stored.
+    // Gating on `p.date > MAX_BAKED_DATE` silently and permanently dropped every
+    // such late arrival (11 of August 2026's polls went missing that way); the
+    // date|pollster key set below is what actually prevents duplicates, so look
+    // back over a whole window and let it do that job.
+    const cutoff = new Date(Date.now() - BACKFILL_DAYS * 86400000).toISOString().slice(0,10);
+    const fresh = parsed.filter(p => p.date >= cutoff && p.date <= today && !keys.has(p.date + '|' + p.pollster));
     fresh.forEach(p => p._new = true);
     if (fresh.length > 0) {
       const oldMax = POLLS.map(p => p.date).sort().pop();
@@ -2258,6 +2283,14 @@ function switchView(view){
   const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
   const PAD = 18, TITLE_H = 38, CREDIT_H = 34;
 
+  const svgIcon = body => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" '
+    + 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + body + '</svg>';
+  const ICON = {
+    down: svgIcon('<path d="M12 3.5v10.5"/><path d="M7 9.5 12 14.5 17 9.5"/><path d="M4.5 20h15"/>'),
+    ok:   svgIcon('<path d="M5 12.5 9.8 17.2 19 7.5"/>'),
+    err:  svgIcon('<circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.2h.01"/>'),
+  };
+
   const theme = () => { const s = getComputedStyle(document.documentElement), g = n => s.getPropertyValue(n).trim();
     return { card:g('--card'), ink:g('--ink'), faint:g('--faint'), border:g('--border'), muted:g('--muted'), line:g('--line') }; };
 
@@ -2408,7 +2441,7 @@ function switchView(view){
     const target = exportable(panel);
     const title = titleFor ? titleFor() : ((panel.querySelector('.panel-title') || {}).textContent || 'לוח סקרי הבחירות 2026');
     if (!target) return;
-    const was = btn.textContent; btn.textContent = '…'; btn.disabled = true;
+    btn.classList.add('busy'); btn.disabled = true;
     try {
       const cv = target.kind === 'svg' ? await fromSvg(target.node, title) : await fromTable(target.node, title);
       const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
@@ -2417,11 +2450,12 @@ function switchView(view){
       a.download = 'israel-polls-2026-' + title.replace(/[^֐-׿a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-      btn.textContent = '✓';
-      setTimeout(() => { btn.textContent = was; btn.disabled = false; }, 1200);
+      btn.classList.remove('busy'); btn.classList.add('done'); btn.innerHTML = ICON.ok;
+      setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = ICON.down; btn.disabled = false; }, 1200);
     } catch (e) {
       console.warn('export failed', e);
-      btn.textContent = '⚠'; setTimeout(() => { btn.textContent = was; btn.disabled = false; }, 1600);
+      btn.classList.remove('busy'); btn.classList.add('failed'); btn.innerHTML = ICON.err;
+      setTimeout(() => { btn.classList.remove('failed'); btn.innerHTML = ICON.down; btn.disabled = false; }, 1800);
     }
   }
 
@@ -2429,7 +2463,7 @@ function switchView(view){
     const btn = document.createElement('button');
     btn.className = 'expbtn'; btn.type = 'button';
     btn.title = 'הורד כתמונה'; btn.setAttribute('aria-label', 'הורד את הווידג׳ט כתמונה');
-    btn.textContent = '⭳';
+    btn.innerHTML = ICON.down;
     btn.addEventListener('click', e => { e.stopPropagation(); run(scope, btn, titleFor); });
     return btn;
   }
