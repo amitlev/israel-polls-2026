@@ -1,12 +1,13 @@
 name: Enrich polls from gov.il disclosures
 
-# gov.il's Central Elections Committee publishes far fewer filings than
-# Wikipedia (14 total for this cycle, vs 167+ baked polls), so this runs
-# weekly rather than twice daily. The listing page is Cloudflare-protected,
-# so discovery uses a real headless browser (see update-govil-polls.mjs).
+# gov.il's Central Elections Committee publishes fewer filings than Wikipedia
+# (46 for this cycle so far, vs 190+ baked polls), but they trickle in daily and
+# the "מעבר לכותרות" tab is fed from nothing else, so a weekly run left that tab
+# up to a week behind. The listing page is Cloudflare-protected, so discovery
+# uses a real headless browser (see update-govil-polls.mjs).
 on:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       write:
@@ -22,12 +23,22 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Flip to 'true' once several scheduled runs have been spot-checked across
-  # different pollsters' PDF templates against their source PDFs (see the
-  # parsing-risk note in .github/scripts/lib/govil-pdf-parser.mjs). Until
-  # then, scheduled runs stay review-only regardless of this value; only a
-  # manual workflow_dispatch run with "write" checked will actually commit.
-  GOVIL_AUTO_WRITE: 'false'
+  # Now 'true': scheduled runs commit. Held at 'false' pending a spot-check of
+  # the parsed output against the source PDFs, this meant every scheduled run
+  # since the pipeline was built printed its findings and wrote nothing — the
+  # "מעבר לכותרות" tab sat frozen on the two filings from the original manual
+  # run while gov.il published 44 more.
+  #
+  # That spot-check has since been done against Midgam's template — the only one
+  # of the four that discloses topical questions — with filings 4/14/24/32
+  # verified field-by-field against their PDFs. The other templates degrade to
+  # nulls rather than wrong values (see the parsing-risk note in
+  # .github/scripts/lib/govil-pdf-parser.mjs), and a filing whose pollster or
+  # fieldwork date can't be read is skipped with a printed reason, never guessed.
+  #
+  # Set back to 'false' to return scheduled runs to review-only; a manual
+  # workflow_dispatch run with "write" checked commits either way.
+  GOVIL_AUTO_WRITE: 'true'
 
 jobs:
   update:
