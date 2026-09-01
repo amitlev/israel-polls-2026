@@ -147,13 +147,41 @@ function cleanLines(text){
     .filter(l => l.trim() && !/^--\s*\d+\s+of\s+\d+\s*--$/.test(l.trim()));
 }
 
+/* pdf-parse sometimes wraps one response row over several lines, leaving the label
+   on its own line(s) and the percentage alone on the next ("לא הוביל" / "לניצחון" /
+   "62%"). Rejoin those; a column header never precedes a bare percentage, so it
+   still reads as a table separator rather than a row. */
+function takeWrappedRow(lines, i){
+  const parts = [];
+  for (let j = i; j < lines.length && parts.length < 3; j++){
+    const t = lines[j].replace(/\t/g, ' ').trim();
+    if (/^\d+(?:\.\d+)?%$/.test(t)){
+      return parts.length ? { label: parts.join(' '), pct: parseFloat(t), next: j + 1 } : null;
+    }
+    if (/\d/.test(t)) return null;   // a normal row or numeric cell, not a wrapped label
+    parts.push(t);
+  }
+  return null;
+}
+
+/* A question header: "שאלה:" possibly carrying an audience qualifier before the
+   colon, as pdf-parse renders it ("שאלה\tלמצביעי האופוזיציה\t:\t…"). */
+function isQuestionStart(line){
+  return /^שאלה\s*[^:?]{0,40}:/.test(line.replace(/\t/g, ' ').trim());
+}
+
 /* Splits the full text into "שאלה:"-prefixed blocks, classifying each as a
    seat-projection table (main + what-if scenarios) or a topical opinion
    question, and parses the rows of each. */
 export function parseQuestionBlocks(text){
   const lines = cleanLines(stripNoise(text));
   const qIdx = [];
-  lines.forEach((l, i) => { if (l.trim().startsWith('שאלה:')) qIdx.push(i); });
+  // Most questions open with a literal "שאלה:", but some carry an audience
+  // qualifier before the colon ("שאלה <TAB> למצביעי האופוזיציה <TAB> : <TAB> ...").
+  // Missing those didn't just lose the question — its rows were absorbed into the
+  // PRECEDING question's block and rendered as extra responses on that question's
+  // chart, so the qualifier form has to be recognised here.
+  lines.forEach((l, i) => { if (isQuestionStart(l)) qIdx.push(i); });
 
   const seatTables = [];
   const topical = [];
@@ -169,7 +197,9 @@ export function parseQuestionBlocks(text){
       qText += (qText ? ' ' : '') + block[qEnd].replace(/\t/g, ' ');
       if (block[qEnd].includes('?')) { qEnd++; break; }
     }
-    qText = qText.replace(/^שאלה:\s*/, '').replace(/\s+/g, ' ').trim();
+    // Keep any audience qualifier in the label ("למצביעי האופוזיציה: לדעתך, …") —
+    // it's what distinguishes the sub-population a question was asked of.
+    qText = qText.replace(/^שאלה\s*/, '').replace(/^:\s*/, '').replace(/\s+:\s+/, ': ').replace(/\s+/g, ' ').trim();
     const body = block.slice(qEnd);
     const isSeatQuestion = SEAT_QUESTION_MARKERS.some(m => qText.includes(m));
 
@@ -191,23 +221,27 @@ export function parseQuestionBlocks(text){
       }
       if (parties.length) seatTables.push({ label: qText, parties, undecidedPct });
     } else {
-      // One question can present several "כלל/המדגם" sub-tables back to back
-      // (e.g. separate PM-matchup pairs) — each becomes its own topical record.
+      // One question can present several sub-tables back to back (e.g. separate
+      // PM-matchup pairs), each under its own column header. Rather than keying on
+      // one literal header ("כלל"/"המדגם"), which silently swallowed tables headed
+      // by a sub-population instead ("מתכוונים/להצביע/לאופוזיציה"), group runs of
+      // consecutive percentage rows: any header line carries no percentage, so it
+      // separates one sub-table from the next whatever it says.
       let i = 0;
       let sub = 0;
       while (i < body.length){
-        if (body[i].trim() === 'כלל' && body[i + 1] && body[i + 1].trim() === 'המדגם'){
-          i += 2;
-          const responses = [];
-          while (i < body.length && body[i].trim() !== 'כלל'){
-            const row = parseRow(body[i]);
-            if (row && row.pct != null) responses.push({ label: row.label, pct: row.pct });
-            i++;
-          }
-          if (responses.length) topical.push({ label: qText, responses, subIndex: sub++ });
-        } else {
-          i++;
+        const responses = [];
+        while (i < body.length){
+          const row = parseRow(body[i]);
+          if (row && row.pct != null){ responses.push({ label: row.label, pct: row.pct }); i++; continue; }
+          const wrapped = takeWrappedRow(body, i);
+          if (!wrapped) break;
+          responses.push({ label: wrapped.label, pct: wrapped.pct });
+          i = wrapped.next;
         }
+        // A lone percentage line is a stray footnote, not a table.
+        if (responses.length >= 2) topical.push({ label: qText, responses, subIndex: sub++ });
+        if (!responses.length) i++;
       }
     }
   });
