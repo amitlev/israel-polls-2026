@@ -10,6 +10,8 @@ import { FILES, regenAll } from './lib/restore-chunks.mjs';
 
 const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
 const DRY = !!process.env.DRY_RUN;
+const BACKFILL_DAYS = Number(process.env.BACKFILL_DAYS || 45);   // how far back to re-check Wikipedia for polls added after the fact
+
 
 /* ── parser (ported from docs/index.html) ── */
 const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists","Unity","Amcha Yisrael"];
@@ -20,6 +22,17 @@ const FIRM_OUTLET = {
   'Yossi Taktika':'Zman Israel / Times of Israel','Yossi Tatika':'Zman Israel / Times of Israel',
   'Filber':'Channel 14 (Direct Polls)','Maagar Mochot':'Channel 13',
   'Kantar':'Israel Hayom','Direct Polls':'i24NEWS',
+};
+/* Wikipedia occasionally renames a polling firm ("Midgam" became "Midgam R&C" for
+   Channel 12 and "Midgam Project" for Channel 13). Under the new name the same
+   pollster misses every name-keyed lookup here — FIRM_OUTLET, HE_LINEAGE, the
+   house-effect table, and the gov.il enrichment's `pollster ===` match — and, worse,
+   no longer matches its own already-stored rows, so a re-parse would duplicate them.
+   Canonicalise back to the name the dataset already uses. */
+const POLLSTER_ALIAS = {
+  'Midgam R&C':     { pollster: 'Midgam', outlet: 'Channel 12 (HaHadashot 12)' },
+  'Midgam Project': { pollster: 'Midgam', outlet: 'Channel 13' },
+  'Yossi Taktika':  { pollster: 'Yossi Tatika' },
 };
 function headerKey(txt){ const t=txt.toLowerCase();
   if(/joint list/.test(t)) return 'JOINT2';
@@ -125,13 +138,14 @@ function parseWikiText(wikitext){
       const cellLines=ch.split('\n').filter(l=>/^\s*\|/.test(l) && !/^\s*\|[}+]/.test(l));
       if(cellLines.length < cols.length+4) continue;
       const iso=opdrtsDate(cellContent(cellLines[0])); if(!iso || iso>todayISO) continue;
-      const firm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!firm) continue;
+      const rawFirm=wikiPlain(cellContent(cellLines[1])).replace(/\s*\([^)]*\)\s*$/,'').trim(); if(!rawFirm) continue;
+      const alias=POLLSTER_ALIAS[rawFirm]||{}; const firm=alias.pollster||rawFirm;
       const dk=iso+'|'+firm; if(seen.has(dk)) continue;
       const publisher=wikiPlain(cellContent(cellLines[2]));
       const sampleSize=convSampleSize(cellContent(cellLines[3]));
       const seatCells=[]; cellLines.slice(4).forEach(l=>{ const sp=cellSpan(l); seatCells.push(cellContent(l)); for(let k=1;k<sp;k++) seatCells.push(''); }); // expand colspan cells (e.g. combined Joint List) so columns align with the header
       if(seatCells.length<cols.length) continue;
-      const rec={ date:iso, pollster:firm, outlet:FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
+      const rec={ date:iso, pollster:firm, outlet:alias.outlet||FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
       cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
       const tail=seatCells.slice(cols.length).map(convSeat);
@@ -168,25 +182,48 @@ const srcHtml = fs.readFileSync(FILES[0], 'utf8');
 const arrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
 if (!arrText) throw new Error('BASE_POLLS_DATA array not found in ' + FILES[0]);
 const existing = JSON.parse(arrText);
+
+// Rows stored under a name Wikipedia has since renamed away from get canonicalised
+// in place, so they keep matching the incoming rows (and the name-keyed lookups in
+// the dashboard). Idempotent — a no-op once every row is already canonical.
+let renamed = 0;
+for (const p of existing) {
+  const a = POLLSTER_ALIAS[p.pollster];
+  if (!a) continue;
+  p.pollster = a.pollster || p.pollster;
+  if (a.outlet) p.outlet = a.outlet;
+  renamed++;
+}
+
 const maxDate = existing.map(p => p.date).sort().pop();
 const seen = new Set(existing.map(p => p.date + '|' + p.pollster));
 const today = new Date().toISOString().slice(0, 10);
+// Wikipedia's editors add a poll a day or two after its fieldwork date, so a poll
+// published today is routinely dated BEFORE the newest row already stored. The old
+// `p.date > maxDate` gate dropped every such late arrival permanently — that alone
+// lost 11 of August 2026's polls. Duplicates are prevented by the date|pollster key
+// set, so re-check a whole window back instead of only past the high-water mark.
+const cutoff = new Date(Date.now() - BACKFILL_DAYS * 86400000).toISOString().slice(0, 10);
 const fresh = parsed
-  .filter(p => p.date > maxDate && p.date <= today && !seen.has(p.date + '|' + p.pollster))
+  .filter(p => p.date >= cutoff && p.date <= today && !seen.has(p.date + '|' + p.pollster))
   .sort((a, b) => a.date < b.date ? -1 : 1);
 
-if (!fresh.length) { console.log(`No new polls (baked up to ${maxDate}).`); process.exit(0); }
+if (!fresh.length && !renamed) { console.log(`No new polls (baked up to ${maxDate}, looking back to ${cutoff}).`); process.exit(0); }
 
 const summary = fresh.map(p => `${p.date} ${p.pollster}`).join(', ');
-console.log(`${fresh.length} new poll(s): ${summary}`);
+console.log(`${fresh.length} new poll(s): ${summary || '—'}${renamed ? `; ${renamed} row(s) renamed to a canonical pollster` : ''}`);
 if (DRY) { console.log('DRY_RUN — no files written.'); process.exit(0); }
 
-const insertion = fresh.map(p => ', ' + JSON.stringify(p)).join('');   // append only new objects (minimal diff)
+// Backfilled polls land mid-array, so the merged list is re-sorted and re-serialised
+// wholesale (same approach as update-govil-polls.mjs) rather than appended.
+const merged = [...existing, ...fresh].sort((a, b) => a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
+const mergedJson = JSON.stringify(merged);
 for (const f of FILES) {
   const html = fs.readFileSync(f, 'utf8');
-  const arr = html.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
-  if (!arr) throw new Error('BASE_POLLS_DATA array not found in ' + f);
-  fs.writeFileSync(f, html.replace(arr, arr.slice(0, -1) + insertion + ']'));
+  if (!/window\.BASE_POLLS_DATA = \[.*?\];/s.test(html)) throw new Error('BASE_POLLS_DATA array not found in ' + f);
+  // Function replacement: a literal `$&`/`$'` inside the JSON would otherwise be
+  // interpreted as a replacement pattern.
+  fs.writeFileSync(f, html.replace(/window\.BASE_POLLS_DATA = \[.*?\];/s, () => `window.BASE_POLLS_DATA = ${mergedJson};`));
 }
 regenAll();
 
