@@ -11,312 +11,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Israel 2026 Knesset election polling averages, bloc trends and a majority forecast — Hebrew, Arabic and English.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Israel 2026 Election Polls">
+<meta property="og:title" content="Israel 2026 Election Polls · לוח סקרי הבחירות 2026">
+<meta property="og:description" content="Seat averages, bloc trends and a majority forecast across 150+ polls. עברית · العربية · English.">
+<meta property="og:url" content="https://israel-polls-2026.vercel.app/">
+<meta name="twitter:card" content="summary">
 <title>לוח סקרי הבחירות לכנסת 2026</title>
 <script>
   /* Apply saved/OS theme before first paint to avoid a flash */
   (function(){ try { var t = localStorage.getItem('ilpolls_theme');
     if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
   } catch(e){} })();
+  /* ?embed=<widget> hides the chrome from the very first paint; the move into
+     .embed-root happens on DOMContentLoaded, in the share module below. */
+  (function(){ try {
+    if (new URLSearchParams(location.search).get('embed')) document.documentElement.classList.add('embed');
+  } catch(e){} })();
 </script>
 <script>
-/* ═══ Arabic layer ══════════════════════════════════════════════════════════
+/* ═══ Language layer (he · ar · en) ═════════════════════════════════════════
    The dashboard is authored in Hebrew and stays that way: every literal in the
-   render code, every comparison, every localStorage key is untouched. Arabic is
-   a presentation layer — a Hebrew→Arabic phrase table plus a translator that
-   rewrites text nodes and human-readable attributes as they land in the DOM,
-   driven by a MutationObserver so all ~70 render sites are covered without
-   threading a t() call through any of them. Both languages are RTL, so the
-   layout needs no work at all.
+   render code, every comparison, every localStorage key is untouched. Arabic
+   and English are a presentation layer — one Hebrew-keyed phrase table plus a
+   translator that rewrites text nodes and human-readable attributes as they
+   land in the DOM, driven by a MutationObserver so all ~70 render sites are
+   covered without threading a t() call through any of them.
 
-   Two consequences worth knowing before editing:
+   Hebrew and Arabic are RTL; English flips <html dir> to ltr, which the layout
+   already handles because the CSS is written with logical properties. The few
+   physical exceptions carry an html[dir="ltr"] rule beside them.
+
+   Three consequences worth knowing before editing:
    • A phrase missing from the table stays Hebrew. Coverage degrades, nothing
      breaks — which is also what happens to a party or a gov.il answer option
      that Wikipedia/gov.il adds after this table was written.
    • Because translation happens after render, code that measures a string to
      size something (the tug-of-war majority pill) must measure the translated
-     text — see ILT() calls in the render code. There are only a couple. */
+     text — see ILT() calls in the render code. There are only a couple.
+   • Party, leader and outlet names are swapped in the data instead of the DOM,
+     because the render code also puts them in SVG attributes and on the PNG
+     export canvas, neither of which the DOM pass ever sees. */
 (function(){
+  var LANGS = ['he', 'ar', 'en'];
   var STORE = 'ilpolls_lang';
   var qs = null; try { qs = new URLSearchParams(location.search).get('lang'); } catch(e){}
   var saved = null; try { saved = localStorage.getItem(STORE); } catch(e){}
-  var LANG = (qs === 'ar' || qs === 'he') ? qs : (saved === 'ar' ? 'ar' : 'he');
-  if (qs === 'ar' || qs === 'he') { try { localStorage.setItem(STORE, LANG); } catch(e){} }
+  var LANG = LANGS.indexOf(qs) >= 0 ? qs : (LANGS.indexOf(saved) >= 0 ? saved : 'he');
+  /* ?lang= is meant to be a shareable "open this in X" link, so it sticks. */
+  if (LANGS.indexOf(qs) >= 0) { try { localStorage.setItem(STORE, LANG); } catch(e){} }
   window.IL_LANG = LANG;
+  window.IL_LANGS = LANGS;
+
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === 'en' ? 'ltr' : 'rtl';
 
   /* The whole page is language-stamped at boot, so a switch is a reload. */
-  function setLang(l) {
+  window.IL_SET_LANG = function(l) {
+    if (l === LANG) return;
     try { localStorage.setItem(STORE, l); } catch(e){}
     var u; try { u = new URL(location.href); u.searchParams.delete('lang'); } catch(e){ u = null; }
     if (u) location.replace(u.toString()); else location.reload();
-  }
-  function wireLangBtn() {
-    var b = document.getElementById('langBtn'); if (!b) return;
-    b.textContent = LANG === 'ar' ? 'עב' : 'ع';
-    var lbl = LANG === 'ar' ? 'التبديل إلى العبرية' : 'הצג בערבית';
-    b.title = lbl; b.setAttribute('aria-label', lbl);
-    b.addEventListener('click', function(){ setLang(LANG === 'ar' ? 'he' : 'ar'); });
-  }
-  document.addEventListener('DOMContentLoaded', wireLangBtn);
+  };
+  var SWITCH_LABEL = { he: 'עברית', ar: 'العربية', en: 'English' };
+  var SWITCH_SHORT = { he: 'עב', ar: 'ع', en: 'EN' };
+  document.addEventListener('DOMContentLoaded', function(){
+    var box = document.getElementById('langSwitch'); if (!box) return;
+    LANGS.forEach(function(l){
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = SWITCH_SHORT[l]; b.lang = l;
+      b.title = SWITCH_LABEL[l]; b.setAttribute('aria-label', SWITCH_LABEL[l]);
+      if (l === LANG) { b.className = 'sel'; b.setAttribute('aria-current', 'true'); }
+      b.addEventListener('click', function(){ window.IL_SET_LANG(l); });
+      box.appendChild(b);
+    });
+  });
 
   window.ILT = function(s){ return s; };      /* Hebrew -> display text */
   window.ILT_SRC = function(s){ return s; };  /* display text -> Hebrew, for the few
                                                  lookups keyed by on-screen text */
-  if (LANG !== 'ar') return;
-  document.documentElement.lang = 'ar';
+  if (LANG === 'he') return;
 
-  /* ── party / outlet names: swapped in the data, not in the DOM, because the
-        render code interpolates them into SVG attributes and export canvases ── */
-  window.AR_PARTY = {
-    "Likud":             { name: "الليكود",                  leader: "بنيامين نتنياهو" },
-    "Religious Zionism": { name: "الصهيونية الدينية",         leader: "بتسلئيل سموتريتش" },
-    "Otzma Yehudit":     { name: "القوة اليهودية",            leader: "إيتمار بن غفير" },
-    "Shas":              { name: "شاس",                      leader: "أرييه درعي" },
-    "UTJ":               { name: "يهدوت هتوراة",              leader: "يتسحاق غولدكنوبف" },
-    "Yesh Atid":         { name: "يش عتيد",                   leader: "يائير لبيد" },
-    "National Unity":    { name: "أزرق أبيض",                 leader: "بيني غانتس" },
-    "Yisrael Beiteinu":  { name: "إسرائيل بيتنا",             leader: "أفيغدور ليبرمان" },
-    "The Democrats":     { name: "الديمقراطيون",              leader: "يائير غولان" },
-    "Bennett 2026":      { name: "بينيت 2026",                leader: "نفتالي بينيت" },
-    "Together":          { name: "معًا (بينيت–لبيد)",         leader: "نفتالي بينيت ويائير لبيد" },
-    "Yashar":            { name: "ياشار!",                    leader: "غادي أيزنكوت" },
-    "Yesodot Yisrael":   { name: "أسس إسرائيل",               leader: "يوعز هندل وحيلي تروبر" },
-    "Joint List":        { name: "القائمة المشتركة",          leader: "يوسف جبارين وأحمد الطيبي" },
-    "Ra'am":             { name: "القائمة العربية الموحدة",   leader: "منصور عباس" },
-    "Hadash-Ta'al":      { name: "الجبهة–العربية للتغيير",    leader: "يوسف جبارين وأحمد الطيبي" },
-    "Balad":             { name: "التجمع الوطني الديمقراطي",  leader: "سامي أبو شحادة" },
-    "Reservists":        { name: "حركة جنود الاحتياط",        leader: "يوعز هندل" },
-    "Unity":             { name: "الوحدة",                    leader: "جلعاد إردان" },
-    "Amcha Yisrael":     { name: "عمخا يسرائيل",              leader: "عوفر فينتر" }
+  window.IL_PARTY = {
+    "Likud":             { ar: { name: "الليكود",                 leader: "بنيامين نتنياهو" },
+                           en: { name: "Likud",                   leader: "Benjamin Netanyahu" } },
+    "Religious Zionism": { ar: { name: "الصهيونية الدينية",        leader: "بتسلئيل سموتريتش" },
+                           en: { name: "Religious Zionism",       leader: "Bezalel Smotrich" } },
+    "Otzma Yehudit":     { ar: { name: "القوة اليهودية",           leader: "إيتمار بن غفير" },
+                           en: { name: "Otzma Yehudit",           leader: "Itamar Ben Gvir" } },
+    "Shas":              { ar: { name: "شاس",                     leader: "أرييه درعي" },
+                           en: { name: "Shas",                    leader: "Aryeh Deri" } },
+    "UTJ":               { ar: { name: "يهدوت هتوراة",             leader: "يتسحاق غولدكنوبف" },
+                           en: { name: "United Torah Judaism",    leader: "Yitzhak Goldknopf" } },
+    "Yesh Atid":         { ar: { name: "يش عتيد",                  leader: "يائير لبيد" },
+                           en: { name: "Yesh Atid",               leader: "Yair Lapid" } },
+    "National Unity":    { ar: { name: "أزرق أبيض",                leader: "بيني غانتس" },
+                           en: { name: "Blue and White",          leader: "Benny Gantz" } },
+    "Yisrael Beiteinu":  { ar: { name: "إسرائيل بيتنا",            leader: "أفيغدور ليبرمان" },
+                           en: { name: "Yisrael Beiteinu",        leader: "Avigdor Lieberman" } },
+    "The Democrats":     { ar: { name: "الديمقراطيون",             leader: "يائير غولان" },
+                           en: { name: "The Democrats",           leader: "Yair Golan" } },
+    "Bennett 2026":      { ar: { name: "بينيت 2026",               leader: "نفتالي بينيت" },
+                           en: { name: "Bennett 2026",            leader: "Naftali Bennett" } },
+    "Together":          { ar: { name: "معًا (بينيت–لبيد)",        leader: "نفتالي بينيت ويائير لبيد" },
+                           en: { name: "Together (Bennett–Lapid)", leader: "Naftali Bennett & Yair Lapid" } },
+    "Yashar":            { ar: { name: "ياشار!",                   leader: "غادي أيزنكوت" },
+                           en: { name: "Yashar!",                 leader: "Gadi Eisenkot" } },
+    "Yesodot Yisrael":   { ar: { name: "أسس إسرائيل",              leader: "يوعز هندل وحيلي تروبر" },
+                           en: { name: "Yesodot Yisrael",         leader: "Yoaz Hendel & Hili Tropper" } },
+    "Joint List":        { ar: { name: "القائمة المشتركة",         leader: "يوسف جبارين وأحمد الطيبي" },
+                           en: { name: "Joint List",              leader: "Yousef Jabareen & Ahmad Tibi" } },
+    "Ra'am":             { ar: { name: "القائمة العربية الموحدة",  leader: "منصور عباس" },
+                           en: { name: "Ra'am",                   leader: "Mansour Abbas" } },
+    "Hadash-Ta'al":      { ar: { name: "الجبهة–العربية للتغيير",   leader: "يوسف جبارين وأحمد الطيبي" },
+                           en: { name: "Hadash–Ta'al",            leader: "Yousef Jabareen & Ahmad Tibi" } },
+    "Balad":             { ar: { name: "التجمع الوطني الديمقراطي", leader: "سامي أبو شحادة" },
+                           en: { name: "Balad",                   leader: "Sami Abu Shehadeh" } },
+    "Reservists":        { ar: { name: "حركة جنود الاحتياط",       leader: "يوعز هندل" },
+                           en: { name: "The Reservists",          leader: "Yoaz Hendel" } },
+    "Unity":             { ar: { name: "الوحدة",                   leader: "جلعاد إردان" },
+                           en: { name: "Unity",                   leader: "Gilad Erdan" } },
+    "Amcha Yisrael":     { ar: { name: "عمخا يسرائيل",             leader: "عوفر فينتر" },
+                           en: { name: "Amcha Yisrael",           leader: "Ofer Winter" } }
   };
-  window.AR_OUTLET = {
-    "Channel 12 (HaHadashot 12)": "القناة 12 (أخبار 12)",
-    "Channel 13": "القناة 13",
-    "Channel 14 (Direct Polls)": "القناة 14",
-    "Israel Hayom": "إسرائيل هَيوم",
-    "Kan 11": "كان 11",
-    "Maariv": "معاريف",
-    "Zman Israel / Times of Israel": "زمان يسرائيل",
-    "Walla": "واللا"
+  window.IL_OUTLET = {
+    "Channel 12 (HaHadashot 12)":    { ar: "القناة 12 (أخبار 12)", en: "Channel 12" },
+    "Channel 13":                    { ar: "القناة 13",            en: "Channel 13" },
+    "Channel 14 (Direct Polls)":     { ar: "القناة 14",            en: "Channel 14" },
+    "Israel Hayom":                  { ar: "إسرائيل هَيوم",         en: "Israel Hayom" },
+    "Kan 11":                        { ar: "كان 11",               en: "Kan 11" },
+    "Maariv":                        { ar: "معاريف",               en: "Maariv" },
+    "Zman Israel / Times of Israel": { ar: "زمان يسرائيل",          en: "Zman Israel" },
+    "Walla":                         { ar: "واللا",                en: "Walla" }
   };
 
-  /* ── phrase table. %n stands for a number the render code interpolates,
-        %d for a d.m.yyyy date; they are filled back in, in order. ── */
-  var AR = {
+  /* ── phrase table, keyed by the Hebrew the render code emits. %n stands for a
+        number the code interpolates, %d for a date; they are filled back in, in
+        order. Keeping both translations on one line makes a gap obvious. ── */
+  var T = {
+    /* share + embed */
+    "שתף": { ar: "مشاركة", en: "Share" },
+    "שתף את הווידג׳ט": { ar: "مشاركة الودجت", en: "Share this widget" },
+    "העתק קישור": { ar: "نسخ الرابط", en: "Copy link" },
+    "העתק קוד הטמעה": { ar: "نسخ كود التضمين", en: "Copy embed code" },
+    "שיתוף מהמכשיר": { ar: "مشاركة من الجهاز", en: "Share via device" },
+    "הועתק": { ar: "تم النسخ", en: "Copied" },
+    "העתקה נכשלה": { ar: "فشل النسخ", en: "Copy failed" },
+    "לוח הסקרים המלא": { ar: "لوحة الاستطلاعات الكاملة", en: "Full polling dashboard" },
     /* chrome */
-    "לוח סקרי הבחירות לכנסת 2026": "لوحة استطلاعات انتخابات الكنيست 2026",
-    "סקרי הבחירות לכנסת 2026": "استطلاعات انتخابات الكنيست 2026",
-    "לוח סקרי הבחירות 2026": "لوحة استطلاعات الانتخابات 2026",
-    "מבוסס על ויקיפדיה": "استنادًا إلى ويكيبيديا",
-    "טוען סקרים עדכניים…": "جارٍ تحميل أحدث الاستطلاعات…",
-    "בדוק סקרים חדשים מוויקיפדיה": "ابحث عن استطلاعات جديدة في ويكيبيديا",
-    "רענן": "تحديث",
-    "החלף בין מצב בהיר לכהה": "التبديل بين الوضع الفاتح والداكن",
-    "החלף מצב תצוגה": "تبديل وضع العرض",
-    "מרענן… הדשבורד יתעדכן בעוד כשתי דקות": "جارٍ التحديث… ستتحدّث اللوحة خلال دقيقتين تقريبًا",
-    "מושך נתונים מוויקיפדיה…": "جارٍ جلب البيانات من ويكيبيديا…",
-    "תגובה ריקה": "استجابة فارغة",
-    "רענון הצליח — %n סקרים חדשים": "نجح التحديث — %n استطلاعات جديدة",
-    "אין סקרים חדשים": "لا توجد استطلاعات جديدة",
-    "רענון נכשל:": "فشل التحديث:",
-    "נתונים מעודכנים ל-": "البيانات محدَّثة حتى ",
+    "לוח סקרי הבחירות לכנסת 2026": { ar: "لوحة استطلاعات انتخابات الكنيست 2026", en: "Israel 2026 Knesset Election Polls" },
+    "סקרי הבחירות לכנסת 2026": { ar: "استطلاعات انتخابات الكنيست 2026", en: "Israel 2026 Knesset Election Polls" },
+    "לוח סקרי הבחירות 2026": { ar: "لوحة استطلاعات الانتخابات 2026", en: "Israel 2026 Election Polls" },
+    "מבוסס על ויקיפדיה": { ar: "استنادًا إلى ويكيبيديا", en: "Based on Wikipedia" },
+    "טוען סקרים עדכניים…": { ar: "جارٍ تحميل أحدث الاستطلاعات…", en: "Loading the latest polls…" },
+    "בדוק סקרים חדשים מוויקיפדיה": { ar: "ابحث عن استطلاعات جديدة في ويكيبيديا", en: "Check Wikipedia for new polls" },
+    "רענן": { ar: "تحديث", en: "Refresh" },
+    "החלף בין מצב בהיר לכהה": { ar: "التبديل بين الوضع الفاتح والداكن", en: "Switch between light and dark" },
+    "החלף מצב תצוגה": { ar: "تبديل وضع العرض", en: "Toggle display mode" },
+    "מרענן… הדשבורד יתעדכן בעוד כשתי דקות": { ar: "جارٍ التحديث… ستتحدّث اللوحة خلال دقيقتين تقريبًا", en: "Refreshing… the dashboard will update in about two minutes" },
+    "מושך נתונים מוויקיפדיה…": { ar: "جارٍ جلب البيانات من ويكيبيديا…", en: "Fetching data from Wikipedia…" },
+    "תגובה ריקה": { ar: "استجابة فارغة", en: "Empty response" },
+    "רענון הצליח — %n סקרים חדשים": { ar: "نجح التحديث — %n استطلاعات جديدة", en: "Refreshed — %n new polls" },
+    "אין סקרים חדשים": { ar: "لا توجد استطلاعات جديدة", en: "No new polls" },
+    "רענון נכשל:": { ar: "فشل التحديث:", en: "Refresh failed:" },
+    "נתונים מעודכנים ל-": { ar: "البيانات محدَّثة حتى ", en: "Data current to " },
 
     /* controls */
-    "טווח תאריכים": "النطاق الزمني",
-    "כלי תקשורת / סוקרים": "وسائل الإعلام / شركات الاستطلاع",
-    "כל כלי התקשורת": "كل وسائل الإعلام",
-    "כל המפלגות": "كل الأحزاب",
-    "בחירת מפלגות": "اختيار الأحزاب",
-    "לא נבחרו": "لم يُختَر شيء",
-    "%n מתוך %n": "%n من %n",
-    "בחר הכל": "تحديد الكل",
-    "נקה": "مسح",
-    "הצג סקרים כלולים": "عرض الاستطلاعات المشمولة",
-    "הסתר סקרים כלולים": "إخفاء الاستطلاعات المشمولة",
-    "הגדל למסך מלא": "تكبير إلى ملء الشاشة",
-    "הורד כתמונה": "تنزيل كصورة",
-    "הורד את הווידג׳ט כתמונה": "تنزيل الودجت كصورة",
+    "טווח תאריכים": { ar: "النطاق الزمني", en: "Date range" },
+    "כלי תקשורת / סוקרים": { ar: "وسائل الإعلام / شركات الاستطلاع", en: "Outlets / pollsters" },
+    "כל כלי התקשורת": { ar: "كل وسائل الإعلام", en: "All outlets" },
+    "כל המפלגות": { ar: "كل الأحزاب", en: "All parties" },
+    "בחירת מפלגות": { ar: "اختيار الأحزاب", en: "Choose parties" },
+    "לא נבחרו": { ar: "لم يُختَر شيء", en: "None selected" },
+    "%n מתוך %n": { ar: "%n من %n", en: "%n of %n" },
+    "בחר הכל": { ar: "تحديد الكل", en: "Select all" },
+    "נקה": { ar: "مسح", en: "Clear" },
+    "הצג סקרים כלולים": { ar: "عرض الاستطلاعات المشمولة", en: "Show included polls" },
+    "הסתר סקרים כלולים": { ar: "إخفاء الاستطلاعات المشمولة", en: "Hide included polls" },
+    "הגדל למסך מלא": { ar: "تكبير إلى ملء الشاشة", en: "Expand to full screen" },
+    "הורד כתמונה": { ar: "تنزيل كصورة", en: "Download as image" },
+    "הורד את הווידג׳ט כתמונה": { ar: "تنزيل الودجت كصورة", en: "Download this widget as an image" },
 
     /* hero */
-    "אם הבחירות היו נערכות היום": "لو جرت الانتخابات اليوم",
-    "רוב לקואליציה": "أغلبية للائتلاف",
-    "רוב לאופוזיציה": "أغلبية للمعارضة",
-    "אין רוב לאף גוש": "لا أغلبية لأي كتلة",
-    "הקואליציה מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": "الائتلاف يصل إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.",
-    "האופוזיציה מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": "المعارضة تصل إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.",
-    "הגושים מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": "الكتلتان تصلان إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.",
-    "הקואליציה מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": "الائتلاف يتقدّم بـ%n مقعدًا (بفارق %n)، لكنه بعيد عن الـ61 مقعدًا المطلوبة.",
-    "האופוזיציה מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": "المعارضة تتقدّم بـ%n مقعدًا (بفارق %n)، لكنها بعيدة عن الـ61 مقعدًا المطلوبة.",
-    "הגושים מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": "الكتلتان عند %n مقعدًا (بفارق %n)، بعيدًا عن الـ61 مقعدًا المطلوبة.",
-    "סקרים בטווח הנבחר": "استطلاعات في النطاق المحدد",
-    "המפלגה הגדולה ביותר": "أكبر حزب",
-    "הפרש בין הגושים": "الفارق بين الكتلتين",
-    "סיכוי לרוב לאופוזיציה על פי המודל": "فرصة أغلبية للمعارضة وفق النموذج",
-    "סיכוי לרוב לקואליציה על פי המודל": "فرصة أغلبية للائتلاف وفق النموذج",
+    "אם הבחירות היו נערכות היום": { ar: "لو جرت الانتخابات اليوم", en: "If the election were held today" },
+    "רוב לקואליציה": { ar: "أغلبية للائتلاف", en: "Coalition majority" },
+    "רוב לאופוזיציה": { ar: "أغلبية للمعارضة", en: "Opposition majority" },
+    "אין רוב לאף גוש": { ar: "لا أغلبية لأي كتلة", en: "No majority for either bloc" },
+    "הקואליציה מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": { ar: "الائتلاف يصل إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.", en: "The coalition reaches %n seats on average — enough to form a government." },
+    "האופוזיציה מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": { ar: "المعارضة تصل إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.", en: "The opposition reaches %n seats on average — enough to form a government." },
+    "הגושים מגיעה ל‑%n מנדטים בממוצע — די להרכבת קואליציה.": { ar: "الكتلتان تصلان إلى %n مقعدًا في المتوسط — ما يكفي لتشكيل ائتلاف.", en: "The blocs reach %n seats on average — enough to form a government." },
+    "הקואליציה מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": { ar: "الائتلاف يتقدّم بـ%n مقعدًا (بفارق %n)، لكنه بعيد عن الـ61 مقعدًا المطلوبة.", en: "The coalition leads with %n seats (a gap of %n), but falls short of the 61 needed." },
+    "האופוזיציה מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": { ar: "المعارضة تتقدّم بـ%n مقعدًا (بفارق %n)، لكنها بعيدة عن الـ61 مقعدًا المطلوبة.", en: "The opposition leads with %n seats (a gap of %n), but falls short of the 61 needed." },
+    "הגושים מובילה עם %n מנדטים (פער של %n), אך רחוקה מ‑61 המנדטים הדרושים.": { ar: "الكتلتان عند %n مقعدًا (بفارق %n)، بعيدًا عن الـ61 مقعدًا المطلوبة.", en: "The blocs stand at %n seats (a gap of %n), short of the 61 needed." },
+    "סקרים בטווח הנבחר": { ar: "استطلاعات في النطاق المحدد", en: "Polls in the selected range" },
+    "המפלגה הגדולה ביותר": { ar: "أكبر حزب", en: "Largest party" },
+    "הפרש בין הגושים": { ar: "الفارق بين الكتلتين", en: "Gap between the blocs" },
+    "סיכוי לרוב לאופוזיציה על פי המודל": { ar: "فرصة أغلبية للمعارضة وفق النموذج", en: "chance of an opposition majority, per the model" },
+    "סיכוי לרוב לקואליציה על פי המודל": { ar: "فرصة أغلبية للائتلاف وفق النموذج", en: "chance of a coalition majority, per the model" },
 
     /* blocs */
-    "משיכת החבל": "شدّ الحبل",
-    "חלוקה לגושים": "توزيع الكتل",
-    "מגמת הגושים": "اتجاه الكتل",
-    "מגמות מפלגות": "اتجاهات الأحزاب",
-    "לפי מפלגה": "حسب الحزب",
-    "הקואליציה": "الائتلاف",
-    "האופוזיציה": "المعارضة",
-    "קואליציה": "ائتلاف",
-    "אופוזיציה": "معارضة",
-    "אחרים": "أخرى",
-    "אחר": "أخرى",
-    "קוא׳": "ائتلاف",
-    "אופ׳": "معارضة",
-    "לקוא׳": "للائتلاف",
-    "לאופ׳": "للمعارضة",
-    "תיקו": "تعادل",
-    "רוב": "أغلبية",
-    "חסרים %n ל‑61": "ناقص %n للـ61",
-    "מתחת לאחוז החסימה": "دون نسبة الحسم",
-    "שיוך הגושים נקבע בכפתורים שבטבלת המפלגות.": "يُحدَّد انتماء الكتل عبر الأزرار في جدول الأحزاب.",
-    "ממוצע על %n סקרים. \"אחרים\" כולל קולות מתחת לאחוז החסימה.": "متوسط على %n استطلاعات. \"أخرى\" تشمل الأصوات دون نسبة الحسم.",
-    "אין מספיק נתונים בטווח שנבחר.": "لا توجد بيانات كافية في النطاق المحدد.",
-    "אין סקרים בטווח שנבחר.": "لا توجد استطلاعات في النطاق المحدد.",
-    "אין נתונים בטווח": "لا توجد بيانات في النطاق",
-    "משיכת חבל בין הגושים: קואליציה %n מנדטים, אופוזיציה %n, אחרים %n. דרושים 61 לרוב.": "شدّ حبل بين الكتلتين: الائتلاف %n مقعدًا، المعارضة %n، أخرى %n. الأغلبية تتطلب 61.",
-    "הקו המקווקו במרכז הוא נקודת התיקו — משם החבל נמשך לכיוון הגוש המוביל, לפי הפער בין הגושים. רוב דורש 61 מנדטים, כמצוין מתחת לכל גוש. המפלגות הגדולות בכל גוש עומדות קרוב יותר לקשר; מנהיגי גוש \"אחרים\" עומדים במרכז, מאחורי החבל, ואינם מושכים.": "الخط المتقطّع في المنتصف هو نقطة التعادل — ومن هناك يُشدّ الحبل نحو الكتلة المتقدّمة، بحسب الفارق بين الكتلتين. الأغلبية تتطلب 61 مقعدًا، كما هو مبيّن تحت كل كتلة. الأحزاب الأكبر في كل كتلة تقف أقرب إلى العقدة؛ أما قادة كتلة \"أخرى\" فيقفون في الوسط خلف الحبل ولا يشدّون.",
+    "משיכת החבל": { ar: "شدّ الحبل", en: "Tug of war" },
+    "חלוקה לגושים": { ar: "توزيع الكتل", en: "Bloc split" },
+    "מגמת הגושים": { ar: "اتجاه الكتل", en: "Bloc trend" },
+    "מגמות מפלגות": { ar: "اتجاهات الأحزاب", en: "Party trends" },
+    "לפי מפלגה": { ar: "حسب الحزب", en: "By party" },
+    "הקואליציה": { ar: "الائتلاف", en: "Coalition" },
+    "האופוזיציה": { ar: "المعارضة", en: "Opposition" },
+    "קואליציה": { ar: "ائتلاف", en: "Coalition" },
+    "אופוזיציה": { ar: "معارضة", en: "Opposition" },
+    "אחרים": { ar: "أخرى", en: "Others" },
+    "אחר": { ar: "أخرى", en: "Other" },
+    "קוא׳": { ar: "ائتلاف", en: "Coal." },
+    "אופ׳": { ar: "معارضة", en: "Opp." },
+    "לקוא׳": { ar: "للائتلاف", en: "coalition" },
+    "לאופ׳": { ar: "للمعارضة", en: "opposition" },
+    "תיקו": { ar: "تعادل", en: "Tie" },
+    "רוב": { ar: "أغلبية", en: "Majority" },
+    "חסרים %n ל‑61": { ar: "ناقص %n للـ61", en: "%n short of 61" },
+    "מתחת לאחוז החסימה": { ar: "دون نسبة الحسم", en: "Below the threshold" },
+    "שיוך הגושים נקבע בכפתורים שבטבלת המפלגות.": { ar: "يُحدَّد انتماء الكتل عبر الأزرار في جدول الأحزاب.", en: "Bloc assignment is set with the buttons in the party table." },
+    "ממוצע על %n סקרים. \"אחרים\" כולל קולות מתחת לאחוז החסימה.": { ar: "متوسط على %n استطلاعات. \"أخرى\" تشمل الأصوات دون نسبة الحسم.", en: "Average over %n polls. \"Others\" includes votes below the electoral threshold." },
+    "אין מספיק נתונים בטווח שנבחר.": { ar: "لا توجد بيانات كافية في النطاق المحدد.", en: "Not enough data in the selected range." },
+    "אין סקרים בטווח שנבחר.": { ar: "لا توجد استطلاعات في النطاق المحدد.", en: "No polls in the selected range." },
+    "אין נתונים בטווח": { ar: "لا توجد بيانات في النطاق", en: "No data in range" },
+    "משיכת חבל בין הגושים: קואליציה %n מנדטים, אופוזיציה %n, אחרים %n. דרושים 61 לרוב.": { ar: "شدّ حبل بين الكتلتين: الائتلاف %n مقعدًا، المعارضة %n، أخرى %n. الأغلبية تتطلب 61.", en: "Tug of war between the blocs: coalition %n seats, opposition %n, others %n. 61 needed for a majority." },
+    "הקו המקווקו במרכז הוא נקודת התיקו — משם החבל נמשך לכיוון הגוש המוביל, לפי הפער בין הגושים. רוב דורש 61 מנדטים, כמצוין מתחת לכל גוש. המפלגות הגדולות בכל גוש עומדות קרוב יותר לקשר; מנהיגי גוש \"אחרים\" עומדים במרכז, מאחורי החבל, ואינם מושכים.": { ar: "الخط المتقطّع في المنتصف هو نقطة التعادل — ومن هناك يُشدّ الحبل نحو الكتلة المتقدّمة، بحسب الفارق بين الكتلتين. الأغلبية تتطلب 61 مقعدًا، كما هو مبيّن تحت كل كتلة. الأحزاب الأكبر في كل كتلة تقف أقرب إلى العقدة؛ أما قادة كتلة \"أخرى\" فيقفون في الوسط خلف الحبل ولا يشدّون.", en: "The dashed line in the centre is the tie point — from there the rope is pulled toward the leading bloc, by the gap between them. A majority needs 61 seats, as marked under each bloc. The largest parties in each bloc stand closest to the knot; leaders of the \"others\" bloc stand in the centre, behind the rope, and do not pull." },
 
     /* table + tooltips */
-    "מפלגה": "الحزب",
-    "ממוצע מנדטים": "متوسط المقاعد",
-    "ממוצע משוקלל": "متوسط مرجّح",
-    "חציון": "الوسيط",
-    "סקרים": "استطلاعات",
-    "%n סקרים": "%n استطلاعات",
-    "מינימום": "الحد الأدنى",
-    "מקסימום": "الحد الأقصى",
-    "לחץ לפירוט": "اضغط للتفاصيل",
-    "חדש": "جديد",
+    "מפלגה": { ar: "الحزب", en: "Party" },
+    "ממוצע מנדטים": { ar: "متوسط المقاعد", en: "Average seats" },
+    "ממוצע משוקלל": { ar: "متوسط مرجّح", en: "Weighted average" },
+    "חציון": { ar: "الوسيط", en: "Median" },
+    "סקרים": { ar: "استطلاعات", en: "Polls" },
+    "%n סקרים": { ar: "%n استطلاعات", en: "%n polls" },
+    "מינימום": { ar: "الحد الأدنى", en: "Minimum" },
+    "מקסימום": { ar: "الحد الأقصى", en: "Maximum" },
+    "לחץ לפירוט": { ar: "اضغط للتفاصيل", en: "Click for details" },
+    "חדש": { ar: "جديد", en: "new" },
 
     /* poll modal */
-    "מדגם בפועל: %n משיבים": "العينة الفعلية: %n مستجيبًا",
-    "טעות דגימה:": "هامش الخطأ:",
-    "שיעור היענות: %n%": "نسبة الاستجابة: %n%",
-    "לא החליטו: %n%": "لم يحسموا: %n%",
-    "תרחישים נוספים בסקר זה (%n)": "سيناريوهات إضافية في هذا الاستطلاع (%n)",
+    "מדגם בפועל: %n משיבים": { ar: "العينة الفعلية: %n مستجيبًا", en: "Actual sample: %n respondents" },
+    "טעות דגימה:": { ar: "هامش الخطأ:", en: "Margin of error:" },
+    "שיעור היענות: %n%": { ar: "نسبة الاستجابة: %n%", en: "Response rate: %n%" },
+    "לא החליטו: %n%": { ar: "لم يحسموا: %n%", en: "Undecided: %n%" },
+    "תרחישים נוספים בסקר זה (%n)": { ar: "سيناريوهات إضافية في هذا الاستطلاع (%n)", en: "Additional scenarios in this poll (%n)" },
 
     /* events on the trend chart */
-    "רע״ם, חד״ש-תע״ל ובל״ד מתחייבים לחדש את הרשימה המשותפת": "الموحدة والجبهة–العربية للتغيير والتجمع يتعهدون بتجديد القائمة المشتركة",
-    "תחילת מלחמת איראן": "اندلاع الحرب مع إيران",
-    "תחילת מלחמת לבנון": "اندلاع الحرب مع لبنان",
-    "אושר תקציב חדש — נמנעו בחירות מוקדמות": "إقرار ميزانية جديدة — تجنُّب انتخابات مبكرة",
-    "הפסקת אש ישראל–לבנון נכנסת לתוקף": "دخول وقف إطلاق النار بين إسرائيل ولبنان حيّز التنفيذ",
-    "בנט ולפיד מקימים את \"יחד\" (בראשות בנט)": "بينيت ولبيد يؤسسان \"معًا\" (برئاسة بينيت)",
-    "הצעות לפיזור הכנסת מוגשות": "تقديم اقتراحات لحلّ الكنيست",
-    "יוסף ג׳בארין נבחר להוביל את חד״ש": "يوسف جبارين يُنتخب لقيادة الجبهة",
-    "חד״ש-תע״ל ובל״ד מחדשים את הרשימה המשותפת (בלי רע״ם)": "الجبهة–العربية للتغيير والتجمع يجدّدان القائمة المشتركة (بدون الموحدة)",
-    "נחתם מזכר איסלמאבאד — לקראת סיום מלחמת איראן": "توقيع مذكرة إسلام آباد — تمهيدًا لإنهاء الحرب مع إيران",
-    "הנדל, טרופר והמילואימניקים מתאחדים (\"יסודות ישראל\")": "هندل وتروبر وحركة جنود الاحتياط يتوحّدون (\"أسس إسرائيل\")",
-    "הכנסת מאשרת את פיזורה": "الكنيست يقرّ حلّ نفسه",
-    "הדמוקרטים עורכים פריימריז לרשימה": "الديمقراطيون يجرون انتخابات تمهيدية للقائمة",
-    "ארדן ואדלשטיין מקימים מפלגה חדשה": "إردان وإدلشتاين يؤسسان حزبًا جديدًا",
+    "רע״ם, חד״ש-תע״ל ובל״ד מתחייבים לחדש את הרשימה המשותפת": { ar: "الموحدة والجبهة–العربية للتغيير والتجمع يتعهدون بتجديد القائمة المشتركة", en: "Ra'am, Hadash–Ta'al and Balad commit to reviving the Joint List" },
+    "תחילת מלחמת איראן": { ar: "اندلاع الحرب مع إيران", en: "The Iran war begins" },
+    "תחילת מלחמת לבנון": { ar: "اندلاع الحرب مع لبنان", en: "The Lebanon war begins" },
+    "אושר תקציב חדש — נמנעו בחירות מוקדמות": { ar: "إقرار ميزانية جديدة — تجنُّب انتخابات مبكرة", en: "New budget passed — early election averted" },
+    "הפסקת אש ישראל–לבנון נכנסת לתוקף": { ar: "دخول وقف إطلاق النار بين إسرائيل ولبنان حيّز التنفيذ", en: "Israel–Lebanon ceasefire takes effect" },
+    "בנט ולפיד מקימים את \"יחד\" (בראשות בנט)": { ar: "بينيت ولبيد يؤسسان \"معًا\" (برئاسة بينيت)", en: "Bennett and Lapid form \"Together\" (led by Bennett)" },
+    "הצעות לפיזור הכנסת מוגשות": { ar: "تقديم اقتراحات لحلّ الكنيست", en: "Bills to dissolve the Knesset are tabled" },
+    "יוסף ג׳בארין נבחר להוביל את חד״ש": { ar: "يوسف جبارين يُنتخب لقيادة الجبهة", en: "Yousef Jabareen elected to lead Hadash" },
+    "חד״ש-תע״ל ובל״ד מחדשים את הרשימה המשותפת (בלי רע״ם)": { ar: "الجبهة–العربية للتغيير والتجمع يجدّدان القائمة المشتركة (بدون الموحدة)", en: "Hadash–Ta'al and Balad revive the Joint List (without Ra'am)" },
+    "נחתם מזכר איסלמאבאד — לקראת סיום מלחמת איראן": { ar: "توقيع مذكرة إسلام آباد — تمهيدًا لإنهاء الحرب مع إيران", en: "Islamabad memorandum signed — toward ending the Iran war" },
+    "הנדל, טרופר והמילואימניקים מתאחדים (\"יסודות ישראל\")": { ar: "هندل وتروبر وحركة جنود الاحتياط يتوحّدون (\"أسس إسرائيل\")", en: "Hendel, Tropper and the Reservists merge (\"Yesodot Yisrael\")" },
+    "הכנסת מאשרת את פיזורה": { ar: "الكنيست يقرّ حلّ نفسه", en: "The Knesset votes to dissolve itself" },
+    "הדמוקרטים עורכים פריימריז לרשימה": { ar: "الديمقراطيون يجرون انتخابات تمهيدية للقائمة", en: "The Democrats hold a primary for their list" },
+    "ארדן ואדלשטיין מקימים מפלגה חדשה": { ar: "إردان وإدلشتاين يؤسسان حزبًا جديدًا", en: "Erdan and Edelstein form a new party" },
 
     /* ask-the-data */
-    "שאל את הנתונים": "اسأل البيانات",
-    "ללא עלות": "مجانًا",
-    "בחרו שאלה, או לחצו על אחת ההצעות, לקבלת תשובה מיידית המחושבת מכלל הסקרים.": "اختر سؤالًا أو اضغط على أحد الاقتراحات للحصول على إجابة فورية محسوبة من مجمل الاستطلاعات.",
-    "התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא התחברות, ללא חשבון חיצוני וללא עלות.": "تُحتسب الإجابات محليًا داخل المتصفح من كل الاستطلاعات — دون تسجيل دخول، ودون حساب خارجي، ودون تكلفة.",
-    "ממוצע מנדטים למפלגה": "متوسط مقاعد الحزب",
-    "ממוצע ב-N הסקרים האחרונים": "المتوسط في آخر N استطلاعات",
-    "שינוי במפלגה מאז תאריך": "تغيّر الحزب منذ تاريخ",
-    "מי עלה / ירד הכי הרבה מאז תאריך": "مَن ارتفع / انخفض أكثر منذ تاريخ",
-    "ממוצע למפלגה לפי סוקר": "متوسط الحزب حسب شركة الاستطلاع",
-    "המפלגות הגדולות ביותר": "أكبر الأحزاب",
-    "מצב הגושים ורוב (61)": "وضع الكتل والأغلبية (61)",
-    "יש רוב לקואליציה?": "هل للائتلاف أغلبية؟",
-    "מי עלה החודש?": "مَن ارتفع هذا الشهر؟",
-    "ממוצע הליכוד": "متوسط الليكود",
-    "מאז": "منذ",
-    "אין נתונים עבור": "لا توجد بيانات لـ",
-    "מנדטים בממוצע": "مقعدًا في المتوسط",
-    "מספר סקרים": "عدد الاستطلاعات",
-    "הכי גבוה": "الأعلى",
-    "הכי נמוך": "الأدنى",
-    "מנדטים בממוצע ב-%n הסקרים האחרונים": "مقعدًا في المتوسط في آخر %n استطلاعات",
-    "טווח הסקרים": "نطاق الاستطلاعات",
-    "סקרים עם נתון למפלגה": "استطلاعات فيها رقم للحزب",
-    "מנדטים מאז %d": "مقعدًا منذ %d",
-    "אז (סביב %d)": "حينها (نحو %d)",
-    "היום (5 סקרים אחרונים)": "اليوم (آخر 5 استطلاعات)",
-    "שינוי מאז %d": "التغيّر منذ %d",
-    "עלייה": "ارتفاع",
-    "ירידה": "انخفاض",
-    "אין שינוי משמעותי בטווח זה.": "لا تغيّر جوهري في هذا النطاق.",
-    "אין נתון ל": "لا توجد بيانات لـ",
-    "אצל": "لدى",
-    "נותן ל": "يمنح ",
-    "ממוצע כללי (כל הסוקרים)": "المتوسط العام (كل الشركات)",
-    "הפרש מהממוצע הכללי": "الفارق عن المتوسط العام",
-    "מספר סקרים של": "عدد استطلاعات",
-    "המפלגות הגדולות ביותר (ממוצע על פני כל הסקרים)": "أكبر الأحزاب (متوسط على كل الاستطلاعات)",
-    "אין נתוני גושים.": "لا توجد بيانات كتل.",
-    "לקואליציה יש רוב": "للائتلاف أغلبية",
-    "לקואליציה אין רוב": "ليس للائتلاف أغلبية",
-    "מבוסס על שיוך הגושים הנוכחי שלך (ניתן לשנות בטבלת המפלגות).": "استنادًا إلى توزيع الكتل الحالي لديك (يمكن تغييره في جدول الأحزاب).",
-    "לא ניתן לחשב.": "تعذّر الحساب.",
+    "שאל את הנתונים": { ar: "اسأل البيانات", en: "Ask the data" },
+    "ללא עלות": { ar: "مجانًا", en: "Free" },
+    "בחרו שאלה, או לחצו על אחת ההצעות, לקבלת תשובה מיידית המחושבת מכלל הסקרים.": { ar: "اختر سؤالًا أو اضغط على أحد الاقتراحات للحصول على إجابة فورية محسوبة من مجمل الاستطلاعات.", en: "Pick a question, or tap one of the suggestions, for an instant answer computed across every poll." },
+    "התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא התחברות, ללא חשבון חיצוני וללא עלות.": { ar: "تُحتسب الإجابات محليًا داخل المتصفح من كل الاستطلاعات — دون تسجيل دخول، ودون حساب خارجي، ودون تكلفة.", en: "Answers are computed locally in your browser from every poll — no sign-in, no external account, no cost." },
+    "ממוצע מנדטים למפלגה": { ar: "متوسط مقاعد الحزب", en: "Average seats for a party" },
+    "ממוצע ב-N הסקרים האחרונים": { ar: "المتوسط في آخر N استطلاعات", en: "Average over the last N polls" },
+    "שינוי במפלגה מאז תאריך": { ar: "تغيّر الحزب منذ تاريخ", en: "Change for a party since a date" },
+    "מי עלה / ירד הכי הרבה מאז תאריך": { ar: "مَن ارتفع / انخفض أكثر منذ تاريخ", en: "Who gained / lost most since a date" },
+    "ממוצע למפלגה לפי סוקר": { ar: "متوسط الحزب حسب شركة الاستطلاع", en: "Average for a party by pollster" },
+    "המפלגות הגדולות ביותר": { ar: "أكبر الأحزاب", en: "Largest parties" },
+    "מצב הגושים ורוב (61)": { ar: "وضع الكتل والأغلبية (61)", en: "Bloc standings and majority (61)" },
+    "יש רוב לקואליציה?": { ar: "هل للائتلاف أغلبية؟", en: "Does the coalition have a majority?" },
+    "מי עלה החודש?": { ar: "مَن ارتفع هذا الشهر؟", en: "Who gained this month?" },
+    "ממוצע הליכוד": { ar: "متوسط الليكود", en: "Likud average" },
+    "מאז": { ar: "منذ", en: "since" },
+    "אין נתונים עבור": { ar: "لا توجد بيانات لـ", en: "No data for" },
+    "מנדטים בממוצע": { ar: "مقعدًا في المتوسط", en: "seats on average" },
+    "מספר סקרים": { ar: "عدد الاستطلاعات", en: "Number of polls" },
+    "הכי גבוה": { ar: "الأعلى", en: "Highest" },
+    "הכי נמוך": { ar: "الأدنى", en: "Lowest" },
+    "מנדטים בממוצע ב-%n הסקרים האחרונים": { ar: "مقعدًا في المتوسط في آخر %n استطلاعات", en: "seats on average over the last %n polls" },
+    "טווח הסקרים": { ar: "نطاق الاستطلاعات", en: "Poll range" },
+    "סקרים עם נתון למפלגה": { ar: "استطلاعات فيها رقم للحزب", en: "Polls reporting a figure for the party" },
+    "מנדטים מאז %d": { ar: "مقعدًا منذ %d", en: "seats since %d" },
+    "אז (סביב %d)": { ar: "حينها (نحو %d)", en: "Then (around %d)" },
+    "היום (5 סקרים אחרונים)": { ar: "اليوم (آخر 5 استطلاعات)", en: "Now (last 5 polls)" },
+    "שינוי מאז %d": { ar: "التغيّر منذ %d", en: "Change since %d" },
+    "עלייה": { ar: "ارتفاع", en: "Gained" },
+    "ירידה": { ar: "انخفاض", en: "Lost" },
+    "אין שינוי משמעותי בטווח זה.": { ar: "لا تغيّر جوهري في هذا النطاق.", en: "No meaningful change in this range." },
+    "אין נתון ל": { ar: "لا توجد بيانات لـ", en: "No figure for " },
+    "אצל": { ar: "لدى", en: "from" },
+    "נותן ל": { ar: "يمنح ", en: "gives " },
+    "ממוצע כללי (כל הסוקרים)": { ar: "المتوسط العام (كل الشركات)", en: "Overall average (all pollsters)" },
+    "הפרש מהממוצע הכללי": { ar: "الفارق عن المتوسط العام", en: "Difference from the overall average" },
+    "מספר סקרים של": { ar: "عدد استطلاعات", en: "Polls by" },
+    "המפלגות הגדולות ביותר (ממוצע על פני כל הסקרים)": { ar: "أكبر الأحزاب (متوسط على كل الاستطلاعات)", en: "Largest parties (average across every poll)" },
+    "אין נתוני גושים.": { ar: "لا توجد بيانات كتل.", en: "No bloc data." },
+    "לקואליציה יש רוב": { ar: "للائتلاف أغلبية", en: "The coalition has a majority" },
+    "לקואליציה אין רוב": { ar: "ليس للائتلاف أغلبية", en: "The coalition has no majority" },
+    "מבוסס על שיוך הגושים הנוכחי שלך (ניתן לשנות בטבלת המפלגות).": { ar: "استنادًا إلى توزيع الكتل الحالي لديك (يمكن تغييره في جدول الأحزاب).", en: "Based on your current bloc assignment (changeable in the party table)." },
+    "לא ניתן לחשב.": { ar: "تعذّر الحساب.", en: "Cannot compute." },
 
     /* forecast */
-    "הסתברות לרוב (61+)": "احتمال الأغلبية (61+)",
-    "רמת אי‑ודאות": "مستوى عدم اليقين",
-    "61 = רוב": "61 = أغلبية",
-    "ללא הכרעה": "بلا حسم",
-    "%n סקרים אחרונים": "آخر %n استطلاعات",
-    "%n מנדטים": "%n مقعدًا",
-    "סיכוי ל‑%n+ מנדטים: %n%": "احتمال %n+ مقعدًا: %n%",
-    "בכ‑%n% מ‑%n הסימולציות הקואליציה מגיעה ל‑61+ מנדטים": "في نحو %n% من %n محاكاة يصل الائتلاف إلى 61+ مقعدًا",
-    "בכ‑%n% מ‑%n הסימולציות האופוזיציה מגיעה ל‑61+ מנדטים": "في نحو %n% من %n محاكاة تصل المعارضة إلى 61+ مقعدًا",
-    "בכ‑%n% מ‑%n הסימולציות אף גוש לא מגיע ל‑61 (תיקו/ללא הכרעה)": "في نحو %n% من %n محاكاة لا تبلغ أي كتلة 61 (تعادل/بلا حسم)",
-    "המודל מריץ %n סימולציות על בסיס ממוצע הסקרים מ‑%d–%d, עם אי‑ודאות המשקפת שגיאות סקרים היסטוריות בישראל (בבחירות 2015–2022 הסקרים הסופיים תת‑העריכו את גוש הימין בכ‑5.7 מנדטים בממוצע ועל‑העריכו את גוש המרכז‑שמאל‑ערבי בכ‑2.5). הגושים לפי השיוך הנוכחי שלך. זהו מודל הסתברותי ולא תחזית ודאית — ניתן להרחיב/לצמצם את אי‑הוודאות במחוון.": "يُجري النموذج %n محاكاة استنادًا إلى متوسط الاستطلاعات من %d إلى %d، مع هامش عدم يقين يعكس أخطاء الاستطلاعات التاريخية في إسرائيل (في انتخابات 2015–2022 قلّلت الاستطلاعات النهائية من تقدير كتلة اليمين بنحو 5.7 مقعدًا في المتوسط وبالغت في تقدير كتلة الوسط–اليسار–العرب بنحو 2.5). الكتل بحسب التوزيع الحالي لديك. هذا نموذج احتمالي وليس تنبؤًا مؤكدًا — ويمكن توسيع أو تضييق عدم اليقين بواسطة الشريط.",
+    "הסתברות לרוב (61+)": { ar: "احتمال الأغلبية (61+)", en: "Majority probability (61+)" },
+    "רמת אי‑ודאות": { ar: "مستوى عدم اليقين", en: "Uncertainty level" },
+    "61 = רוב": { ar: "61 = أغلبية", en: "61 = majority" },
+    "ללא הכרעה": { ar: "بلا حسم", en: "No clear result" },
+    "%n סקרים אחרונים": { ar: "آخر %n استطلاعات", en: "last %n polls" },
+    "%n מנדטים": { ar: "%n مقعدًا", en: "%n seats" },
+    "סיכוי ל‑%n+ מנדטים: %n%": { ar: "احتمال %n+ مقعدًا: %n%", en: "Chance of %n+ seats: %n%" },
+    "בכ‑%n% מ‑%n הסימולציות הקואליציה מגיעה ל‑61+ מנדטים": { ar: "في نحو %n% من %n محاكاة يصل الائتلاف إلى 61+ مقعدًا", en: "In about %n% of %n simulations the coalition reaches 61+ seats" },
+    "בכ‑%n% מ‑%n הסימולציות האופוזיציה מגיעה ל‑61+ מנדטים": { ar: "في نحو %n% من %n محاكاة تصل المعارضة إلى 61+ مقعدًا", en: "In about %n% of %n simulations the opposition reaches 61+ seats" },
+    "בכ‑%n% מ‑%n הסימולציות אף גוש לא מגיע ל‑61 (תיקו/ללא הכרעה)": { ar: "في نحو %n% من %n محاكاة لا تبلغ أي كتلة 61 (تعادل/بلا حسم)", en: "In about %n% of %n simulations neither bloc reaches 61 (tie / no clear result)" },
+    "המודל מריץ %n סימולציות על בסיס ממוצע הסקרים מ‑%d–%d, עם אי‑ודאות המשקפת שגיאות סקרים היסטוריות בישראל (בבחירות 2015–2022 הסקרים הסופיים תת‑העריכו את גוש הימין בכ‑5.7 מנדטים בממוצע ועל‑העריכו את גוש המרכז‑שמאל‑ערבי בכ‑2.5). הגושים לפי השיוך הנוכחי שלך. זהו מודל הסתברותי ולא תחזית ודאית — ניתן להרחיב/לצמצם את אי‑הוודאות במחוון.": { ar: "يُجري النموذج %n محاكاة استنادًا إلى متوسط الاستطلاعات من %d إلى %d، مع هامش عدم يقين يعكس أخطاء الاستطلاعات التاريخية في إسرائيل (في انتخابات 2015–2022 قلّلت الاستطلاعات النهائية من تقدير كتلة اليمين بنحو 5.7 مقعدًا في المتوسط وبالغت في تقدير كتلة الوسط–اليسار–العرب بنحو 2.5). الكتل بحسب التوزيع الحالي لديك. هذا نموذج احتمالي وليس تنبؤًا مؤكدًا — ويمكن توسيع أو تضييق عدم اليقين بواسطة الشريط.", en: "The model runs %n simulations on the average of polls from %d–%d, with uncertainty reflecting historical Israeli polling error (in the 2015–2022 elections the final polls underestimated the right-wing bloc by about 5.7 seats on average and overestimated the centre–left–Arab bloc by about 2.5). Blocs follow your current assignment. This is a probabilistic model, not a certain forecast — the slider widens or narrows the uncertainty." },
 
     /* PM matchup */
-    "מבין האישים הבאים, מי לדעתך הכי מתאים לתפקיד ראש הממשלה?": "من بين الشخصيات التالية، مَن الأنسب برأيك لمنصب رئيس الحكومة؟",
-    "%n סקרים · עד %d": "%n استطلاعات · حتى %d",
-    "נפתלי בנט": "نفتالي بينيت",
-    "בנימין נתניהו": "بنيامين نتنياهو",
-    "גדי איזנקוט": "غادي أيزنكوت",
-    "אביגדור ליברמן": "أفيغدور ليبرمان",
-    "אף אחד מהם": "لا أحد منهم",
-    "לא יודע": "لا أعرف",
+    "מבין האישים הבאים, מי לדעתך הכי מתאים לתפקיד ראש הממשלה?": { ar: "من بين الشخصيات التالية، مَن الأنسب برأيك لمنصب رئيس الحكومة؟", en: "Of the following figures, who do you think is most suited to be prime minister?" },
+    "%n סקרים · עד %d": { ar: "%n استطلاعات · حتى %d", en: "%n polls · through %d" },
+    "נפתלי בנט": { ar: "نفتالي بينيت", en: "Naftali Bennett" },
+    "בנימין נתניהו": { ar: "بنيامين نتنياهو", en: "Benjamin Netanyahu" },
+    "גדי איזנקוט": { ar: "غادي أيزنكوت", en: "Gadi Eisenkot" },
+    "אביגדור ליברמן": { ar: "أفيغدور ليبرمان", en: "Avigdor Lieberman" },
+    "אף אחד מהם": { ar: "لا أحد منهم", en: "None of them" },
+    "לא יודע": { ar: "لا أعرف", en: "Don't know" },
 
     /* toggles */
-    "מתוקנן להטיית סוקר": "مُعدَّل حسب انحياز الشركة",
-    "תקנון לפי הטיית סוקרים": "تعديل حسب انحياز الشركات",
-    "מציג מספרים לאחר ניכוי הטיית הבית (על פי 2009–2022)": "يعرض الأرقام بعد خصم انحياز الشركة (وفق 2009–2022)",
-    "לחץ כדי לתקנן כל סקר לפי הטיית הסוקר ההיסטורית": "اضغط لتعديل كل استطلاع حسب الانحياز التاريخي لشركته",
-    "ממוצע משוקלל (בטא)": "متوسط مرجّح (بيتا)",
-    "ממוצע פשוט": "متوسط بسيط",
-    "משוקלל לפי עדכניות, גודל מדגם, ותיקנון הטיית סוקר (מחושב אוטומטית מהמחזור הנוכחי)": "مرجّح حسب حداثة الاستطلاع وحجم العينة وتعديل انحياز الشركة (محسوب تلقائيًا من الدورة الحالية)",
-    "לחץ למעבר לממוצע משוקלל (בטא)": "اضغط للانتقال إلى المتوسط المرجّح (بيتا)",
+    "מתוקנן להטיית סוקר": { ar: "مُعدَّل حسب انحياز الشركة", en: "Adjusted for house effect" },
+    "תקנון לפי הטיית סוקרים": { ar: "تعديل حسب انحياز الشركات", en: "Adjust for house effects" },
+    "מציג מספרים לאחר ניכוי הטיית הבית (על פי 2009–2022)": { ar: "يعرض الأرقام بعد خصم انحياز الشركة (وفق 2009–2022)", en: "Showing figures with the house effect removed (based on 2009–2022)" },
+    "לחץ כדי לתקנן כל סקר לפי הטיית הסוקר ההיסטורית": { ar: "اضغط لتعديل كل استطلاع حسب الانحياز التاريخي لشركته", en: "Click to adjust each poll by its pollster's historical bias" },
+    "ממוצע משוקלל (בטא)": { ar: "متوسط مرجّح (بيتا)", en: "Weighted average (beta)" },
+    "ממוצע פשוט": { ar: "متوسط بسيط", en: "Simple average" },
+    "משוקלל לפי עדכניות, גודל מדגם, ותיקנון הטיית סוקר (מחושב אוטומטית מהמחזור הנוכחי)": { ar: "مرجّح حسب حداثة الاستطلاع وحجم العينة وتعديل انحياز الشركة (محسوب تلقائيًا من الدورة الحالية)", en: "Weighted by recency, sample size and a house-effect correction (derived automatically from the current cycle)" },
+    "לחץ למעבר לממוצע משוקלל (בטא)": { ar: "اضغط للانتقال إلى المتوسط المرجّح (بيتا)", en: "Click to switch to the weighted average (beta)" },
 
     /* methodology tooltips */
-    "מתודולוגיה:": "المنهجية:",
-    "התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא בינה מלאכותית, ללא התחברות וללא עלות. בחרו שאלה או לחצו על הצעה מהירה.": "تُحتسب الإجابات محليًا داخل المتصفح من كل الاستطلاعات — دون ذكاء اصطناعي، ودون تسجيل دخول، ودون تكلفة. اختر سؤالًا أو اضغط على اقتراح سريع.",
-    "ממוצע וחציון המנדטים לכל מפלגה, מחושבים רק על הסקרים שדיווחו נתון עבורה בטווח הנבחר. מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0. בכפתורים ניתן לשייך כל מפלגה לגוש.": "متوسط ووسيط المقاعد لكل حزب، محسوبان فقط على الاستطلاعات التي أوردت رقمًا له في النطاق المحدد. الأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0. الأزرار تتيح إسناد كل حزب إلى كتلة.",
-    "במצב \"ממוצע משוקלל\": העמודה משקפת ממוצע שנותן משקל רב יותר לסקרים עדכניים (מחצית מהמשקל נעלמת כל שבועיים), למדגמים גדולים יותר, ולסקרים שתוקננו להטיית הסוקר שלהם — הטיה המחושבת אוטומטית מתוך סקרי המחזור הנוכחי בלבד (לא נתון היסטורי קבוע). החציון נשאר לא‑משוקלל. מפלגות מתחת לאחוז החסימה (3.25%) עדיין נספרות כ‑0.": "في وضع \"المتوسط المرجّح\": يعكس العمود متوسطًا يمنح وزنًا أكبر للاستطلاعات الأحدث (يتلاشى نصف الوزن كل أسبوعين)، وللعينات الأكبر، وللاستطلاعات المعدَّلة حسب انحياز شركتها — وهو انحياز يُحسب تلقائيًا من استطلاعات الدورة الحالية وحدها (وليس ثابتًا تاريخيًا). يبقى الوسيط غير مرجّح. والأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0.",
-    "כל נקודה היא סקר בודד (כדי להראות את הפיזור), והקו הוא מגמה מוחלקת — ממוצע נע משוקלל שמראה כיוון. בחרו אילו מפלגות להציג; הסמנים הכתומים הם אירועים.": "كل نقطة استطلاع منفرد (لإظهار التشتّت)، والخط اتجاه مُنعَّم — متوسط متحرك مرجّح يبيّن الاتجاه. اختر الأحزاب المعروضة؛ والعلامات البرتقالية أحداث.",
-    "במצב \"ממוצע משוקלל\": הקו הוא רגרסיה מקומית משוקללת (LOESS) לפי עדכניות הסקר, גודל המדגם, ותיקנון הטיית סוקר המחושב אוטומטית מתוך סקרי המחזור הנוכחי (לא נתון היסטורי קבוע). הרצועה המוצללת משקפת את הפיזור המשוקלל סביב הקו (~90%) — לא כיול על שגיאות היסטוריות אמיתיות, כי אין מספיק נתוני עבר ישראליים לכיול כזה.": "في وضع \"المتوسط المرجّح\": الخط انحدار محلي مرجّح (LOESS) حسب حداثة الاستطلاع وحجم العينة وتعديل انحياز الشركة المحسوب تلقائيًا من استطلاعات الدورة الحالية (وليس ثابتًا تاريخيًا). والنطاق المظلّل يعكس التشتّت المرجّح حول الخط (~90%) — وليس معايرة على أخطاء تاريخية فعلية، إذ لا تتوفر بيانات إسرائيلية سابقة كافية لمعايرة كهذه.",
-    "אותם מספרים כמו חלוקת הגושים: ממוצע סך המנדטים לכל גוש על פני הסקרים בטווח, לפי שיוך המפלגות שקבעתם בטבלה. מיקום הקשר על החבל משקף את הפער בין הגושים בלבד (המרכז = תיקו), ורוב דורש 61 מנדטים. סדר המנהיגים בכל גוש נקבע לפי ממוצע המנדטים — הגדולה ביותר קרובה לקשר — וגודל הדמויות אחיד. מוצגות מפלגות שממוצען מתעגל ל‑1 מנדט ומעלה.": "الأرقام نفسها المستخدمة في توزيع الكتل: متوسط مجموع المقاعد لكل كتلة عبر استطلاعات النطاق، بحسب إسناد الأحزاب الذي حدّدته في الجدول. موقع العقدة على الحبل يعكس الفارق بين الكتلتين فقط (المنتصف = تعادل)، والأغلبية تتطلب 61 مقعدًا. ترتيب القادة داخل كل كتلة يتبع متوسط المقاعد — فالأكبر أقرب إلى العقدة — وحجم الشخصيات موحّد. وتُعرض الأحزاب التي يُقرَّب متوسطها إلى مقعد واحد فأكثر.",
-    "ממוצע סך המנדטים לכל גוש על פני הסקרים בטווח, לפי שיוך המפלגות שקבעתם בטבלה. \"אחרים\" = ההשלמה ל‑120. הקו המקווקו מסמן רוב של 61.": "متوسط مجموع المقاعد لكل كتلة عبر استطلاعات النطاق، بحسب إسناد الأحزاب الذي حدّدته في الجدول. \"أخرى\" = المتمّم حتى 120. والخط المتقطّع يشير إلى أغلبية 61.",
-    "כמו מגמות המפלגות, אך לפי גושים: כל נקודה היא סך מנדטי הגוש בסקר בודד, והקו הוא מגמה מוחלקת לאורך זמן. הקו המקווקו = רוב של 61.": "مثل اتجاهات الأحزاب لكن حسب الكتل: كل نقطة هي مجموع مقاعد الكتلة في استطلاع منفرد، والخط اتجاه مُنعَّم عبر الزمن. والخط المتقطّع = أغلبية 61.",
-    "כמו מגמות המפלגות במצב משוקלל: כל נקודה היא סך מנדטי הגוש בסקר בודד, והקו הוא רגרסיה מקומית משוקללת לפי עדכניות, גודל מדגם ותיקנון הטיית סוקר, עם רצועת פיזור משוקללת (~90%, לא כיול היסטורי). הקו המקווקו = רוב של 61.": "مثل اتجاهات الأحزاب في الوضع المرجّح: كل نقطة هي مجموع مقاعد الكتلة في استطلاع منفرد، والخط انحدار محلي مرجّح حسب الحداثة وحجم العينة وتعديل انحياز الشركة، مع نطاق تشتّت مرجّح (~90%، وليس معايرة تاريخية). والخط المتقطّع = أغلبية 61.",
-    "מודל מונטה־קרלו: 4,000 סימולציות סביב ממוצע הסקרים האחרונים, עם אי‑ודאות המכוילת לשגיאות סקרים היסטוריות בישראל (2015–2022). נספר בכמה מהן כל גוש עובר 61. זהו מודל הסתברותי — לא תחזית ודאית.": "نموذج مونتي كارلو: 4,000 محاكاة حول متوسط أحدث الاستطلاعات، مع عدم يقين مُعايَر على أخطاء الاستطلاعات التاريخية في إسرائيل (2015–2022). ويُحصى في كم منها تتجاوز كل كتلة 61. هذا نموذج احتمالي — لا تنبؤ مؤكد.",
+    "מתודולוגיה:": { ar: "المنهجية:", en: "Methodology:" },
+    "התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא בינה מלאכותית, ללא התחברות וללא עלות. בחרו שאלה או לחצו על הצעה מהירה.": { ar: "تُحتسب الإجابات محليًا داخل المتصفح من كل الاستطلاعات — دون ذكاء اصطناعي، ودون تسجيل دخول، ودون تكلفة. اختر سؤالًا أو اضغط على اقتراح سريع.", en: "Answers are computed locally in your browser from every poll — no AI, no sign-in, no cost. Pick a question or tap a quick suggestion." },
+    "ממוצע וחציון המנדטים לכל מפלגה, מחושבים רק על הסקרים שדיווחו נתון עבורה בטווח הנבחר. מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0. בכפתורים ניתן לשייך כל מפלגה לגוש.": { ar: "متوسط ووسيط المقاعد لكل حزب، محسوبان فقط على الاستطلاعات التي أوردت رقمًا له في النطاق المحدد. الأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0. الأزرار تتيح إسناد كل حزب إلى كتلة.", en: "The mean and median seats for each party, computed only over the polls that reported a figure for it in the selected range. Parties below the electoral threshold (3.25%) count as 0. The buttons assign each party to a bloc." },
+    "במצב \"ממוצע משוקלל\": העמודה משקפת ממוצע שנותן משקל רב יותר לסקרים עדכניים (מחצית מהמשקל נעלמת כל שבועיים), למדגמים גדולים יותר, ולסקרים שתוקננו להטיית הסוקר שלהם — הטיה המחושבת אוטומטית מתוך סקרי המחזור הנוכחי בלבד (לא נתון היסטורי קבוע). החציון נשאר לא‑משוקלל. מפלגות מתחת לאחוז החסימה (3.25%) עדיין נספרות כ‑0.": { ar: "في وضع \"المتوسط المرجّح\": يعكس العمود متوسطًا يمنح وزنًا أكبر للاستطلاعات الأحدث (يتلاشى نصف الوزن كل أسبوعين)، وللعينات الأكبر، وللاستطلاعات المعدَّلة حسب انحياز شركتها — وهو انحياز يُحسب تلقائيًا من استطلاعات الدورة الحالية وحدها (وليس ثابتًا تاريخيًا). يبقى الوسيط غير مرجّح. والأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0.", en: "In \"weighted average\" mode the column shows a mean that gives more weight to recent polls (half the weight decays every two weeks), to larger samples, and to polls corrected for their pollster's house effect — a bias derived automatically from this cycle's polls alone, not a fixed historical constant. The median stays unweighted. Parties below the threshold (3.25%) still count as 0." },
+    "כל נקודה היא סקר בודד (כדי להראות את הפיזור), והקו הוא מגמה מוחלקת — ממוצע נע משוקלל שמראה כיוון. בחרו אילו מפלגות להציג; הסמנים הכתומים הם אירועים.": { ar: "كل نقطة استطلاع منفرد (لإظهار التشتّت)، والخط اتجاه مُنعَّم — متوسط متحرك مرجّح يبيّن الاتجاه. اختر الأحزاب المعروضة؛ والعلامات البرتقالية أحداث.", en: "Each dot is a single poll (to show the spread), and the line is a smoothed trend — a weighted moving average showing direction. Choose which parties to show; the orange markers are events." },
+    "במצב \"ממוצע משוקלל\": הקו הוא רגרסיה מקומית משוקללת (LOESS) לפי עדכניות הסקר, גודל המדגם, ותיקנון הטיית סוקר המחושב אוטומטית מתוך סקרי המחזור הנוכחי (לא נתון היסטורי קבוע). הרצועה המוצללת משקפת את הפיזור המשוקלל סביב הקו (~90%) — לא כיול על שגיאות היסטוריות אמיתיות, כי אין מספיק נתוני עבר ישראליים לכיול כזה.": { ar: "في وضع \"المتوسط المرجّح\": الخط انحدار محلي مرجّح (LOESS) حسب حداثة الاستطلاع وحجم العينة وتعديل انحياز الشركة المحسوب تلقائيًا من استطلاعات الدورة الحالية (وليس ثابتًا تاريخيًا). والنطاق المظلّل يعكس التشتّت المرجّح حول الخط (~90%) — وليس معايرة على أخطاء تاريخية فعلية، إذ لا تتوفر بيانات إسرائيلية سابقة كافية لمعايرة كهذه.", en: "In \"weighted average\" mode the line is a locally weighted regression (LOESS) by poll recency, sample size, and a house-effect correction derived automatically from this cycle's polls, not a fixed historical constant. The shaded band reflects the weighted spread around the line (~90%) — not a calibration against real historical error, since there is not enough Israeli past data to calibrate one." },
+    "אותם מספרים כמו חלוקת הגושים: ממוצע סך המנדטים לכל גוש על פני הסקרים בטווח, לפי שיוך המפלגות שקבעתם בטבלה. מיקום הקשר על החבל משקף את הפער בין הגושים בלבד (המרכז = תיקו), ורוב דורש 61 מנדטים. סדר המנהיגים בכל גוש נקבע לפי ממוצע המנדטים — הגדולה ביותר קרובה לקשר — וגודל הדמויות אחיד. מוצגות מפלגות שממוצען מתעגל ל‑1 מנדט ומעלה.": { ar: "الأرقام نفسها المستخدمة في توزيع الكتل: متوسط مجموع المقاعد لكل كتلة عبر استطلاعات النطاق، بحسب إسناد الأحزاب الذي حدّدته في الجدول. موقع العقدة على الحبل يعكس الفارق بين الكتلتين فقط (المنتصف = تعادل)، والأغلبية تتطلب 61 مقعدًا. ترتيب القادة داخل كل كتلة يتبع متوسط المقاعد — فالأكبر أقرب إلى العقدة — وحجم الشخصيات موحّد. وتُعرض الأحزاب التي يُقرَّب متوسطها إلى مقعد واحد فأكثر.", en: "The same numbers as the bloc split: the average total seats per bloc across the polls in range, by the party assignment you set in the table. The knot's position on the rope reflects only the gap between the blocs (centre = tie), and a majority needs 61 seats. The order of leaders within each bloc follows the seat average — the largest nearest the knot — and every figure is drawn the same size. Parties whose average rounds to 1 seat or more are shown." },
+    "ממוצע סך המנדטים לכל גוש על פני הסקרים בטווח, לפי שיוך המפלגות שקבעתם בטבלה. \"אחרים\" = ההשלמה ל‑120. הקו המקווקו מסמן רוב של 61.": { ar: "متوسط مجموع المقاعد لكل كتلة عبر استطلاعات النطاق، بحسب إسناد الأحزاب الذي حدّدته في الجدول. \"أخرى\" = المتمّم حتى 120. والخط المتقطّع يشير إلى أغلبية 61.", en: "The average total seats per bloc across the polls in range, by the party assignment you set in the table. \"Others\" = the remainder up to 120. The dashed line marks a majority of 61." },
+    "כמו מגמות המפלגות, אך לפי גושים: כל נקודה היא סך מנדטי הגוש בסקר בודד, והקו הוא מגמה מוחלקת לאורך זמן. הקו המקווקו = רוב של 61.": { ar: "مثل اتجاهات الأحزاب لكن حسب الكتل: كل نقطة هي مجموع مقاعد الكتلة في استطلاع منفرد، والخط اتجاه مُنعَّم عبر الزمن. والخط المتقطّع = أغلبية 61.", en: "Like the party trends, but by bloc: each dot is a bloc's total seats in a single poll, and the line is a smoothed trend over time. The dashed line = a majority of 61." },
+    "כמו מגמות המפלגות במצב משוקלל: כל נקודה היא סך מנדטי הגוש בסקר בודד, והקו הוא רגרסיה מקומית משוקללת לפי עדכניות, גודל מדגם ותיקנון הטיית סוקר, עם רצועת פיזור משוקללת (~90%, לא כיול היסטורי). הקו המקווקו = רוב של 61.": { ar: "مثل اتجاهات الأحزاب في الوضع المرجّح: كل نقطة هي مجموع مقاعد الكتلة في استطلاع منفرد، والخط انحدار محلي مرجّح حسب الحداثة وحجم العينة وتعديل انحياز الشركة، مع نطاق تشتّت مرجّح (~90%، وليس معايرة تاريخية). والخط المتقطّع = أغلبية 61.", en: "Like the party trends in weighted mode: each dot is a bloc's total seats in a single poll, and the line is a locally weighted regression by recency, sample size and house-effect correction, with a weighted spread band (~90%, not a historical calibration). The dashed line = a majority of 61." },
+    "מודל מונטה־קרלו: 4,000 סימולציות סביב ממוצע הסקרים האחרונים, עם אי‑ודאות המכוילת לשגיאות סקרים היסטוריות בישראל (2015–2022). נספר בכמה מהן כל גוש עובר 61. זהו מודל הסתברותי — לא תחזית ודאית.": { ar: "نموذج مونتي كارلو: 4,000 محاكاة حول متوسط أحدث الاستطلاعات، مع عدم يقين مُعايَر على أخطاء الاستطلاعات التاريخية في إسرائيل (2015–2022). ويُحصى في كم منها تتجاوز كل كتلة 61. هذا نموذج احتمالي — لا تنبؤ مؤكد.", en: "Monte Carlo model: 4,000 simulations around the average of the most recent polls, with uncertainty calibrated to historical Israeli polling error (2015–2022). It counts how many of them put each bloc past 61. This is a probabilistic model — not a certain forecast." },
 
     /* footer */
-    "מקורות והערות מתודולוגיות": "المصادر وملاحظات منهجية",
-    "מקור הנתונים: דף הסקרים המלא בוויקיפדיה —": "مصدر البيانات: صفحة الاستطلاعات الكاملة في ويكيبيديا —",
-    "סקרים, ינואר–יולי 2026). בכל טעינה מחדש הלוח מנסה למשוך סקרים חדשים ולמזג אותם.": "استطلاعًا، يناير–يوليو 2026). ومع كل إعادة تحميل تحاول اللوحة جلب استطلاعات جديدة ودمجها.",
-    "מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0 מנדטים. הממוצע והחציון מחושבים רק על סקרים שדיווחו נתון למפלגה; מפלגות שהתמזגו (\"בנט 2026\", \"יש עתיד\", \"המילואימניקים\") אינן בטבלה אך נכללות בגושים ההיסטוריים.": "الأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0 مقعد. ويُحسب المتوسط والوسيط فقط على الاستطلاعات التي أوردت رقمًا للحزب؛ والأحزاب التي اندمجت (\"بينيت 2026\"، \"يش عتيد\"، \"حركة جنود الاحتياط\") ليست في الجدول لكنها مشمولة في الكتل التاريخية.",
-    "יחד": "معًا",
-    "מיזוג בנט–לפיד (אפריל); \"יסודות ישראל\"": "اندماج بينيت–لبيد (أبريل)؛ \"أسس إسرائيل\"",
-    "הנדל–טרופר–המילואימניקים (יולי); \"הרשימה המשותפת\" מופיעה בסקרים שבדקו ריצה ערבית משותפת. שיוך הגושים נשמר מקומית. תמונות מוויקיפדיה.": "هندل–تروبر–حركة جنود الاحتياط (يوليو)؛ و\"القائمة المشتركة\" تظهر في الاستطلاعات التي فحصت خوضًا عربيًا مشتركًا. ويُحفظ إسناد الكتل محليًا. الصور من ويكيبيديا.",
-    "חלק מהסקרים האחרונים מועשרים בנתונים מתוך הגילוי הרשמי של ועדת הבחירות המרכזית לכנסת (לפי סעיף 16ה לחוק דרכי תעמולה): טעות דגימה, מספר משיבים בפועל, שיעור היענות ואחוז הלא-מוחלטים — ראו את פרטי הסקר להרחבה. תרחישי מיזוג/מה-אם המדווחים באותם גילויים מופיעים גם הם בפרטי הסקר. מאותו מקור מגיעה גם שאלת ההתאמה לראשות הממשלה שבתחתית העמוד.": "بعض الاستطلاعات الأخيرة مُثراة ببيانات من الإفصاح الرسمي للجنة الانتخابات المركزية للكنيست (بموجب المادة 16هـ من قانون أساليب الدعاية): هامش الخطأ، وعدد المستجيبين الفعلي، ونسبة الاستجابة، ونسبة غير الحاسمين — انظر تفاصيل الاستطلاع للمزيد. كما تظهر في تفاصيل الاستطلاع سيناريوهات الاندماج/ماذا-لو الواردة في تلك الإفصاحات. ومن المصدر نفسه يأتي سؤال الأنسب لرئاسة الحكومة في أسفل الصفحة."
+    "מקורות והערות מתודולוגיות": { ar: "المصادر وملاحظات منهجية", en: "Sources and methodology notes" },
+    "מקור הנתונים: דף הסקרים המלא בוויקיפדיה —": { ar: "مصدر البيانات: صفحة الاستطلاعات الكاملة في ويكيبيديا —", en: "Data source: the full polling page on Wikipedia —" },
+    "סקרים, ינואר–יולי 2026). בכל טעינה מחדש הלוח מנסה למשוך סקרים חדשים ולמזג אותם.": { ar: "استطلاعًا، يناير–يوليو 2026). ومع كل إعادة تحميل تحاول اللوحة جلب استطلاعات جديدة ودمجها.", en: "polls, January–July 2026). On every reload the dashboard tries to fetch new polls and merge them in." },
+    "מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0 מנדטים. הממוצע והחציון מחושבים רק על סקרים שדיווחו נתון למפלגה; מפלגות שהתמזגו (\"בנט 2026\", \"יש עתיד\", \"המילואימניקים\") אינן בטבלה אך נכללות בגושים ההיסטוריים.": { ar: "الأحزاب دون نسبة الحسم (3.25%) تُحتسب بـ0 مقعد. ويُحسب المتوسط والوسيط فقط على الاستطلاعات التي أوردت رقمًا للحزب؛ والأحزاب التي اندمجت (\"بينيت 2026\"، \"يش عتيد\"، \"حركة جنود الاحتياط\") ليست في الجدول لكنها مشمولة في الكتل التاريخية.", en: "Parties below the electoral threshold (3.25%) count as 0 seats. The mean and median are computed only over polls that reported a figure for the party; merged parties (\"Bennett 2026\", \"Yesh Atid\", \"the Reservists\") are absent from the table but included in the historical blocs." },
+    "יחד": { ar: "معًا", en: "Together" },
+    "מיזוג בנט–לפיד (אפריל); \"יסודות ישראל\"": { ar: "اندماج بينيت–لبيد (أبريل)؛ \"أسس إسرائيل\"", en: "the Bennett–Lapid merger (April); \"Yesodot Yisrael\"" },
+    "הנדל–טרופר–המילואימניקים (יולי); \"הרשימה המשותפת\" מופיעה בסקרים שבדקו ריצה ערבית משותפת. שיוך הגושים נשמר מקומית. תמונות מוויקיפדיה.": { ar: "هندل–تروبر–حركة جنود الاحتياط (يوليو)؛ و\"القائمة المشتركة\" تظهر في الاستطلاعات التي فحصت خوضًا عربيًا مشتركًا. ويُحفظ إسناد الكتل محليًا. الصور من ويكيبيديا.", en: "Hendel–Tropper–the Reservists (July); \"the Joint List\" appears in polls that tested a joint Arab run. Bloc assignment is stored locally. Photos from Wikipedia." },
+    "חלק מהסקרים האחרונים מועשרים בנתונים מתוך הגילוי הרשמי של ועדת הבחירות המרכזית לכנסת (לפי סעיף 16ה לחוק דרכי תעמולה): טעות דגימה, מספר משיבים בפועל, שיעור היענות ואחוז הלא-מוחלטים — ראו את פרטי הסקר להרחבה. תרחישי מיזוג/מה-אם המדווחים באותם גילויים מופיעים גם הם בפרטי הסקר. מאותו מקור מגיעה גם שאלת ההתאמה לראשות הממשלה שבתחתית העמוד.": { ar: "بعض الاستطلاعات الأخيرة مُثراة ببيانات من الإفصاح الرسمي للجنة الانتخابات المركزية للكنيست (بموجب المادة 16هـ من قانون أساليب الدعاية): هامش الخطأ، وعدد المستجيبين الفعلي، ونسبة الاستجابة، ونسبة غير الحاسمين — انظر تفاصيل الاستطلاع للمزيد. كما تظهر في تفاصيل الاستطلاع سيناريوهات الاندماج/ماذا-لو الواردة في تلك الإفصاحات. ومن المصدر نفسه يأتي سؤال الأنسب لرئاسة الحكومة في أسفل الصفحة.", en: "Some recent polls are enriched with data from the Central Elections Committee's official disclosure filings (under Section 16H of the Election Propaganda Law): margin of error, actual respondent count, response rate and the share of undecided voters — see the poll details for more. Merger / what-if scenarios reported in those filings appear in the poll details too. The prime-minister suitability question at the bottom of the page comes from the same source." }
   };
-
   /* ── translator ───────────────────────────────────────────────────────────
      Matching is done on a normalised copy (the several dash and quote variants
      the Hebrew text uses are folded together) so a table entry does not have to
@@ -332,11 +388,13 @@
             .replace(/[ ‎‏‪-‮]/g, ' ');
   }
   function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-  var NUM = '\\d[\\d,]*(?:\\.\\d+)?', DATE = '\\d{1,2}\\.\\d{1,2}\\.\\d{4}';
+  var NUM = '\\d[\\d,]*(?:\\.\\d+)?';
+  var DATE = '\\d{1,2}\\.\\d{1,2}\\.\\d{4}|\\d{1,2} [A-Z][a-z]{2} \\d{4}';
 
   var EXACT = {}, RULES = [], SRC = [];
-  Object.keys(AR).forEach(function(k){
-    var key = norm(k), val = AR[k], tpl = key.indexOf('%n') >= 0 || key.indexOf('%d') >= 0;
+  Object.keys(T).forEach(function(k){
+    var val = T[k][LANG]; if (val === undefined) return;
+    var key = norm(k), tpl = key.indexOf('%n') >= 0 || key.indexOf('%d') >= 0;
     var pat = tpl ? esc(key).replace(/%d/g, '(' + DATE + ')').replace(/%n/g, '(' + NUM + ')') : esc(key);
     if (!tpl) EXACT[key] = val;
     RULES.push({ re: new RegExp(pat, 'g'), out: val, tpl: tpl, len: key.length });
@@ -417,8 +475,8 @@
     var n; while ((n = w.nextNode())) trNode(n);
   }
 
-  /* Left connected on purpose: our own writes produce Arabic, which no longer
-     matches, so a re-entrant pass is a no-op and the loop settles at once. */
+  /* Left connected on purpose: our own writes produce translated text, which no
+     longer matches, so a re-entrant pass is a no-op and the loop settles at once. */
   new MutationObserver(function(recs){
     for (var i = 0; i < recs.length; i++) {
       var r = recs[i];
@@ -471,6 +529,12 @@
   * { box-sizing: border-box; }
   html[lang="ar"] body, html[lang="ar"] input, html[lang="ar"] select, html[lang="ar"] button,
   html[lang="ar"] text { font-family:"Noto Sans Arabic","Noto Naskh Arabic","Geeza Pro","Segoe UI",Tahoma,Arial,sans-serif; }
+  /* the language switcher: three states, current one filled */
+  .lang-switch { display:inline-flex; margin-inline-start:8px; border:1px solid rgba(255,255,255,.2); border-radius:20px; overflow:hidden; flex-shrink:0; }
+  .lang-switch button { background:rgba(255,255,255,.12); border:none; color:rgba(255,255,255,.72); font:inherit; font-size:11px; font-weight:700; line-height:1; padding:6px 9px; cursor:pointer; transition:background .15s,color .15s; }
+  .lang-switch button + button { border-inline-start:1px solid rgba(255,255,255,.2); }
+  .lang-switch button:hover { background:rgba(255,255,255,.26); color:#fff; }
+  .lang-switch button.sel { background:#fff; color:var(--header); }
   body { margin:0; font-family:"Assistant","Heebo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; }
 
   .site-header { background:var(--header); color:#fff; padding:14px 20px; }
@@ -527,7 +591,7 @@
   .panel-body { padding:14px 16px; }
 
   table { width:100%; border-collapse:collapse; }
-  th, td { text-align:right; padding:7px 8px; }
+  th, td { text-align:start; padding:7px 8px; }
   thead th { font-size:10px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid var(--border); padding-bottom:9px; }
   thead th.n { text-align:center; }
   tbody tr { border-bottom:1px solid var(--line); }
@@ -547,6 +611,7 @@
   .leader-name { color:var(--muted); font-size:10.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .seat-cell { display:flex; align-items:center; gap:8px; min-width:90px; }
   .seat-num { font-variant-numeric:tabular-nums; font-weight:900; font-size:19px; width:28px; text-align:left; direction:ltr; line-height:1; }
+  html[dir="ltr"] .seat-num { text-align:right; }
   .bar-track { flex:1; background:var(--line); border-radius:4px; height:6px; overflow:hidden; }
   .bar-fill { height:100%; border-radius:4px; }
   td.med { font-variant-numeric:tabular-nums; font-weight:600; font-size:12.5px; color:var(--muted); text-align:center; direction:ltr; }
@@ -574,7 +639,7 @@
   footer { color:var(--faint); font-size:10.5px; margin-top:16px; line-height:1.6; }
   footer summary { cursor:pointer; font-weight:600; }
   /* ── Tooltip ── */
-  .tt { position:fixed; z-index:960; background:#0c1f3f; color:#fff; font-size:11.5px; border-radius:10px; padding:9px 14px; pointer-events:none; opacity:0; transition:opacity .1s; max-width:270px; line-height:1.75; box-shadow:0 4px 20px rgba(0,0,0,.35); direction:rtl; }
+  .tt { position:fixed; z-index:960; background:#0c1f3f; color:#fff; font-size:11.5px; border-radius:10px; padding:9px 14px; pointer-events:none; opacity:0; transition:opacity .1s; max-width:270px; line-height:1.75; box-shadow:0 4px 20px rgba(0,0,0,.35); direction:inherit; }
   .tt.show { opacity:1; }
   .tt-head { font-weight:800; font-size:12.5px; margin-bottom:5px; color:#a8d4f5; }
   .tt-row { display:flex; justify-content:space-between; gap:14px; }
@@ -622,6 +687,7 @@
   .q-row:first-child { border-top:none; }
   .q-row .ql { color:var(--muted); display:flex; align-items:center; }
   .q-row .qv { font-weight:700; font-variant-numeric:tabular-nums; text-align:left; direction:ltr; }
+  html[dir="ltr"] .q-row .qv { text-align:right; }
   .q-pos { color:#128a54; } .q-neg { color:#c0392b; }
   .q-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-inline-end:6px; flex-shrink:0; }
   .ask-hint { font-size:10.5px; color:var(--faint); margin-top:10px; line-height:1.6; }
@@ -688,7 +754,34 @@
     .m-summary.show { transform:translateY(0); }
     .m-summary .ms-pill { margin-inline-start:auto; font-size:11px; font-weight:800; padding:3px 10px; border-radius:14px; background:var(--tile-blue); color:var(--opp); }
     .maxbtn { display:none; }  /* fullscreen expand not useful on mobile */
+    /* A grid item's default min-width:auto is what let the table's min-content
+       width (logo + name + leader + three bloc buttons + three numeric columns)
+       push the whole page into a horizontal scroll — worse in Arabic and worse
+       again in English. Let the column shrink, and scroll the table instead. */
+    .main-grid > .col, .main-grid .panel { min-width:0; }
+    .panel[data-widget="parties"] .panel-body { overflow-x:auto; }
+    .panel[data-widget="parties"] table { min-width:470px; }
   }
+  /* ── Share + embed ── */
+  .share-pop { position:fixed; z-index:970; background:var(--card); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-lg); padding:10px; display:flex; flex-direction:column; gap:6px; min-width:196px; }
+  .share-title { font-size:10px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; padding:0 2px 2px; }
+  .share-nets { display:flex; flex-wrap:wrap; gap:5px; }
+  .share-nets a { flex:1 1 auto; text-align:center; font-size:11px; font-weight:700; text-decoration:none; color:var(--muted); background:var(--card-2); border:1px solid var(--border); border-radius:7px; padding:5px 8px; transition:border-color .15s,color .15s; }
+  .share-nets a:hover { border-color:var(--accent); color:var(--accent); }
+  .share-pop button { font:inherit; font-size:11.5px; font-weight:600; text-align:center; color:var(--muted); background:var(--card-2); border:1px solid var(--border); border-radius:7px; padding:6px 8px; cursor:pointer; transition:border-color .15s,color .15s; }
+  .share-pop button:hover { border-color:var(--accent); color:var(--accent); }
+  .share-pop button.ok { border-color:#16a34a; color:#16a34a; }
+  .share-pop button.bad { border-color:var(--coal); color:var(--coal); }
+  .widget-flash { animation:widgetFlash 2s ease-out; }
+  @keyframes widgetFlash { 0%,70% { box-shadow:0 0 0 3px var(--accent); } 100% { box-shadow:var(--shadow); } }
+  /* Hidden, not removed: the render code still looks these elements up by id. */
+  html.embed body { visibility:hidden; }
+  html.embed body.embed-ready { visibility:visible; }
+  html.embed body.embed-ready > *:not(.embed-root):not(.tt):not(.modal-ov):not(.panel-ov) { display:none !important; }
+  html.embed .maxbtn, html.embed .sharebtn { display:none; }
+  .embed-root { max-width:900px; margin:0 auto; padding:10px; }
+  .embed-credit { display:block; margin-top:7px; font-size:10.5px; font-weight:600; color:var(--faint); text-decoration:none; text-align:center; }
+  .embed-credit:hover { color:var(--accent); text-decoration:underline; }
   /* ── Per-widget methodology info icon ── */
   .infobtn { font-size:13px; line-height:1; color:var(--faint); cursor:help; user-select:none; margin-inline-start:3px; flex-shrink:0; transition:color .15s; }
   .infobtn:hover, .infobtn:focus { color:var(--accent); outline:none; }
@@ -706,7 +799,7 @@
     <button class="refresh-btn" id="refreshBtn" onclick="doManualRefresh()" title="בדוק סקרים חדשים מוויקיפדיה">
       <span class="icon">↻</span> רענן
     </button>
-    <button class="theme-btn" id="langBtn" data-no-i18n>ع</button>
+    <span class="lang-switch" id="langSwitch" data-no-i18n></span>
     <button class="theme-btn" id="themeBtn" title="החלף בין מצב בהיר לכהה" aria-label="החלף מצב תצוגה">🌙</button>
   </div>
 </header>
@@ -725,7 +818,7 @@
 </section>
 
 <section class="tugwar" id="tugSection">
-  <div class="panel">
+  <div class="panel" data-widget="tug">
     <div class="panel-head">
       <span class="panel-title">משיכת החבל</span>
       <span class="panel-badge" id="tugBadge"></span>
@@ -759,7 +852,7 @@
     <div class="poll-log" id="pollLog" style="flex-basis:100%"></div>
   </div>
 
-  <div class="panel" style="margin-bottom:16px">
+  <div class="panel" data-widget="ask" style="margin-bottom:16px">
     <div class="panel-accent" style="background:var(--accent)"></div>
     <div class="panel-head">
       <span class="panel-title">שאל את הנתונים</span>
@@ -778,7 +871,7 @@
 
   <div class="main-grid">
     <div class="col">
-      <div class="panel">
+      <div class="panel" data-widget="parties">
         <div class="panel-accent" style="background:var(--accent)"></div>
         <div class="panel-head">
           <span class="panel-title">לפי מפלגה</span>
@@ -794,7 +887,7 @@
           <div class="empty-state" id="emptyState" style="display:none">אין סקרים בטווח שנבחר.</div>
         </div>
       </div>
-      <div class="panel">
+      <div class="panel" data-widget="party-trend">
         <div class="panel-accent" style="background:var(--accent)"></div>
         <div class="panel-head">
           <span class="panel-title">מגמות מפלגות</span>
@@ -811,7 +904,7 @@
     </div>
 
     <div class="col">
-      <div class="panel">
+      <div class="panel" data-widget="blocs">
         <div class="panel-accent" style="background:linear-gradient(to left,var(--red) 50%,var(--blue) 50%)"></div>
         <div class="panel-head">
           <span class="panel-title">חלוקה לגושים</span>
@@ -824,7 +917,7 @@
           <div class="note" id="blocNote" style="text-align:center"></div>
         </div>
       </div>
-      <div class="panel">
+      <div class="panel" data-widget="bloc-trend">
         <div class="panel-accent" style="background:linear-gradient(to left,var(--red) 50%,var(--blue) 50%)"></div>
         <div class="panel-head"><span class="panel-title">מגמת הגושים</span></div>
         <div class="panel-body">
@@ -840,7 +933,7 @@
     </div>
   </div>
 
-  <div class="panel" id="forecastPanel" style="margin-top:16px">
+  <div class="panel" id="forecastPanel" data-widget="forecast" style="margin-top:16px">
     <div class="panel-accent" style="background:linear-gradient(to left,var(--red) 50%,var(--blue) 50%)"></div>
     <div class="panel-head">
       <span class="panel-title">הסתברות לרוב (61+)</span>
@@ -858,7 +951,7 @@
     </div>
   </div>
 
-  <div class="panel" id="pmMatchupPanel" style="margin-top:16px">
+  <div class="panel" id="pmMatchupPanel" data-widget="pm" style="margin-top:16px">
     <div class="panel-accent" style="background:linear-gradient(to left,var(--blue) 50%,var(--red) 50%)"></div>
     <div class="panel-head">
       <span class="panel-title">מבין האישים הבאים, מי לדעתך הכי מתאים לתפקיד ראש הממשלה?</span>
@@ -915,9 +1008,10 @@ const OUTLET_HE = {"Channel 12 (HaHadashot 12)": "ערוץ 12 (חדשות 12)", 
 
 /* Arabic run: swap the display names in place — every consumer (table, tug-of-war,
    trend legend, PNG export) reads them from here, and the ids stay untouched. */
-if (window.IL_LANG === 'ar') {
-  PARTIES.forEach(p => { const a = window.AR_PARTY[p.id]; if (a) { p.name = a.name; p.leader = a.leader; } });
-  Object.keys(OUTLET_HE).forEach(k => { if (window.AR_OUTLET[k]) OUTLET_HE[k] = window.AR_OUTLET[k]; });
+if (window.IL_LANG !== 'he') {
+  const L = window.IL_LANG;
+  PARTIES.forEach(p => { const a = (window.IL_PARTY[p.id] || {})[L]; if (a) { p.name = a.name; p.leader = a.leader; } });
+  Object.keys(OUTLET_HE).forEach(k => { const o = (window.IL_OUTLET[k] || {})[L]; if (o) OUTLET_HE[k] = o; });
 }
 
 let POLLS = [...BASE_POLLS];
@@ -925,7 +1019,9 @@ let lastFiltered = [];
 const WIKI_URL = "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election";
 const MAX_BAKED_DATE = BASE_POLLS.map(p => p.date).sort().pop();
 const BACKFILL_DAYS = 45;   /* how far back a refresh re-checks Wikipedia for polls added after the fact */
-const BAKED_DATE = (() => { const d = MAX_BAKED_DATE; return d ? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : '—'; })();
+const EN_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const BAKED_DATE = (() => { const d = MAX_BAKED_DATE; if (!d) return '—';
+  return window.IL_LANG === 'en' ? heDate(d) : d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4); })();
 const FIRM_OUTLET = {
   'Midgam': 'Channel 12 (HaHadashot 12)', 'Lazar': 'Maariv',
   'Yossi Taktika': 'Zman Israel / Times of Israel', 'Yossi Tatika': 'Zman Israel / Times of Israel',
@@ -949,8 +1045,10 @@ const GOV_PARTIES = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ"];
 function median(arr) { const s=[...arr].sort((a,b)=>a-b), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
 function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function outletDisplay(o) { return OUTLET_HE[o] || o; }
-function heDate(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}.${y}`; }
-function heDateShort(iso) { const [y,m,d]=iso.split('-'); return `${+d}.${+m}`; }
+function heDate(iso) { const [y,m,d]=iso.split('-');
+  return window.IL_LANG === 'en' ? `${+d} ${EN_MON[+m-1]} ${y}` : `${+d}.${+m}.${y}`; }
+function heDateShort(iso) { const [y,m,d]=iso.split('-');
+  return window.IL_LANG === 'en' ? `${+d} ${EN_MON[+m-1]}` : `${+d}.${+m}`; }
 function initials(name) { return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
 /* Party names carry double quotes (ש"ס, רע"ם, חד"ש–תע"ל). Interpolating one raw into
    an attribute truncates the value and invents a junk attribute whose name contains a
@@ -2088,14 +2186,17 @@ function drawBarChart(svgEl, items, W){
   const labelW = Math.min(150, Math.round(W * 0.42)), valueW = 40;
   const barMaxW = Math.max(20, W - labelW - valueW - 10);
   const maxV = Math.max(...items.map(x => x.pct), 1);
+  const ltr = document.documentElement.dir === 'ltr';
   let s = '';
   items.forEach((it, i) => {
     const y = padTop + i * (rowH + gap);
+    const ty = (y + rowH/2 + 4).toFixed(1);
     const bw = Math.max(2, it.pct / maxV * barMaxW);
-    const barX = W - labelW - 4;
-    s += `<text x="${W - 4}" y="${(y + rowH/2 + 4).toFixed(1)}" text-anchor="end" font-size="11.5" fill="${CT.ink}">${it.label}</text>`;
-    s += `<rect x="${(barX - bw).toFixed(1)}" y="${y}" width="${bw.toFixed(1)}" height="${rowH}" rx="4" fill="${it.color}"/>`;
-    s += `<text x="${(barX - bw - 5).toFixed(1)}" y="${(y + rowH/2 + 4).toFixed(1)}" text-anchor="end" font-size="11" font-weight="700" fill="${it.color}">${it.pct}%</text>`;
+    const barX = ltr ? labelW + 4 : W - labelW - 4;
+    const barEnd = ltr ? barX + bw : barX - bw;
+    s += `<text x="${ltr ? 4 : W - 4}" y="${ty}" text-anchor="${ltr ? 'start' : 'end'}" font-size="11.5" fill="${CT.ink}">${it.label}</text>`;
+    s += `<rect x="${Math.min(barX, barEnd).toFixed(1)}" y="${y}" width="${bw.toFixed(1)}" height="${rowH}" rx="4" fill="${it.color}"/>`;
+    s += `<text x="${(barEnd + (ltr ? 5 : -5)).toFixed(1)}" y="${ty}" text-anchor="${ltr ? 'start' : 'end'}" font-size="11" font-weight="700" fill="${it.color}">${it.pct}%</text>`;
   });
   svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svgEl.innerHTML = s;
@@ -2130,6 +2231,7 @@ function renderPmMatchup(){
   }
   document.getElementById('pmMatchupNote').innerHTML = topicalPollInfo(g.records);
   if (window.wireExportButtons) setTimeout(window.wireExportButtons, 0);
+  if (window.wireShareButtons) setTimeout(window.wireShareButtons, 0);
 }
 
 initBounds(false);
@@ -2695,6 +2797,8 @@ tryRefresh();
   const FONT = (document.documentElement.lang === 'ar' ? '"Noto Sans Arabic", "Geeza Pro", ' : '') +
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
   const PAD = 18, TITLE_H = 38, CREDIT_H = 34;
+  const LTR = () => document.documentElement.dir === 'ltr';
+  const DIR = () => LTR() ? 'ltr' : 'rtl';
 
   const svgIcon = body => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" '
     + 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + body + '</svg>';
@@ -2720,10 +2824,10 @@ tryRefresh();
   }
   function frame(c, w, h, title, T) {
     c.fillStyle = T.card; c.fillRect(0, 0, w, h);
-    c.direction = 'rtl'; c.textAlign = 'right'; c.textBaseline = 'alphabetic';
+    c.direction = DIR(); c.textAlign = LTR() ? 'left' : 'right'; c.textBaseline = 'alphabetic';
     c.fillStyle = T.ink;
     const shown = fitTitle(c, title, w - PAD * 2);
-    c.fillText(shown, w - PAD, PAD + 15);
+    c.fillText(shown, LTR() ? PAD : w - PAD, PAD + 15);
     c.strokeStyle = T.line; c.lineWidth = 1;
     c.beginPath(); c.moveTo(PAD, h - CREDIT_H + 4); c.lineTo(w - PAD, h - CREDIT_H + 4); c.stroke();
     c.direction = 'ltr'; c.textAlign = 'center';
@@ -2789,19 +2893,24 @@ tryRefresh();
     const { cv, c } = toCanvas(w, h);
     frame(c, w, h, title, T);
 
-    // RTL columns: rank and logo at the right, numbers stacked at the left, with the
-    // seat bar growing leftwards from its own number the way the table does
+    // Laid out in RTL terms — rank and logo on the right, numbers stacked on the
+    // left, the seat bar growing leftwards out of its own number, the way the
+    // table reads. X()/RX()/AL() mirror the whole thing for English.
+    const ltr = LTR();
+    const X = x => ltr ? w - x : x;              // a point
+    const RX = (x, rw) => ltr ? w - x - rw : x;  // a rect's origin
+    const AL = a => ltr ? (a === 'right' ? 'left' : a === 'left' ? 'right' : a) : a;
     const right = w - PAD, left = PAD;
     const xN = left + 35, xMed = left + 95;
     const barX = left + 145, barW = 165, xSeatNum = left + 320;
     let y = TITLE_H + 4;
-    c.direction = 'rtl'; c.textAlign = 'right';
+    c.direction = DIR(); c.textAlign = AL('right');
     c.font = '600 11.5px ' + FONT; c.fillStyle = T.faint;
-    c.fillText(heads[0] || '', right, y + 14);
+    c.fillText(heads[0] || '', X(right), y + 14);
     c.textAlign = 'center';
-    if (heads[1]) c.fillText(heads[1], barX + barW / 2, y + 14);
-    if (heads[2]) c.fillText(heads[2], xMed, y + 14);
-    if (heads[3]) c.fillText(heads[3], xN, y + 14);
+    if (heads[1]) c.fillText(heads[1], X(barX + barW / 2), y + 14);
+    if (heads[2]) c.fillText(heads[2], X(xMed), y + 14);
+    if (heads[3]) c.fillText(heads[3], X(xN), y + 14);
     y += HEAD;
 
     const marks = await Promise.all(rows.map(r => (r.logo || r.photo) ? loadImg(r.logo || r.photo).catch(() => null) : null));
@@ -2809,35 +2918,35 @@ tryRefresh();
       const top = y + i * ROW, mid = top + ROW / 2;
       c.strokeStyle = T.line; c.lineWidth = 1;
       c.beginPath(); c.moveTo(left, top); c.lineTo(right, top); c.stroke();
-      c.textAlign = 'right'; c.direction = 'rtl';
+      c.textAlign = AL('right'); c.direction = DIR();
       c.fillStyle = T.faint; c.font = '600 10.5px ' + FONT;
-      c.fillText(r.rank, right, mid + 4);
+      c.fillText(r.rank, X(right), mid + 4);
       // logo tile, matching the light chip the table uses
       const bw = 46, bh = 28, bx = right - 20 - bw;
       const m = marks[i];
       if (m) {
         c.fillStyle = '#fff'; c.strokeStyle = T.border;
-        c.beginPath(); c.roundRect(bx, mid - bh / 2, bw, bh, 5); c.fill(); c.stroke();
+        c.beginPath(); c.roundRect(RX(bx, bw), mid - bh / 2, bw, bh, 5); c.fill(); c.stroke();
         const s = Math.min((bw - 6) / m.width, (bh - 6) / m.height);
-        c.drawImage(m, bx + (bw - m.width * s) / 2, mid - m.height * s / 2, m.width * s, m.height * s);
+        c.drawImage(m, RX(bx, bw) + (bw - m.width * s) / 2, mid - m.height * s / 2, m.width * s, m.height * s);
       }
       c.fillStyle = T.ink; c.font = '700 13px ' + FONT;
-      c.fillText(r.name, bx - 10, mid - 1);
+      c.fillText(r.name, X(bx - 10), mid - 1);
       c.fillStyle = T.muted; c.font = '400 10.5px ' + FONT;
-      c.fillText(r.leader, bx - 10, mid + 12);
+      c.fillText(r.leader, X(bx - 10), mid + 12);
       // seat bar + number
       c.fillStyle = T.line;
-      c.beginPath(); c.roundRect(barX, mid - 3, barW, 6, 3); c.fill();
+      c.beginPath(); c.roundRect(RX(barX, barW), mid - 3, barW, 6, 3); c.fill();
       c.fillStyle = r.colour;
       const fillW = Math.max(0, Math.min(1, r.barPct / 100)) * barW;
-      c.beginPath(); c.roundRect(barX + barW - fillW, mid - 3, fillW, 6, 3); c.fill();
-      c.textAlign = 'left'; c.direction = 'ltr';
+      c.beginPath(); c.roundRect(RX(barX + barW - fillW, fillW), mid - 3, fillW, 6, 3); c.fill();
+      c.textAlign = AL('left'); c.direction = 'ltr';
       c.font = '800 15px ' + FONT; c.fillStyle = r.colour;
-      c.fillText(r.seats, xSeatNum, mid + 5);
+      c.fillText(r.seats, X(xSeatNum), mid + 5);
       c.textAlign = 'center'; c.fillStyle = T.ink; c.font = '600 12px ' + FONT;
-      c.fillText(r.med, xMed, mid + 4);
+      c.fillText(r.med, X(xMed), mid + 4);
       c.fillStyle = T.faint; c.font = '500 11.5px ' + FONT;
-      c.fillText(r.n, xN, mid + 4);
+      c.fillText(r.n, X(xN), mid + 4);
     });
     return cv;
   }
@@ -2892,6 +3001,170 @@ tryRefresh();
   }
   window.wireExportButtons = wire;
   if (document.readyState !== 'loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
+})();
+</script>
+<script>
+/* ===== Per-widget share + embed =============================================
+ * Every panel carries a data-widget id. That id is the whole contract: it is
+ * what ?w= scrolls to, what ?embed= renders on its own, and what the share and
+ * embed URLs point at — so ids must outlive markup changes.
+ *
+ * Share links always point at the public site, never at location.href: this
+ * page also runs from file:// inside Cowork and from the plugin's bundled copy,
+ * where the current URL means nothing to anyone else.
+ * ========================================================================== */
+(function(){
+  const SITE = 'https://israel-polls-2026.vercel.app/';
+  const NETS = [
+    { id:'x',        label:'X',        url:(u,t) => `https://twitter.com/intent/tweet?text=${enc(t)}&url=${enc(u)}` },
+    { id:'facebook', label:'Facebook', url:(u)   => `https://www.facebook.com/sharer/sharer.php?u=${enc(u)}` },
+    { id:'linkedin', label:'LinkedIn', url:(u)   => `https://www.linkedin.com/sharing/share-offsite/?url=${enc(u)}` },
+    { id:'whatsapp', label:'WhatsApp', url:(u,t) => `https://wa.me/?text=${enc(t + ' ' + u)}` },
+    { id:'telegram', label:'Telegram', url:(u,t) => `https://t.me/share/url?url=${enc(u)}&text=${enc(t)}` },
+  ];
+  const enc = encodeURIComponent;
+  const ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
+
+  const lang = () => window.IL_LANG || 'he';
+  const titleOf = p => ((p.querySelector('.panel-title') || {}).textContent || document.title).trim();
+  function link(kind, id){ return SITE + '?' + kind + '=' + id + '&lang=' + lang(); }
+  function shareText(p){
+    const head = (document.getElementById('heroHeadline') || {}).textContent;
+    return titleOf(p) + (head ? ' · ' + head.trim() : '') + ' — ' + document.title;
+  }
+  function embedCode(p, id){
+    /* The panel's own rendered height, so the iframe does not open with the
+       widget cut off or floating in dead space. */
+    const h = Math.max(320, Math.ceil(p.getBoundingClientRect().height) + 28);
+    return `<iframe src="${link('embed', id)}" width="100%" height="${h}" `
+         + `style="border:0" loading="lazy" title="${titleOf(p).replace(/"/g, '&quot;')}"></iframe>`;
+  }
+
+  /* navigator.clipboard needs a secure context, which file:// is not. */
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); return true; } catch(e){}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); return ok;
+    } catch(e){ return false; }
+  }
+
+  let pop = null, popFor = null;
+  function closePop(){ if (pop) { pop.remove(); pop = null; popFor = null; } }
+  document.addEventListener('click', e => { if (pop && !pop.contains(e.target) && !e.target.closest('.sharebtn')) closePop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+  window.addEventListener('resize', closePop);
+  window.addEventListener('scroll', closePop, true);
+
+  function openPop(btn, panel, id){
+    closePop();
+    const url = link('w', id), text = shareText(panel);
+    pop = document.createElement('div');
+    pop.className = 'share-pop';
+    pop.innerHTML =
+      `<div class="share-title">שתף את הווידג׳ט</div>` +
+      `<div class="share-nets">` +
+        NETS.map(n => `<a href="${n.url(url, text)}" target="_blank" rel="noopener noreferrer">${n.label}</a>`).join('') +
+      `</div>` +
+      `<button type="button" data-act="link">העתק קישור</button>` +
+      `<button type="button" data-act="embed">העתק קוד הטמעה</button>` +
+      (navigator.share ? `<button type="button" data-act="native">שיתוף מהמכשיר</button>` : '');
+    document.body.appendChild(pop);
+
+    const done = (el, ok) => {
+      const was = el.textContent;
+      el.textContent = ok ? 'הועתק' : 'העתקה נכשלה';
+      el.classList.add(ok ? 'ok' : 'bad');
+      setTimeout(() => { el.textContent = was; el.classList.remove('ok', 'bad'); }, 1400);
+    };
+    pop.addEventListener('click', async e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.act === 'link')  done(b, await copy(url));
+      if (b.dataset.act === 'embed') done(b, await copy(embedCode(panel, id)));
+      if (b.dataset.act === 'native') { closePop(); try { await navigator.share({ title: titleOf(panel), text, url }); } catch(e){} }
+    });
+
+    const r = btn.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+    const x = Math.max(8, Math.min(window.innerWidth - pr.width - 8, r.left + r.width / 2 - pr.width / 2));
+    const below = r.bottom + 6 + pr.height < window.innerHeight;
+    pop.style.left = x + 'px';
+    pop.style.top = (below ? r.bottom + 6 : Math.max(8, r.top - pr.height - 6)) + 'px';
+    popFor = id;
+  }
+
+  function wire(){
+    if (document.documentElement.classList.contains('embed')) return;
+    document.querySelectorAll('.panel[data-widget]').forEach(panel => {
+      const head = panel.querySelector('.panel-head');
+      if (!head || head.querySelector('.sharebtn')) return;
+      const id = panel.dataset.widget;
+      const btn = document.createElement('button');
+      btn.className = 'expbtn sharebtn'; btn.type = 'button';
+      btn.title = 'שתף'; btn.setAttribute('aria-label', 'שתף את הווידג׳ט');
+      btn.innerHTML = ICON;
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        popFor === id ? closePop() : openPop(btn, panel, id);
+      });
+      const first = head.querySelector('.expbtn, .maxbtn');
+      if (first) head.insertBefore(btn, first); else head.appendChild(btn);
+    });
+  }
+  window.wireShareButtons = wire;
+
+  /* ── ?w=<id>: land on the widget someone shared ── */
+  function focusWidget(id){
+    const p = document.querySelector(`.panel[data-widget="${CSS.escape(id)}"]`);
+    if (!p) return;
+    const r = p.getBoundingClientRect();
+    const top = Math.max(0, window.scrollY + r.top - Math.max(12, (window.innerHeight - r.height) / 2));
+    /* Smooth where the engine animates it, but some embedders (and Cowork's own
+       webview) ignore behavior:'smooth' entirely and would leave the reader at
+       the top of a 4,000px page — so land it by hand if nothing moved. */
+    try { window.scrollTo({ top: top, behavior: 'smooth' }); } catch(e) { window.scrollTo(0, top); }
+    setTimeout(() => { if (Math.abs(window.scrollY - top) > 8) window.scrollTo(0, top); }, 400);
+    p.classList.add('widget-flash');
+    setTimeout(() => p.classList.remove('widget-flash'), 2000);
+  }
+
+  /* ── ?embed=<id>: one widget, no chrome ──────────────────────────────────
+     The rest of the page is hidden rather than removed: the render code looks
+     elements up by id and redraws on theme changes and refreshes, so anything
+     torn out here would break the widget that is still on screen. Until the
+     move is done the body is only visibility:hidden, so the first render still
+     measures real boxes. */
+  function setUpEmbed(id){
+    const panel = document.querySelector(`.panel[data-widget="${CSS.escape(id)}"]`);
+    const root = document.createElement('div');
+    root.className = 'embed-root';
+    if (panel) {
+      panel.style.margin = '0';
+      root.appendChild(panel);
+    } else {
+      root.innerHTML = '<div class="panel"><div class="panel-body">' + document.title + '</div></div>';
+    }
+    const credit = document.createElement('a');
+    credit.className = 'embed-credit';
+    credit.href = SITE + '?lang=' + lang();
+    credit.target = '_blank'; credit.rel = 'noopener noreferrer';
+    credit.textContent = 'לוח הסקרים המלא';
+    root.appendChild(credit);
+    document.body.appendChild(root);
+    document.body.classList.add('embed-ready');
+    if (typeof renderAll === 'function') renderAll();
+  }
+
+  function init(){
+    let q = null; try { q = new URLSearchParams(location.search); } catch(e){}
+    const embed = q && q.get('embed');
+    if (embed) { setUpEmbed(embed); return; }   // no share buttons inside an embed
+    wire();
+    const w = q && q.get('w');
+    if (w) setTimeout(() => focusWidget(w), 120);
+  }
+  if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
 </body>

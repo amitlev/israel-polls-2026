@@ -1,6 +1,6 @@
 # Israel 2026 election polls dashboard (לוח סקרי הבחירות 2026)
 
-A live, self-contained Hebrew dashboard for tracking Israeli 2026 Knesset election polls inside Claude Desktop (Cowork).
+A live, self-contained dashboard for tracking Israeli 2026 Knesset election polls inside Claude Desktop (Cowork) — in Hebrew, Arabic or English.
 
 **Features**
 
@@ -10,12 +10,13 @@ A live, self-contained Hebrew dashboard for tracking Israeli 2026 Knesset electi
 - Assign any party to coalition / opposition / other and watch the blocs recompute
 - Auto-refreshes new polls from [Wikipedia's polling page](https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election) every time it opens
 - Enriches recent polls with real methodology data (margin of error, true respondent count, response rate, undecided %) sourced from the Central Elections Committee's official [Section 16H disclosure filings](https://www.gov.il/he/Departments/DynamicCollectors/knesset_election_polls_26), plus a per-poll "additional scenarios" panel for any merger/what-if seat tables those filings disclose
-- **Arabic view** — the whole dashboard in Arabic behind the `ع` button in the header (or `?lang=ar`), including party and leader names, the tug-of-war, every tooltip and the PNG exports; the choice is remembered
+- **Three languages** — עברית · العربية · English, switched in the header (or `?lang=he|ar|en`) and remembered. Party and leader names, the tug-of-war, every tooltip and the PNG exports all follow; English flips the page to LTR
+- **Share and embed any widget** — each panel has a share button with X / Facebook / LinkedIn / WhatsApp / Telegram links, a copyable deep link (`?w=<widget>`), and a copyable `<iframe>` snippet that renders that one widget on its own (`?embed=<widget>`), in the language it was shared in
 - A second "מעבר לכותרות" (beyond the horse race) view tracking PM-preference matchups, trust ratings, and policy-opinion questions from the same gov.il filings over time — content Wikipedia's table doesn't carry at all
 
-**הערה בעברית:** הלוח עצמו בעברית (RTL), עם מעבר לערבית בכפתור ع. ההתקנה דורשת Claude Desktop במצב Cowork.
+**הערה בעברית:** הלוח בעברית (RTL) כברירת מחדל, עם מעבר לערבית ולאנגלית במתג שבראש העמוד. ההתקנה דורשת Claude Desktop במצב Cowork.
 
-**ملاحظة بالعربية:** اللوحة متاحة بالعربية عبر زر ع في أعلى الصفحة (أو `?lang=ar`).
+**ملاحظة بالعربية:** اللوحة متاحة بالعربية عبر مبدّل اللغة في أعلى الصفحة (أو `?lang=ar`).
 
 ## Install
 
@@ -47,18 +48,36 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
 - **New-party detection.** Wikipedia's table occasionally adds a party column (e.g. Unity, Amcha Yisrael) that `headerKey()` doesn't recognize yet — until it's added to `ALL_KEYS`/`headerKey()`/`PARTIES` (in both `update-polls.mjs` and `docs/index.html`), that party's seats are silently dropped from every poll rather than shown, and worse, when Wikipedia's "Joint List" column isn't colspan-merged, an unrelated bug can shift every later column's data (this happened for real — see the Aug 2026 Yashar/Democrats corruption fixed in this repo's history). To catch this automatically going forward, `update-polls.mjs` now flags any header cell it can't recognize in the currently-active table; the twice-daily workflow surfaces that as a GitHub issue (opened once, commented on for repeat detections) instead of a log line nobody reads. The same check also runs client-side (as a `console.warn`) when the dashboard refreshes from Wikipedia in the browser.
 - A party's `active` flag in `PARTIES` controls whether it's shown at all (used for parties superseded by a later merger, e.g. `Yesh Atid`/`Bennett 2026` after the `Together` merger) — when Wikipedia's table stops populating one tracked key in favor of a differently-named one for the same real-world party (as happened with `Yesodot Yisrael` → `Reservists`/"Zionist Home"), flip the flags to match which key current polls actually populate, rather than assuming the newer-added key is always the active one.
 
-## Arabic (i18n)
+## Languages (he · ar · en)
 
-The dashboard is authored in Hebrew and stays that way — every literal in the render code, every string comparison, every `localStorage` key. Arabic is a presentation layer, added entirely in the `<head>` of `docs/index.html`:
+The dashboard is authored in Hebrew and stays that way — every literal in the render code, every string comparison, every `localStorage` key. Arabic and English are a presentation layer, added entirely in the `<head>` of `docs/index.html`:
 
-- A Hebrew→Arabic phrase table, plus a translator that rewrites text nodes and human-readable attributes (`title`, `aria-label`, …) as they land in the DOM, driven by a `MutationObserver`. That covers all ~70 render sites without threading a `t()` call through any of them, and it runs at the microtask checkpoint, so there is no flash of Hebrew.
-- Party and leader names, and outlet names, are swapped in the data instead (`AR_PARTY` / `AR_OUTLET`), because the render code also interpolates them into SVG attributes and the PNG export canvas, which the DOM pass never sees.
+- One Hebrew-keyed phrase table (`T`), each entry carrying its `ar` and `en` translation side by side so a gap is obvious, plus a translator that rewrites text nodes and human-readable attributes (`title`, `aria-label`, …) as they land in the DOM, driven by a `MutationObserver`. That covers all ~70 render sites without threading a `t()` call through any of them, and it runs at the microtask checkpoint, so there is no flash of Hebrew.
+- Party, leader and outlet names are swapped in the data instead (`IL_PARTY` / `IL_OUTLET`), because the render code also interpolates them into SVG attributes and the PNG export canvas, which the DOM pass never sees.
 - Matching is leftmost-**longest**, not leftmost-first: a bare regex alternation would let a short numeric template like `"%n סקרים"` win over a long sentence starting a word later. Matches are collected per rule and resolved longest-first.
-- Both languages are RTL, so there is no layout work — and no separate HTML file to keep in sync with the twice-daily Wikipedia update.
+- One HTML file for all three, so the twice-daily Wikipedia update has nothing extra to keep in sync.
 
-**Editing it.** A phrase missing from the table simply stays Hebrew — coverage degrades, nothing breaks. That is also what happens to a party, or a gov.il answer option, that Wikipedia/gov.il introduces after the table was written, so add new user-facing Hebrew to the table in the same commit that introduces it. To check coverage, load the page with `?lang=ar` and walk the DOM for characters in the Hebrew block; only the `עב` language button should match. Verbatim gov.il text (the `mode` field, the additional-scenario tables) is deliberately marked `data-no-i18n` and left in Hebrew: it is free text quoted from a disclosure PDF, and reads far worse half translated.
+**English and direction.** English sets `<html dir="ltr">`. The stylesheet is written with logical properties, so almost nothing had to change; the four physical exceptions carry an `html[dir="ltr"]` rule beside them. Three drawings are direction-aware in code rather than CSS: the PNG export lays itself out on a canvas (`X()`/`RX()`/`AL()` mirror it), and `drawBarChart` mirrors because it reads in text order. The tug-of-war and the bloc donut deliberately do **not** mirror — the coalition sits on the right because that is where the right-wing bloc goes, which is a political convention, not a reading direction. English also spells the month (`5 Mar 2026`), since `5.3.2026` is ambiguous to an English reader; the `%d` placeholder matches both shapes.
+
+**Editing it.** A phrase missing from the table simply stays Hebrew — coverage degrades, nothing breaks. That is also what happens to a party, or a gov.il answer option, that Wikipedia/gov.il introduces after the table was written, so add new user-facing Hebrew to the table in the same commit that introduces it. To check coverage, load the page with `?lang=ar` or `?lang=en` and walk the DOM for characters in the Hebrew block; only the `עב` language button should match. Verbatim gov.il text (the `mode` field, the additional-scenario tables) is deliberately marked `data-no-i18n` and left in Hebrew: it is free text quoted from a disclosure PDF, and reads far worse half translated.
 
 Two things must stay hand-wired because translation happens *after* render: the tug-of-war majority pill is sized from its label's length, so it measures `ILT(status)`; and the per-widget methodology tooltip is keyed by the on-screen panel title, so it maps back through `ILT_SRC()`.
+
+## Share and embed
+
+Every panel carries a `data-widget` id — `tug`, `ask`, `parties`, `party-trend`, `blocs`, `bloc-trend`, `forecast`, `pm`. That id is the whole contract, so it should outlive markup changes:
+
+| URL | What it does |
+| --- | --- |
+| `?w=<id>` | opens the full dashboard scrolled to that widget, with a brief highlight |
+| `?embed=<id>` | renders that widget alone, no header, controls or footer |
+| `&lang=he\|ar\|en` | pins the language; a shared link keeps the language it was shared in |
+
+The share button on each panel offers X, Facebook, LinkedIn, WhatsApp and Telegram, a **Copy link**, a **Copy embed code** that hands back an `<iframe>` sized to the widget's current rendered height, and the native share sheet where `navigator.share` exists. Share URLs always point at the public site rather than `location.href`, because this page also runs from `file://` inside Cowork and from the plugin's bundled copy, where the current URL means nothing to anyone else.
+
+In embed mode the rest of the page is hidden rather than removed — the render code looks elements up by id and redraws on theme changes and refreshes, so anything torn out would break the widget still on screen. Until the target panel has been moved into `.embed-root` the body is only `visibility:hidden`, so the first render still measures real boxes.
+
+Two limits worth knowing: an embed loads the whole ~690KB single-file dashboard, since that is what a self-contained page can offer; and link previews are a static `summary` card with no `og:image`, because generating a per-widget preview image would need a server-side renderer this static site does not have.
 
 ## License
 
