@@ -10,9 +10,12 @@ A live, self-contained Hebrew dashboard for tracking Israeli 2026 Knesset electi
 - Assign any party to coalition / opposition / other and watch the blocs recompute
 - Auto-refreshes new polls from [Wikipedia's polling page](https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election) every time it opens
 - Enriches recent polls with real methodology data (margin of error, true respondent count, response rate, undecided %) sourced from the Central Elections Committee's official [Section 16H disclosure filings](https://www.gov.il/he/Departments/DynamicCollectors/knesset_election_polls_26), plus a per-poll "additional scenarios" panel for any merger/what-if seat tables those filings disclose
+- **Arabic view** — the whole dashboard in Arabic behind the `ع` button in the header (or `?lang=ar`), including party and leader names, the tug-of-war, every tooltip and the PNG exports; the choice is remembered
 - A second "מעבר לכותרות" (beyond the horse race) view tracking PM-preference matchups, trust ratings, and policy-opinion questions from the same gov.il filings over time — content Wikipedia's table doesn't carry at all
 
-**הערה בעברית:** הלוח עצמו כולו בעברית (RTL). ההתקנה דורשת Claude Desktop במצב Cowork.
+**הערה בעברית:** הלוח עצמו בעברית (RTL), עם מעבר לערבית בכפתור ع. ההתקנה דורשת Claude Desktop במצב Cowork.
+
+**ملاحظة بالعربية:** اللوحة متاحة بالعربية عبر زر ع في أعلى الصفحة (أو `?lang=ar`).
 
 ## Install
 
@@ -43,6 +46,19 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
   - The weighted-average feature's sample-size weighting now prefers the gov.il-sourced true respondent count (`respondents`) over Wikipedia's rougher `sampleSize` wherever both exist
 - **New-party detection.** Wikipedia's table occasionally adds a party column (e.g. Unity, Amcha Yisrael) that `headerKey()` doesn't recognize yet — until it's added to `ALL_KEYS`/`headerKey()`/`PARTIES` (in both `update-polls.mjs` and `docs/index.html`), that party's seats are silently dropped from every poll rather than shown, and worse, when Wikipedia's "Joint List" column isn't colspan-merged, an unrelated bug can shift every later column's data (this happened for real — see the Aug 2026 Yashar/Democrats corruption fixed in this repo's history). To catch this automatically going forward, `update-polls.mjs` now flags any header cell it can't recognize in the currently-active table; the twice-daily workflow surfaces that as a GitHub issue (opened once, commented on for repeat detections) instead of a log line nobody reads. The same check also runs client-side (as a `console.warn`) when the dashboard refreshes from Wikipedia in the browser.
 - A party's `active` flag in `PARTIES` controls whether it's shown at all (used for parties superseded by a later merger, e.g. `Yesh Atid`/`Bennett 2026` after the `Together` merger) — when Wikipedia's table stops populating one tracked key in favor of a differently-named one for the same real-world party (as happened with `Yesodot Yisrael` → `Reservists`/"Zionist Home"), flip the flags to match which key current polls actually populate, rather than assuming the newer-added key is always the active one.
+
+## Arabic (i18n)
+
+The dashboard is authored in Hebrew and stays that way — every literal in the render code, every string comparison, every `localStorage` key. Arabic is a presentation layer, added entirely in the `<head>` of `docs/index.html`:
+
+- A Hebrew→Arabic phrase table, plus a translator that rewrites text nodes and human-readable attributes (`title`, `aria-label`, …) as they land in the DOM, driven by a `MutationObserver`. That covers all ~70 render sites without threading a `t()` call through any of them, and it runs at the microtask checkpoint, so there is no flash of Hebrew.
+- Party and leader names, and outlet names, are swapped in the data instead (`AR_PARTY` / `AR_OUTLET`), because the render code also interpolates them into SVG attributes and the PNG export canvas, which the DOM pass never sees.
+- Matching is leftmost-**longest**, not leftmost-first: a bare regex alternation would let a short numeric template like `"%n סקרים"` win over a long sentence starting a word later. Matches are collected per rule and resolved longest-first.
+- Both languages are RTL, so there is no layout work — and no separate HTML file to keep in sync with the twice-daily Wikipedia update.
+
+**Editing it.** A phrase missing from the table simply stays Hebrew — coverage degrades, nothing breaks. That is also what happens to a party, or a gov.il answer option, that Wikipedia/gov.il introduces after the table was written, so add new user-facing Hebrew to the table in the same commit that introduces it. To check coverage, load the page with `?lang=ar` and walk the DOM for characters in the Hebrew block; only the `עב` language button should match. Verbatim gov.il text (the `mode` field, the additional-scenario tables) is deliberately marked `data-no-i18n` and left in Hebrew: it is free text quoted from a disclosure PDF, and reads far worse half translated.
+
+Two things must stay hand-wired because translation happens *after* render: the tug-of-war majority pill is sized from its label's length, so it measures `ILT(status)`; and the per-widget methodology tooltip is keyed by the on-screen panel title, so it maps back through `ILT_SRC()`.
 
 ## License
 
