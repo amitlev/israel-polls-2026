@@ -151,6 +151,15 @@
         order. Keeping both translations on one line makes a gap obvious. ── */
   var T = {
     /* share + embed */
+    "מכין תמונה…": { ar: "جارٍ تجهيز الصورة…", en: "Preparing image…" },
+    "הכנת התמונה נכשלה": { ar: "تعذّر تجهيز الصورة", en: "Could not prepare the image" },
+    "העתק תמונה + קישור": { ar: "نسخ الصورة + الرابط", en: "Copy image + link" },
+    "שתף עם תמונה": { ar: "مشاركة مع الصورة", en: "Share with image" },
+    "התמונה הועתקה — הדביקו אותה בפוסט": { ar: "نُسخت الصورة — الصقها في المنشور", en: "Image copied — paste it into the post" },
+    "התמונה הורדה — צרפו אותה לפוסט": { ar: "نُزّلت الصورة — أرفقها بالمنشور", en: "Image downloaded — attach it to the post" },
+    "התמונה והקישור הועתקו": { ar: "نُسخت الصورة والرابط", en: "Image and link copied" },
+    "הורדה": { ar: "نُزّلت", en: "Downloaded" },
+    "כולל את הסינון הנוכחי": { ar: "يشمل التصفية الحالية", en: "Includes your current filters" },
     "שתף": { ar: "مشاركة", en: "Share" },
     "שתף את הווידג׳ט": { ar: "مشاركة الودجت", en: "Share this widget" },
     "העתק קישור": { ar: "نسخ الرابط", en: "Copy link" },
@@ -772,13 +781,18 @@
   .share-pop button:hover { border-color:var(--accent); color:var(--accent); }
   .share-pop button.ok { border-color:#16a34a; color:#16a34a; }
   .share-pop button.bad { border-color:var(--coal); color:var(--coal); }
+  .share-pop button:disabled { opacity:.5; cursor:default; }
+  .share-shot { border:1px solid var(--border); border-radius:8px; background:var(--card-2); overflow:hidden; min-height:66px; display:flex; align-items:center; justify-content:center; }
+  .share-shot[data-state="wait"], .share-shot[data-state="fail"] { font-size:10.5px; color:var(--faint); padding:10px; text-align:center; }
+  .share-shot img { display:block; width:100%; height:auto; max-height:150px; object-fit:cover; object-position:top; }
+  .share-hint { font-size:10px; line-height:1.5; color:var(--faint); text-align:center; padding:1px 2px 0; }
   .widget-flash { animation:widgetFlash 2s ease-out; }
   @keyframes widgetFlash { 0%,70% { box-shadow:0 0 0 3px var(--accent); } 100% { box-shadow:var(--shadow); } }
   /* Hidden, not removed: the render code still looks these elements up by id. */
   html.embed body { visibility:hidden; }
   html.embed body.embed-ready { visibility:visible; }
   html.embed body.embed-ready > *:not(.embed-root):not(.tt):not(.modal-ov):not(.panel-ov) { display:none !important; }
-  html.embed .maxbtn, html.embed .sharebtn { display:none; }
+  html.embed .maxbtn, html.embed .sharebtn, html.embed .panel-head .dd { display:none; }
   .embed-root { max-width:900px; margin:0 auto; padding:10px; }
   .embed-credit { display:block; margin-top:7px; font-size:10.5px; font-weight:600; color:var(--faint); text-decoration:none; text-align:center; }
   .embed-credit:hover { color:var(--accent); text-decoration:underline; }
@@ -1112,7 +1126,12 @@ function makeMultiSelect(ddId, summaryId, menuId, items, defaults, storageKey, a
   }
   rebuild(); updateSummary();
   document.addEventListener('click', e => { const dd = document.getElementById(ddId); if (dd.open && !dd.contains(e.target)) dd.removeAttribute('open'); });
-  return { get: () => selected, setItems(ni) { items = ni; rebuild(); updateSummary(); } };
+  return {
+    get: () => selected,
+    all: () => items.map(x => x.id),
+    set(ids, persist) { selected = new Set(ids.filter(id => items.some(x => x.id === id))); if (persist) save(); rebuild(); updateSummary(); },
+    setItems(ni) { items = ni; rebuild(); updateSummary(); }
+  };
 }
 
 function convVal(v){ v=(v||'').trim(); if(/^\d+$/.test(v)) return parseInt(v,10); if(/^\(?[\d.]+%\)?$/.test(v)) return 0; return null; }
@@ -2959,6 +2978,21 @@ tryRefresh();
     return null;
   }
 
+  function fileName(title) {
+    return 'israel-polls-2026-' + title.replace(/[^֐-׿\u0600-\u06ff a-zA-Z0-9]+/g, '-')
+      .replace(/ +/g, '-').replace(/^-|-$/g, '') + '.png';
+  }
+
+  /* The share module wants the very same PNG the download button produces, as a
+     blob it can put on the clipboard or hand to navigator.share. */
+  window.widgetImage = async function(panel, title) {
+    const target = exportable(panel); if (!target) return null;
+    const t = title || ((panel.querySelector('.panel-title') || {}).textContent || 'לוח סקרי הבחירות 2026').trim();
+    const cv = target.kind === 'svg' ? await fromSvg(target.node, t) : await fromTable(target.node, t);
+    const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+    return { blob: blob, name: fileName(t), w: cv.width, h: cv.height };
+  };
+
   async function run(panel, btn, titleFor) {
     const target = exportable(panel);
     const title = titleFor ? titleFor() : ((panel.querySelector('.panel-title') || {}).textContent || 'לוח סקרי הבחירות 2026');
@@ -2969,7 +3003,7 @@ tryRefresh();
       const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'israel-polls-2026-' + title.replace(/[^֐-׿\u0600-\u06ff a-zA-Z0-9]+/g, '-').replace(/ +/g, '-').replace(/^-|-$/g, '') + '.png';
+      a.download = fileName(title);
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       btn.classList.remove('busy'); btn.classList.add('done'); btn.innerHTML = ICON.ok;
@@ -3009,25 +3043,101 @@ tryRefresh();
  * what ?w= scrolls to, what ?embed= renders on its own, and what the share and
  * embed URLs point at — so ids must outlive markup changes.
  *
+ * Both link kinds also carry the filters in force when they were made, so a
+ * shared link opens on what the sharer was looking at, and an embed keeps
+ * showing it — the whole point of an embed being that the host page has no
+ * filter controls of its own.
+ *
  * Share links always point at the public site, never at location.href: this
  * page also runs from file:// inside Cowork and from the plugin's bundled copy,
  * where the current URL means nothing to anyone else.
  * ========================================================================== */
 (function(){
   const SITE = 'https://israel-polls-2026.vercel.app/';
-  const NETS = [
-    { id:'x',        label:'X',        url:(u,t) => `https://twitter.com/intent/tweet?text=${enc(t)}&url=${enc(u)}` },
-    { id:'facebook', label:'Facebook', url:(u)   => `https://www.facebook.com/sharer/sharer.php?u=${enc(u)}` },
-    { id:'linkedin', label:'LinkedIn', url:(u)   => `https://www.linkedin.com/sharing/share-offsite/?url=${enc(u)}` },
-    { id:'whatsapp', label:'WhatsApp', url:(u,t) => `https://wa.me/?text=${enc(t + ' ' + u)}` },
-    { id:'telegram', label:'Telegram', url:(u,t) => `https://t.me/share/url?url=${enc(u)}&text=${enc(t)}` },
-  ];
   const enc = encodeURIComponent;
+  const NETS = [
+    { label:'X',        url:(u,t) => `https://twitter.com/intent/tweet?text=${enc(t)}&url=${enc(u)}` },
+    { label:'Facebook', url:(u)   => `https://www.facebook.com/sharer/sharer.php?u=${enc(u)}` },
+    { label:'LinkedIn', url:(u)   => `https://www.linkedin.com/sharing/share-offsite/?url=${enc(u)}` },
+    { label:'WhatsApp', url:(u,t) => `https://wa.me/?text=${enc(t + ' ' + u)}` },
+    { label:'Telegram', url:(u,t) => `https://t.me/share/url?url=${enc(u)}&text=${enc(t)}` },
+  ];
   const ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
 
   const lang = () => window.IL_LANG || 'he';
   const titleOf = p => ((p.querySelector('.panel-title') || {}).textContent || document.title).trim();
-  function link(kind, id){ return SITE + '?' + kind + '=' + id + '&lang=' + lang(); }
+
+  /* ── filter state ────────────────────────────────────────────────────────
+     Encoded short and only where it differs from the default, so an unfiltered
+     widget still shares a clean URL. Outlets and parties travel as slugs rather
+     than raw keys ("Channel 12 (HaHadashot 12)" → "channel-12"): shorter, and
+     stable against the index shuffling that adding an outlet would cause. */
+  const slug = s => String(s).split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const BLOC_CODE = { coal: 'c', opp: 'o', other: 'x' };
+  const BLOC_NAME = { c: 'coal', o: 'opp', x: 'other' };
+
+  function collectState(){
+    const s = {};
+    try {
+      const lo = dateSlider.getLoIso(), hi = dateSlider.getHiIso();
+      if (lo) s.from = lo;
+      if (hi) s.to = hi;
+      if (outletSel) { const sel = [...outletSel.get()], all = outletSel.all();
+        if (sel.length !== all.length) s.o = sel.map(slug).join(','); }
+      if (partySel) { const sel = [...partySel.get()];
+        s.p = sel.map(slug).join(','); }
+      const a = loadBlocAssign(), diff = [];
+      Object.keys(a).forEach(k => { if (a[k] !== BLOC_DEFAULTS[k]) diff.push(slug(k) + ':' + BLOC_CODE[a[k]]); });
+      if (diff.length) s.b = diff.join(',');
+      if (window.USE_WEIGHTED) s.wt = '1';
+      if (window.USE_ADJUST) s.adj = '1';
+    } catch(e){ /* a half-built page still shares a usable link */ }
+    return s;
+  }
+
+  /* Applied in memory only — a link someone else made must not overwrite the
+     reader's own saved filters. */
+  function applyState(q){
+    let touched = false;
+    const from = q.get('from'), to = q.get('to');
+    if (from && to && typeof dateSlider !== 'undefined') { try { dateSlider.setRange(from, to, true); touched = true; } catch(e){} }
+
+    const bySlug = (list, want) => { const w = new Set(want.split(',').filter(Boolean)); return list.filter(id => w.has(slug(id))); };
+    if (q.has('o') && outletSel) { outletSel.set(bySlug(outletSel.all(), q.get('o')), false); touched = true; }
+    if (q.has('p') && partySel) { partySel.set(bySlug(partySel.all(), q.get('p')), false); touched = true; }
+
+    if (q.has('b')) {
+      const a = loadBlocAssign();
+      const bySlugParty = {}; Object.keys(a).forEach(k => bySlugParty[slug(k)] = k);
+      q.get('b').split(',').forEach(pair => {
+        const [ps, code] = pair.split(':');
+        const id = bySlugParty[ps];
+        if (id && BLOC_NAME[code]) a[id] = BLOC_NAME[code];
+      });
+      touched = true;
+    }
+    /* The two mode toggles own their own label and re-render, so flip them by
+       their button rather than by poking the flag behind their back. */
+    const flip = (id, want) => {
+      const b = document.getElementById(id); if (!b) return false;
+      const on = id === 'weightedToggle' ? !!window.USE_WEIGHTED : !!window.USE_ADJUST;
+      if (on === want) return false;
+      b.click(); return true;
+    };
+    const f1 = flip('weightedToggle', q.get('wt') === '1');
+    const f2 = flip('adjToggle', q.get('adj') === '1');
+    if (touched && !f1 && !f2 && typeof renderAll === 'function') renderAll();
+    return touched || f1 || f2;
+  }
+
+  function link(kind, id){
+    const p = new URLSearchParams();
+    p.set(kind, id);
+    p.set('lang', lang());
+    const s = collectState();
+    Object.keys(s).forEach(k => p.set(k, s[k]));
+    return SITE + '?' + p.toString();
+  }
   function shareText(p){
     const head = (document.getElementById('heroHeadline') || {}).textContent;
     return titleOf(p) + (head ? ' · ' + head.trim() : '') + ' — ' + document.title;
@@ -3041,7 +3151,7 @@ tryRefresh();
   }
 
   /* navigator.clipboard needs a secure context, which file:// is not. */
-  async function copy(text){
+  async function copyText(text){
     try { await navigator.clipboard.writeText(text); return true; } catch(e){}
     try {
       const ta = document.createElement('textarea');
@@ -3049,6 +3159,29 @@ tryRefresh();
       document.body.appendChild(ta); ta.select();
       const ok = document.execCommand('copy'); ta.remove(); return ok;
     } catch(e){ return false; }
+  }
+  /* One clipboard item carrying both representations: pasting into a composer
+     that takes images gets the screenshot, pasting into a text field gets the
+     link. Where images cannot reach the clipboard at all, save the PNG instead
+     so there is still something to attach — and say which happened. */
+  async function copyImageAndLink(blob, url, name){
+    try {
+      if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+        await navigator.clipboard.write([new ClipboardItem({
+          'image/png': blob,
+          'text/plain': new Blob([url], { type: 'text/plain' })
+        })]);
+        return 'copied';
+      }
+    } catch(e){}
+    try {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name || 'israel-polls-2026.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      await copyText(url);
+      return 'downloaded';
+    } catch(e){ return 'failed'; }
   }
 
   let pop = null, popFor = null;
@@ -3061,29 +3194,79 @@ tryRefresh();
   function openPop(btn, panel, id){
     closePop();
     const url = link('w', id), text = shareText(panel);
+    const shootable = !!(window.widgetImage && (panel.querySelector('.panel-body svg') || panel.querySelector('table tbody')));
     pop = document.createElement('div');
     pop.className = 'share-pop';
     pop.innerHTML =
       `<div class="share-title">שתף את הווידג׳ט</div>` +
+      (shootable ? `<div class="share-shot" data-state="wait"><span>מכין תמונה…</span></div>` : '') +
       `<div class="share-nets">` +
         NETS.map(n => `<a href="${n.url(url, text)}" target="_blank" rel="noopener noreferrer">${n.label}</a>`).join('') +
       `</div>` +
+      (shootable ? `<button type="button" data-act="native" hidden>שתף עם תמונה</button>` : '') +
+      (shootable ? `<button type="button" data-act="shot" disabled>העתק תמונה + קישור</button>` : '') +
       `<button type="button" data-act="link">העתק קישור</button>` +
       `<button type="button" data-act="embed">העתק קוד הטמעה</button>` +
-      (navigator.share ? `<button type="button" data-act="native">שיתוף מהמכשיר</button>` : '');
+      `<div class="share-hint">כולל את הסינון הנוכחי</div>`;
     document.body.appendChild(pop);
 
-    const done = (el, ok) => {
+    const hint = pop.querySelector('.share-hint');
+    const say = t => { hint.textContent = t; };
+    let shot = null;
+
+    if (shootable) {
+      const box = pop.querySelector('.share-shot');
+      const shotBtn = pop.querySelector('[data-act="shot"]');
+      window.widgetImage(panel).then(r => {
+        if (!pop || !r) throw new Error('no image');
+        shot = r;
+        box.dataset.state = 'ready';
+        const img = new Image();
+        img.src = URL.createObjectURL(r.blob); img.alt = '';
+        box.replaceChildren(img);
+        shotBtn.disabled = false;
+        const file = new File([r.blob], r.name, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          const nb = pop.querySelector('[data-act="native"]');
+          if (nb) { nb.hidden = false; nb.dataset.ready = '1'; }
+        }
+      }).catch(() => { if (pop) { box.dataset.state = 'fail'; box.replaceChildren(document.createTextNode('הכנת התמונה נכשלה')); } });
+    }
+
+    const flash = (el, ok, label) => {
       const was = el.textContent;
-      el.textContent = ok ? 'הועתק' : 'העתקה נכשלה';
+      el.textContent = label || (ok ? 'הועתק' : 'העתקה נכשלה');
       el.classList.add(ok ? 'ok' : 'bad');
-      setTimeout(() => { el.textContent = was; el.classList.remove('ok', 'bad'); }, 1400);
+      setTimeout(() => { if (el.isConnected) { el.textContent = was; el.classList.remove('ok', 'bad'); } }, 1500);
     };
+
+    /* A network button opens its composer in a new tab; the screenshot cannot
+       ride along in an intent URL, so put it on the clipboard on the way out
+       and tell the reader to paste it. */
+    pop.querySelector('.share-nets').addEventListener('click', async e => {
+      if (!e.target.closest('a') || !shot) return;
+      const r = await copyImageAndLink(shot.blob, url, shot.name);
+      say(r === 'copied' ? 'התמונה הועתקה — הדביקו אותה בפוסט'
+        : r === 'downloaded' ? 'התמונה הורדה — צרפו אותה לפוסט'
+        : 'הכנת התמונה נכשלה');
+    });
+
     pop.addEventListener('click', async e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.act === 'link')  done(b, await copy(url));
-      if (b.dataset.act === 'embed') done(b, await copy(embedCode(panel, id)));
-      if (b.dataset.act === 'native') { closePop(); try { await navigator.share({ title: titleOf(panel), text, url }); } catch(e){} }
+      const act = b.dataset.act;
+      if (act === 'link')  flash(b, await copyText(url));
+      if (act === 'embed') flash(b, await copyText(embedCode(panel, id)));
+      if (act === 'shot' && shot) {
+        const r = await copyImageAndLink(shot.blob, url, shot.name);
+        flash(b, r !== 'failed', r === 'downloaded' ? 'הורדה' : null);
+        say(r === 'copied' ? 'התמונה והקישור הועתקו'
+          : r === 'downloaded' ? 'התמונה הורדה — צרפו אותה לפוסט' : 'הכנת התמונה נכשלה');
+      }
+      if (act === 'native' && shot) {
+        const file = new File([shot.blob], shot.name, { type: 'image/png' });
+        closePop();
+        try { await navigator.share({ files: [file], title: titleOf(panel), text: text, url: url }); } catch(e){}
+      }
     });
 
     const r = btn.getBoundingClientRect(), pr = pop.getBoundingClientRect();
@@ -3158,10 +3341,12 @@ tryRefresh();
 
   function init(){
     let q = null; try { q = new URLSearchParams(location.search); } catch(e){}
-    const embed = q && q.get('embed');
+    if (!q) { wire(); return; }
+    applyState(q);                       // before either path renders
+    const embed = q.get('embed');
     if (embed) { setUpEmbed(embed); return; }   // no share buttons inside an embed
     wire();
-    const w = q && q.get('w');
+    const w = q.get('w');
     if (w) setTimeout(() => focusWidget(w), 120);
   }
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);

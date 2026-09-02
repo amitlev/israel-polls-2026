@@ -11,7 +11,8 @@ A live, self-contained dashboard for tracking Israeli 2026 Knesset election poll
 - Auto-refreshes new polls from [Wikipedia's polling page](https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election) every time it opens
 - Enriches recent polls with real methodology data (margin of error, true respondent count, response rate, undecided %) sourced from the Central Elections Committee's official [Section 16H disclosure filings](https://www.gov.il/he/Departments/DynamicCollectors/knesset_election_polls_26), plus a per-poll "additional scenarios" panel for any merger/what-if seat tables those filings disclose
 - **Three languages** — עברית · العربية · English, switched in the header (or `?lang=he|ar|en`) and remembered. Party and leader names, the tug-of-war, every tooltip and the PNG exports all follow; English flips the page to LTR
-- **Share and embed any widget** — each panel has a share button with X / Facebook / LinkedIn / WhatsApp / Telegram links, a copyable deep link (`?w=<widget>`), and a copyable `<iframe>` snippet that renders that one widget on its own (`?embed=<widget>`), in the language it was shared in
+- **Share and embed any widget** — each panel's share button previews a PNG of the widget as it looks right now and hands you **the screenshot and the link together**: one clipboard write carrying both, X / Facebook / LinkedIn / WhatsApp / Telegram, the native share sheet on mobile, and a copyable `<iframe>` snippet
+- **Shared links and embeds carry your filters** — date range, outlets, trend parties, bloc assignment and both average modes travel in the URL, so an embed keeps showing exactly what you picked without the host page needing any filter controls of its own
 - A second "מעבר לכותרות" (beyond the horse race) view tracking PM-preference matchups, trust ratings, and policy-opinion questions from the same gov.il filings over time — content Wikipedia's table doesn't carry at all
 
 **הערה בעברית:** הלוח בעברית (RTL) כברירת מחדל, עם מעבר לערבית ולאנגלית במתג שבראש העמוד. ההתקנה דורשת Claude Desktop במצב Cowork.
@@ -73,9 +74,23 @@ Every panel carries a `data-widget` id — `tug`, `ask`, `parties`, `party-trend
 | `?embed=<id>` | renders that widget alone, no header, controls or footer |
 | `&lang=he\|ar\|en` | pins the language; a shared link keeps the language it was shared in |
 
-The share button on each panel offers X, Facebook, LinkedIn, WhatsApp and Telegram, a **Copy link**, a **Copy embed code** that hands back an `<iframe>` sized to the widget's current rendered height, and the native share sheet where `navigator.share` exists. Share URLs always point at the public site rather than `location.href`, because this page also runs from `file://` inside Cowork and from the plugin's bundled copy, where the current URL means nothing to anyone else.
+### The screenshot
 
-In embed mode the rest of the page is hidden rather than removed — the render code looks elements up by id and redraws on theme changes and refreshes, so anything torn out would break the widget still on screen. Until the target panel has been moved into `.embed-root` the body is only `visibility:hidden`, so the first render still measures real boxes.
+Opening the share popover renders the same PNG the download button produces (`window.widgetImage()`) and shows it as a preview, so you can see what you are about to share. **Copy image + link** writes one `ClipboardItem` carrying both `image/png` and `text/plain`: pasting into a composer that takes images gets the screenshot, pasting into a text field gets the link. Clicking a network button copies the image on the way out and tells you to paste it — an intent URL cannot carry an attachment, so this is as close to "screenshot and link" as the web allows. Where the clipboard refuses images the PNG is saved instead and the wording changes to say so, rather than claiming a copy that did not happen. On mobile, `navigator.share` takes the file directly.
+
+The `ask` panel has no chart or table, so it gets link and embed actions only.
+
+### The filters
+
+Both link kinds carry the filters in force when they were made — `from`/`to`, `o` (outlets), `p` (trend parties), `b` (bloc overrides, only where they differ from the default), `wt` and `adj` for the two average modes. Outlets and parties travel as slugs (`Channel 12 (HaHadashot 12)` → `channel-12`) rather than raw keys or indices: shorter than the keys, and stable against the index shuffling that adding an outlet to the dataset would cause.
+
+State is applied **in memory only**. A link someone else made must not overwrite the reader's own saved filters, so nothing touches `localStorage` on the way in. The two mode toggles are flipped by clicking their own buttons, so their labels and re-render come along for free.
+
+Share URLs always point at the public site rather than `location.href`, because this page also runs from `file://` inside Cowork and from the plugin's bundled copy, where the current URL means nothing to anyone else.
+
+In embed mode the rest of the page is hidden rather than removed — the render code looks elements up by id and redraws on theme changes and refreshes, so anything torn out would break the widget still on screen. Until the target panel has been moved into `.embed-root` the body is only `visibility:hidden`, so the first render still measures real boxes. The party-trend panel's own picker is hidden too: an embed shows the embedder's selection, not a control for changing it.
+
+The bloc-assignment buttons in the party table stay live, though. They are the widget's own interaction rather than a filter, they hide nothing, and a reload returns to whatever the embed URL asked for.
 
 Two limits worth knowing: an embed loads the whole ~690KB single-file dashboard, since that is what a self-contained page can offer; and link previews are a static `summary` card with no `og:image`, because generating a per-widget preview image would need a server-side renderer this static site does not have.
 
