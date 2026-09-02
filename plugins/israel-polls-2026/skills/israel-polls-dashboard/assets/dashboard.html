@@ -2465,9 +2465,22 @@ tryRefresh();
 
   function simulate(sigMul){
     const win = recentWindow(), assign = loadBlocAssign();
+    /* A party a pollster did not list scored no seats in that poll's world — its
+       votes went to whatever list it had merged into, and every individual poll
+       already sums to exactly 120. Averaging a party only over the polls that
+       named it therefore credits a part-time party with a full-time score: in a
+       recent window that put the tracked means at ~129 seats rather than 120,
+       and the renormalisation below then shaved ~7% off every party that HAD
+       been measured throughout. It hit hardest exactly where new parties arrive
+       mid-cycle or appear only in an alternative-scenario column.
+       pollBlocs() — and so the donut, the tug-of-war and the bloc trend — has
+       always read a missing party as 0. Read it the same way here: the means
+       then sum to 120 on their own, and the forecast agrees with the rest of
+       the page instead of quietly disagreeing with it. */
     const parties = PARTIES.filter(p=>p.active!==false).map(p=>{
-      const vals = win.polls.map(x=>x[p.id]).filter(v=>v!==null&&v!==undefined);
-      return vals.length ? { id:p.id, mu:mean(vals), bloc:assign[p.id] } : null;
+      const seen = win.polls.some(x=>x[p.id]!==null&&x[p.id]!==undefined);
+      if (!seen) return null;
+      return { id:p.id, mu:mean(win.polls.map(x=>x[p.id]||0)), bloc:assign[p.id] };
     }).filter(r=>r && r.mu>0);
     const nCoal = Math.max(1, parties.filter(p=>p.bloc==='coal').length);
     const nOpp  = Math.max(1, parties.filter(p=>p.bloc==='opp').length);
