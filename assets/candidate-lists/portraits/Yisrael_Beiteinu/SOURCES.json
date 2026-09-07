@@ -1,0 +1,108 @@
+{
+ "party": "Yisrael_Beiteinu",
+ "generated": "2026-09-07",
+ "site": null,
+ "graphic": "Yisrael_Beiteinu.png",
+ "portraits": [
+  {
+   "rank": 1,
+   "from": "graphic"
+  },
+  {
+   "rank": 2,
+   "from": "graphic"
+  },
+  {
+   "rank": 3,
+   "from": "graphic"
+  },
+  {
+   "rank": 4,
+   "from": "graphic"
+  },
+  {
+   "rank": 5,
+   "from": "graphic"
+  },
+  {
+   "rank": 6,
+   "from": "graphic"
+  },
+  {
+   "rank": 7,
+   "from": "graphic"
+  },
+  {
+   "rank": 8,
+   "from": "graphic"
+  },
+  {
+   "rank": 9,
+   "from": "graphic"
+  },
+  {
+   "rank": 10,
+   "from": "graphic"
+  },
+  {
+   "rank": 11,
+   "from": "graphic"
+  },
+  {
+   "rank": 12,
+   "from": "graphic"
+  },
+  {
+   "rank": 13,
+   "from": "graphic"
+  },
+  {
+   "rank": 14,
+   "from": "graphic"
+  },
+  {
+   "rank": 15,
+   "from": "graphic"
+  },
+  {
+   "rank": 16,
+   "from": "graphic"
+  },
+  {
+   "rank": 17,
+   "from": "graphic"
+  },
+  {
+   "rank": 18,
+   "from": "graphic"
+  },
+  {
+   "rank": 19,
+   "from": "graphic"
+  },
+  {
+   "rank": 20,
+   "from": "graphic"
+  },
+  {
+   "rank": 21,
+   "from": "graphic"
+  },
+  {
+   "rank": 22,
+   "from": "graphic"
+  },
+  {
+   "rank": 23,
+   "from": "graphic"
+  },
+  {
+   "rank": 24,
+   "from": "graphic"
+  },
+  {
+   "rank": 25,
+   "from": "graphic"
+  }
+ ]
+}

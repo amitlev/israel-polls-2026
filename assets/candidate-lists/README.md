@@ -4,10 +4,10 @@ The dashboard tracks parties; this folder tracks the people on each party's list
 26th Knesset, so a seat count can be read as "who actually gets in".
 
 ```
-lists/<Party_id>.json        the transcribed list                    (committed)
-sources/<Party_id>.<ext>     the party-published list graphic it     (committed)
-                             was transcribed from
-portraits/<Party_id>/NN.jpg  one portrait per rank, NN = rank        (committed)
+lists/<Party_id>.json           the transcribed list                 (committed)
+sources/<Party_id>.<ext>        the party-published list graphic     (committed)
+portraits/<Party_id>/NN.jpg     one portrait per rank, NN = rank     (committed)
+portraits/<Party_id>/SOURCES.json  where each portrait came from     (generated)
 ```
 
 ## File names
@@ -62,6 +62,11 @@ silently dropped from every poll. See the "New-party detection" note in the root
 - **`name` carries no honorific and no rank.** Everything a party prints in front of the
   name goes in one of the other two fields, so the name stays searchable and the UI gets
   to decide what to show.
+- **`nameOnGraphic`** appears only where the party's graphic and the party's website
+  disagree about someone's name — "מיכל נגרי" against "מיכל הירש נגרי", "יעל לין שטרן"
+  against "יעל שטרן". The site wins, because it is the copy the party maintains; the
+  graphic's spelling is kept beside it rather than thrown away, since neither source is
+  reliably the fuller one.
 - **`mk`** is the parliamentary status: `"current"` where the graphic printed **ח"כ**,
   `"former"` where it printed **חכ"ל** (ח"כ לשעבר), `null` otherwise. It records what the
   party's own graphic claimed — it is not checked against the Knesset roster. The one
@@ -77,26 +82,43 @@ silently dropped from every poll. See the "New-party detection" note in the root
 
 ## The portraits
 
-`npm run build:candidates` cuts them out of `sources/<Party_id>.<ext>` — 192px squares,
-named by rank, one per card in the graphic. The geometry lives in the `GRIDS` table at the
-top of `.github/scripts/build-candidate-portraits.mjs`; `-- --preview` writes a contact
-sheet to `.leaderheads/candidates/` instead of files, which is the loop for tuning it.
+`npm run build:candidates` writes 192px squares named by rank. `-- --preview` writes a
+contact sheet to `.leaderheads/candidates/` instead of files, which is the loop for tuning.
 
-**Measure the grid, don't eyeball it.** A card's name plate is a solid white band the full
-width of the card, so it hands you the whole layout: the plates' x-spans are the columns,
-their tops give the row pitch, and the photo area is the gap between a plate top and the
-card above it. Eyeballed numbers drift a few pixels per row, and by the bottom row the
-name plate is inside the crop.
+**Two sources, and they are good at different things.** The list graphic has *everyone* on
+it, already framed the way the party wants them framed — but at whatever size the designer
+exported, often around 130px a head. The party's website has the original studio
+photograph at full camera resolution — but in a loose landscape frame that has to be
+cropped, and it does not always carry the whole list.
+
+So the bake takes both: **the framing from the graphic, the pixels from the website.** For a
+party listed in `SITES`, each card in the graphic is located inside the corresponding
+original by normalised cross-correlation, and the winning crop — the one the party's own
+designer chose — is lifted onto the full-resolution file. A match below 0.55, or a rank the
+site doesn't have, falls back to the graphic crop; the run prints which ranks those were and
+`SOURCES.json` records it per portrait. For Together that is rank 32, who is on the graphic
+and has no card on the site at all.
+
+**Measure the grid, don't eyeball it.** A card's name plate is a solid band the full width of
+the card, so it hands you the whole layout: its x-spans are the columns, its top gives the
+row pitch, and the photo area is the gap up to the card above. Eyeballed numbers drift a few
+pixels per row, and by the bottom row the plate is inside the crop. Where the plate is not
+white (Together's is navy) find the grid by whatever *is* uniform — there, the orange rank
+badge, one saturated blob per card, which also confirms the count.
 
 They are **JPEG, not PNG** — photographs with no transparency, where a PNG runs about four
 times the bytes. Note that `@napi-rs/canvas` takes JPEG quality as a **percentage, 0-100**,
 not the 0-1 the browser `toDataURL` API uses. Passing `0.85` is quality *one*, and it does
 not throw; it just quietly returns a 1KB smear.
 
-**The graphic is the resolution ceiling.** Cards in Yisrael Beiteinu's are 154px across, so
-that is what the portraits are — `OUT` is a cap, never an upscale, and the bake prints the
-card size on every run so a coarse source is visible rather than inferred from a blurry
-result. Sharper portraits need a bigger source file, not a bigger `OUT`.
+**A source is a resolution ceiling.** Cards in Yisrael Beiteinu's graphic are 154px across
+and no site was used, so that is what those portraits are — `OUT` is a cap, never an upscale,
+and the bake prints which ranks came out under it. Sharper portraits need a better source,
+not a bigger `OUT`.
+
+Originals downloaded from a party site are cached under `.leaderheads/candidates/` and are
+gitignored — they run to hundreds of megabytes and nothing needs them after the bake.
+`-- --refetch` ignores the cache.
 
 ## Licensing
 
