@@ -110,6 +110,17 @@ const PARTIES = {
 
   /* Names only. No list graphic and no party site with photographs was found. */
   Amcha_Yisrael: {},
+
+  /* 1131x1600, 5x4. Like Together's, this graphic's name plate is dark, so the grid came
+     from the orange rule under each card — one bar per card, the most uniform thing on the
+     page, where the white portrait cards fragment on dark suits and hair. Columns at
+     x=900/695/490/284/83 (pitch 204.25, width 162); card tops at y=342/593/849/1103
+     (pitch 253.67). */
+  Otzma_Yehudit: {
+    graphic: 'Otzma_Yehudit.jpg',
+    grid: { cols: 5, rows: 4, count: 20, order: 'rtl',
+            cell: [0.798408, 0.215625, 0.137931, 0.097500], step: [0.180592, 0.158544] },
+  },
 };
 
 const args = process.argv.slice(2);

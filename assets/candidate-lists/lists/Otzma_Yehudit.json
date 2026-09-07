@@ -1,0 +1,160 @@
+{
+  "party": "Otzma Yehudit",
+  "partyName": "עוצמה יהודית",
+  "knesset": 26,
+  "source": {
+    "kind": "party-graphic",
+    "file": "sources/Otzma_Yehudit.jpg",
+    "title": "נבחרת עוצמה יהודית לכנסת ה-26",
+    "publisher": "עוצמה יהודית",
+    "published": "2026-09-07",
+    "url": "https://www.inn.co.il/news/705828",
+    "licence": "NON-FREE — party campaign material, published alongside the Channel 7 report",
+    "note": "Transcribed from the party's own graphic, which carries all 20 with portraits. Press coverage the same day listed only the top 12 and called the list \"still taking shape\"; the graphic is the party's own and later, so it wins, and the two names the press spelled differently are kept in nameInPress. gov.il confirms the list was submitted (letter ב) but publishes no ordered candidates yet."
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "איתמר בן גביר",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "photoKey": "Itamar Ben-Gvir"
+    },
+    {
+      "rank": 2,
+      "name": "טלי גוטליב",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 3,
+      "name": "יצחק וסרלאוף",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 4,
+      "name": "עמיחי אליהו",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 5,
+      "name": "לימור סון הר מלך",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 6,
+      "name": "יצחק קרויזר",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 7,
+      "name": "חנמאל דורפמן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameInPress": "חנמאל דרופמן"
+    },
+    {
+      "rank": 8,
+      "name": "צחי אליהו",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 9,
+      "name": "יוסי גולדברג",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameInPress": "יוסי גולדברגר"
+    },
+    {
+      "rank": 10,
+      "name": "איתיאל ניימן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 11,
+      "name": "דוד בבלי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 12,
+      "name": "ישי פליישר",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 13,
+      "name": "שירן מירזאי",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 14,
+      "name": "שימי גולן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 15,
+      "name": "יניב בדלוב",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 16,
+      "name": "מסלה אייצ'לותם",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 17,
+      "name": "גדי מזוז",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 18,
+      "name": "מרדכי פריזיס",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 19,
+      "name": "אהרון עמר",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 20,
+      "name": "אור אליה יומטוביאן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+ "party": "Otzma_Yehudit",
+ "generated": "2026-09-07",
+ "site": null,
+ "graphic": "Otzma_Yehudit.jpg",
+ "portraits": [
+  {
+   "key": "01",
+   "from": "graphic"
+  },
+  {
+   "key": "02",
+   "from": "graphic"
+  },
+  {
+   "key": "03",
+   "from": "graphic"
+  },
+  {
+   "key": "04",
+   "from": "graphic"
+  },
+  {
+   "key": "05",
+   "from": "graphic"
+  },
+  {
+   "key": "06",
+   "from": "graphic"
+  },
+  {
+   "key": "07",
+   "from": "graphic"
+  },
+  {
+   "key": "08",
+   "from": "graphic"
+  },
+  {
+   "key": "09",
+   "from": "graphic"
+  },
+  {
+   "key": "10",
+   "from": "graphic"
+  },
+  {
+   "key": "11",
+   "from": "graphic"
+  },
+  {
+   "key": "12",
+   "from": "graphic"
+  },
+  {
+   "key": "13",
+   "from": "graphic"
+  },
+  {
+   "key": "14",
+   "from": "graphic"
+  },
+  {
+   "key": "15",
+   "from": "graphic"
+  },
+  {
+   "key": "16",
+   "from": "graphic"
+  },
+  {
+   "key": "17",
+   "from": "graphic"
+  },
+  {
+   "key": "18",
+   "from": "graphic"
+  },
+  {
+   "key": "19",
+   "from": "graphic"
+  },
+  {
+   "key": "20",
+   "from": "graphic"
+  }
+ ]
+}

@@ -64,8 +64,11 @@ silently dropped from every poll. See the "New-party detection" note in the root
 - **`name` carries no honorific and no rank.** Everything a party prints in front of the
   name goes in one of the other two fields, so the name stays searchable and the UI gets
   to decide what to show.
-- **`nameOnGraphic`** appears only where the party's graphic and the party's website
-  disagree about someone's name — "מיכל נגרי" against "מיכל הירש נגרי", "יעל לין שטרן"
+- **`nameOnGraphic`** / **`nameInPress`** carry the spelling from the source that did *not*
+  win, named after that source, so nothing is thrown away when two sources disagree. The
+  website beat the graphic for Together; the graphic beat the press for Otzma Yehudit,
+  which spelled דורפמן as דרופמן and גולדברג as גולדברגר. `nameOnGraphic` appears only where
+  the party's graphic and the party's website disagree about someone's name — "מיכל נגרי" against "מיכל הירש נגרי", "יעל לין שטרן"
   against "יעל שטרן". The site wins, because it is the copy the party maintains; the
   graphic's spelling is kept beside it rather than thrown away, since neither source is
   reliably the fuller one.
