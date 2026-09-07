@@ -1,0 +1,263 @@
+{
+ "party": "The_Democrats",
+ "generated": "2026-09-07",
+ "site": "https://democrats.org.il/team/",
+ "graphic": null,
+ "portraits": [
+  {
+   "key": "01",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/יאיר-גולן_400-1.png"
+  },
+  {
+   "key": "02",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-16-at-08.43.29.jpeg"
+  },
+  {
+   "key": "03",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/גלעד-קריב-תמונה-scaled-1.png"
+  },
+  {
+   "key": "04",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-20-at-08.23.05.jpeg"
+  },
+  {
+   "key": "05",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/37814399_יאיר_פינק_candidatePhoto_20260622_220331_72cf547d-896d-42a1-a04c-15d9ab946b29.jpg"
+  },
+  {
+   "key": "06",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/17904095_גבי_לסקי_candidatePhoto_20260624_094712_IMG-20220803-WA0052.jpg"
+  },
+  {
+   "key": "07",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/203166731_עמרי_רונן_candidatePhoto_20260623_155144_WhatsApp_Image_2026-06-23_at_09.57.15.jpeg"
+  },
+  {
+   "key": "08",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/24426256_מיכל_רוזין_candidatePhoto_20260623_193652_מיכל_רוזין_צילום_אלעד_מלכה.jpg"
+  },
+  {
+   "key": "09",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/66625690_משה_רדמן_candidatePhoto_20260624_223940_Screenshot_2026-05-31_at_11.07.51.png"
+  },
+  {
+   "key": "10",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/26444687_סומיה_בשיר_candidatePhoto_20260622_083450_1000575283.jpg"
+  },
+  {
+   "key": "11",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/נמרוד-שפר-תמונה-scaled-1.jpg"
+  },
+  {
+   "key": "12",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/09/מורן-זר-תמונה-scaled-1.jpeg"
+  },
+  {
+   "key": "13",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/38377008_אבי_דבוש_candidatePhoto_20260624_123813_אבי_מכווץ.jpg"
+  },
+  {
+   "key": "14",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/40285132_אמילי_מואטי_candidatePhoto_20260624_092237_1001073062.jpg"
+  },
+  {
+   "key": "15",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/61231346_תומר_אביטל_candidatePhoto_20260623_112130_תומר_ראש.jpg"
+  },
+  {
+   "key": "16",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/21926159_נאווה_רוזוליו_candidatePhoto_20260624_134745_תמונה.jpeg"
+  },
+  {
+   "key": "17",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/36715472_רם_שפע_candidatePhoto_20260625_101037_רם_תמונה_לפורטל_.jpg"
+  },
+  {
+   "key": "18",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/50766757_עלי__סלאלחה_candidatePhoto_20260625_140458_עלי_סלאלחה_תמונה.jpeg"
+  },
+  {
+   "key": "19",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/37679602_רתם_סיון_candidatePhoto_20260622_234833_WhatsApp_Image_2026-06-22_at_23.47.45.jpeg"
+  },
+  {
+   "key": "20",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/ערן-עציון-תמונה.jpeg"
+  },
+  {
+   "key": "u01",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/אבישי-ליכטנשטיין.jpeg"
+  },
+  {
+   "key": "u02",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/302831243_אביתר_באר_candidatePhoto_20260625_003850_אביתר_באר_לפריימריז.jpg"
+  },
+  {
+   "key": "u03",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/311892749_אוליביה_עמנואל_דה_לם_candidatePhoto_20260624_142532_ViolonPerroquet.jpg"
+  },
+  {
+   "key": "u04",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/33618976_אחסאן_חלאילה_candidatePhoto_20260623_103608_תמונה_דר_אחסן_חלאילה.jpeg"
+  },
+  {
+   "key": "u05",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/איהאב-שליאן-2026-07-15.jpeg"
+  },
+  {
+   "key": "u06",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/29295490_איתי_לשם_candidatePhoto_20260623_232041_QJuPa3dz_400x400.jpg"
+  },
+  {
+   "key": "u07",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/13277959_אליס_גולדמן_candidatePhoto_20260624_100852_IMG-20260620-WA0046_1.jpg"
+  },
+  {
+   "key": "u08",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/25974965_אמיר_חניפס_candidatePhoto_20260623_023810_תמונה_אמיר_חניפס_.jpeg"
+  },
+  {
+   "key": "u09",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/326898202_בנימין_דניאל_מיניץ_candidatePhoto_20260625_143623_BENNY.jpg"
+  },
+  {
+   "key": "u10",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/312312440_גאלב_סלאמנה_candidatePhoto_20260623_001001_גאלב_סלאמנה_תמונה.jpg"
+  },
+  {
+   "key": "u11",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/29647039_גיל_ביילין_candidatePhoto_20260624_115810_תמונה_פריימריז_26.jpg"
+  },
+  {
+   "key": "u12",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/IMG-דימה-שפירא.jpg"
+  },
+  {
+   "key": "u13",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/55744395_דניאל__אלגרט_candidatePhoto_20260622_114731_e72eefaa-f3d4-4d84-8069-d14ab9371c7a.jpeg"
+  },
+  {
+   "key": "u14",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/הדס-רגולסקי.jpg"
+  },
+  {
+   "key": "u15",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/25544222_יאיר_רובינשטיין_candidatePhoto_20260623_175243.jpeg"
+  },
+  {
+   "key": "u16",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/304975311_יואב_אגמי_candidatePhoto_20260622_124929_תמונת_פריימריס_2.png"
+  },
+  {
+   "key": "u17",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/25700717_יעל_כהן_פארן_candidatePhoto_20260624_111340_WhatsApp_Image_2026-06-24_at_11.06.51.jpeg"
+  },
+  {
+   "key": "u18",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/10950665_ירון_ניב_candidatePhoto_20260622_171528_תמונה_ירון_ניב_edited.jpg"
+  },
+  {
+   "key": "u19",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/יריב-אופנהיימר-לאתר.png"
+  },
+  {
+   "key": "u20",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/לי-הופמן-אדיב.jpeg"
+  },
+  {
+   "key": "u21",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/56302227_מאלכ_בדר_candidatePhoto_20260622_202606_260326.jpg"
+  },
+  {
+   "key": "u22",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/15916208_מהרטה_ברוך_רון_candidatePhoto_20260623_123319_IMG_0545.jpg"
+  },
+  {
+   "key": "u23",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/22106165_מוס_רז_candidatePhoto_20260622_114224_מוסי_תמונה.jpg"
+  },
+  {
+   "key": "u24",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/07/מורן-מישל-עמוד-מועמדים.png"
+  },
+  {
+   "key": "u25",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/301495917_נאור_נרקיס_candidatePhoto_20260623_100930_נאורנרקיס1.png"
+  },
+  {
+   "key": "u26",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/27528884_נדאל_מסאלחה_candidatePhoto_20260623_072029_4661a1bf-71ee-47d2-a508-ca267a42ac51.jpeg"
+  },
+  {
+   "key": "u27",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/37147303_עאיד__בדיר__candidatePhoto_20260623_002522_PHOTO-2026-06-22-10-52-31_1.jpg"
+  },
+  {
+   "key": "u28",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/34991950_ענבל_וורטמן_שהם_candidatePhoto_20260622_232811_תמונה_לאתר.jpg"
+  },
+  {
+   "key": "u29",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/27330455_ענבר_בזק_candidatePhoto_20260622_223729_ענבר_בזק_צילום_רני_לוריא.jpg"
+  },
+  {
+   "key": "u30",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/305639338_ערן_ניסן_candidatePhoto_20260622_120612_1000634600.jpg"
+  },
+  {
+   "key": "u31",
+   "from": "site",
+   "url": "https://democrats.org.il/wp-content/uploads/2026/06/65942849_קטי_פיאסצקי_candidatePhoto_20260623_123618_תמונה.jpeg"
+  }
+ ]
+}

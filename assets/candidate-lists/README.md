@@ -4,9 +4,11 @@ The dashboard tracks parties; this folder tracks the people on each party's list
 26th Knesset, so a seat count can be read as "who actually gets in".
 
 ```
-lists/<Party_id>.json           the transcribed list                 (committed)
-sources/<Party_id>.<ext>        the party-published list graphic     (committed)
-portraits/<Party_id>/NN.jpg     one portrait per rank, NN = rank     (committed)
+lists/<Party_id>.json              the list                          (committed)
+sources/<Party_id>.<ext>           the party-published list graphic, (committed)
+                                   where the party published one
+portraits/<Party_id>/NN.jpg        one portrait per rank             (committed)
+portraits/<Party_id>/uNN.jpg       one per candidate with no rank    (committed)
 portraits/<Party_id>/SOURCES.json  where each portrait came from     (generated)
 ```
 
@@ -77,8 +79,34 @@ silently dropped from every poll. See the "New-party detection" note in the root
   places would let the two disagree.
 - **`photoKey`** is optional, and set only for someone who already has a baked leader head
   in `assets/leader-heads/cutouts/`, so the two never diverge.
-- **`verify`** marks a field that could not be read confidently off the source graphic.
-  It is a note to a human, not something the dashboard reads — clear it once checked.
+- **`verify`** marks a field that could not be read confidently off the source, or that
+  looks wrong in the source itself — The Democrats' site prints "יאיא פינק" where its own
+  photo filename says יאיר. It is a note to a human, not something the dashboard reads;
+  clear it once checked.
+- **`unranked`** is a second array, beside `candidates`, for people who are demonstrably on
+  a list without the party having published where. The Democrats' site numbers only its top
+  20; the other 31 have a photo and a name and no position, so they are kept here rather
+  than given an invented one. It is sorted alphabetically — **that ordering is not the list
+  order and must never be shown as one** — and each entry's `photo` names its portrait
+  (`u07` → `portraits/The_Democrats/u07.jpg`), which is what keeps the file numbering stable
+  when a name is added and the alphabetical positions shift.
+
+## Site readers
+
+`PARTIES[…].site.parse` picks how a party's page is read, and each reader is written against
+one site's markup:
+
+- **`filename-rank`** — the photo's filename starts with the rank (`12-רם-בן-ברק-1536x1024.jpg`).
+  The size suffix is stripped to reach the original upload.
+- **`jet-listing`** — a JetEngine/Elementor listing, one `.jet-listing-grid__item` per
+  candidate with a `data-post-id`, an `<img>`, a heading widget holding the rank and text
+  widgets holding title and name. The page renders every candidate twice in two layouts, so
+  items are folded on `data-post-id` and a rank found in either copy wins.
+
+When a party rebuilds its site these need a new reader, not a patch. Note also that sites mix
+Hebrew gershayim (`עו״ד`) with ASCII quotes (`עו"ד`) freely; both are normalised on the way
+in, because a title regex that misses one leaves the title glued to the front of the name,
+where it silently breaks the alphabetical ordering too.
 
 ## The portraits
 
@@ -87,17 +115,27 @@ contact sheet to `.leaderheads/candidates/` instead of files, which is the loop 
 
 **Two sources, and they are good at different things.** The list graphic has *everyone* on
 it, already framed the way the party wants them framed — but at whatever size the designer
-exported, often around 130px a head. The party's website has the original studio
-photograph at full camera resolution — but in a loose landscape frame that has to be
-cropped, and it does not always carry the whole list.
+exported, often around 130px a head. The party's website has the original photograph, often
+at full camera resolution — but not always the whole list, and not always cropped to a face.
 
-So the bake takes both: **the framing from the graphic, the pixels from the website.** For a
-party listed in `SITES`, each card in the graphic is located inside the corresponding
-original by normalised cross-correlation, and the winning crop — the one the party's own
-designer chose — is lifted onto the full-resolution file. A match below 0.55, or a rank the
-site doesn't have, falls back to the graphic crop; the run prints which ranks those were and
-`SOURCES.json` records it per portrait. For Together that is rank 32, who is on the graphic
-and has no card on the site at all.
+So a party in `PARTIES` has a graphic, a site, or both, and the bake takes what it can:
+
+| Has | What happens |
+| --- | --- |
+| graphic only | each card is cut out of the grid — Yisrael Beiteinu |
+| site only | the site's photo is used; a square one is already framed, anything else is centre-cropped — The Democrats |
+| both | **the framing from the graphic, the pixels from the site** — Together |
+
+That third case is the good one. Each card in the graphic is located inside the
+corresponding original by normalised cross-correlation, and the winning crop — the one the
+party's own designer chose — is lifted onto the full-resolution file. A match below 0.55, or
+a rank the site doesn't have, falls back to the graphic crop; the run prints which ranks
+those were and `SOURCES.json` records it per portrait. For Together that is rank 32, who is
+on the graphic and has no card on the site at all.
+
+Each run also writes `.leaderheads/candidates/<Party_id>_manifest.json` — what the site said
+before any hand-curation. That is what a `lists/` file is built from, and what to diff a site
+against when it changes.
 
 **Measure the grid, don't eyeball it.** A card's name plate is a solid band the full width of
 the card, so it hands you the whole layout: its x-spans are the columns, its top gives the

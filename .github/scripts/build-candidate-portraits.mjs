@@ -6,15 +6,21 @@
  *   the party's list graphic   every candidate is on it, already framed the way the
  *                              party wants them framed — but at whatever size the
  *                              designer exported, often ~130px a head.
- *   the party's website        the original studio photograph, at full camera
- *                              resolution — but a loose landscape frame that has to be
- *                              cropped, and it does not always carry the whole list.
+ *   the party's website        the original photograph, often at full camera
+ *                              resolution — but not always the whole list, and not
+ *                              always cropped to a face.
  *
- * So take both: the framing from the graphic, the pixels from the website. For a party
- * with `site`, each card in the graphic is located inside the corresponding original by
- * normalised cross-correlation, and the crop that wins is the one the party's own
- * designer chose, lifted back onto the full-resolution file. Anyone the site is missing
- * falls back to the graphic crop, and the run says who.
+ * So a party here has a graphic, a site, or both, and the bake takes the best of what
+ * it has:
+ *
+ *   graphic only   cut each card out of the grid.
+ *   site only      use the site's photo; square ones are already framed, anything else
+ *                  is centre-cropped.
+ *   both           the framing from the graphic, the pixels from the site — each card
+ *                  is located inside the corresponding original by normalised cross-
+ *                  correlation, and the crop that wins (the one the party's own
+ *                  designer chose) is lifted onto the full-resolution file. Anyone the
+ *                  site is missing falls back to the graphic, and the run says who.
  *
  *   npm run build:candidates                      every party below
  *   npm run build:candidates -- Together          just one
@@ -22,7 +28,9 @@
  *   npm run build:candidates -- --refetch         ignore the cached originals
  *
  * Originals are cached under .leaderheads/candidates/ (gitignored) — they run to
- * hundreds of megabytes, and nothing needs them after the bake.
+ * hundreds of megabytes, and nothing needs them after the bake. Each run also writes
+ * <Party>_manifest.json there: what the site said, before any hand-curation. That is
+ * what lists/<Party>.json is built from, and what to diff a site against later.
  *
  * Nothing here touches the HTML. Portraits land in assets/candidate-lists/portraits/.
  */
@@ -37,8 +45,9 @@ const QUALITY = 92;         // JPEG, 0-100 (NOT 0-1 — @napi-rs/canvas takes th
                             // These are photographs; a PNG of one is ~4x the bytes.
 const UA = { 'User-Agent': 'israel-polls-2026-dashboard/1.0 (https://github.com/amitlev/israel-polls-2026; candidate portrait bake)' };
 
-/* ── the list graphics ──────────────────────────────────────────────────────────────
- * Per graphic, all boxes in fractions of the source image:
+/* ── the parties ────────────────────────────────────────────────────────────────────
+ *
+ * grid — how to cut the list graphic, all boxes in fractions of the source image:
  *   cols/rows  the grid as printed
  *   order      'rtl' — rank 1 is the TOP-RIGHT card, ranks run right to left
  *   cell       [x, y, w, h] of the FIRST card's photo area (excluding its name plate)
@@ -49,15 +58,18 @@ const UA = { 'User-Agent': 'israel-polls-2026-dashboard/1.0 (https://github.com/
  * row pitch, and the photo area is the gap up to the card above. Eyeballed numbers drift
  * a few px per row and by the bottom row the plate is inside the crop. Keep `cell` square
  * in *pixels* (the two denominators differ), so a crop never reaches outside its card.
+ *
+ * site — where the originals live, and how that page has to be read. `parse` picks the
+ * reader; both readers below are written against a specific site's markup and will need
+ * a new one, not a patch, when a party rebuilds its site.
  */
-const GRIDS = {
+const PARTIES = {
   /* 1206x1609. Columns at x=966/746/528/308/88 (pitch 219.5, width 154);
      white name plates at y=419/687/955/1224/1492 (pitch 268.25); photo area 154x169. */
   Yisrael_Beiteinu: {
-    file: 'Yisrael_Beiteinu.png',
-    cols: 5, rows: 5, count: 25, order: 'rtl',
-    cell: [0.800995, 0.155376, 0.127695, 0.095712],
-    step: [0.182007, 0.166719],
+    graphic: 'Yisrael_Beiteinu.png',
+    grid: { cols: 5, rows: 5, count: 25, order: 'rtl',
+            cell: [0.800995, 0.155376, 0.127695, 0.095712], step: [0.182007, 0.166719] },
   },
 
   /* 900x1600, 7 rows. This graphic's name plate is dark navy rather than white, so the
@@ -65,26 +77,32 @@ const GRIDS = {
      per card, which also confirms the count. Columns at x=667/527/387/247/107 (pitch
      140, width 127); card tops at y=196..1283 (pitch 181.17); photo area 127x131. */
   Together: {
-    file: 'Together.png',
-    cols: 5, rows: 7, count: 35, order: 'rtl',
-    cell: [0.741111, 0.122500, 0.141111, 0.080625],
-    step: [0.155556, 0.113229],
+    graphic: 'Together.png',
+    grid: { cols: 5, rows: 7, count: 35, order: 'rtl',
+            cell: [0.741111, 0.122500, 0.141111, 0.080625], step: [0.155556, 0.113229] },
+    site: { page: 'https://be-yahad.org.il/team/', parse: 'filename-rank' },
   },
-};
 
-/* ── the party websites ─────────────────────────────────────────────────────────────
- * `page` is scanned for image URLs whose filename starts with the candidate's rank, the
- * convention every one of these WordPress sites has followed so far ("12-רם-בן-ברק-
- * 1536x1024.jpg"). The size suffix is stripped to get the original upload.
- */
-const SITES = {
-  Together: { page: 'https://be-yahad.org.il/team/' },
+  /* No graphic — the party never published one. Its site carries square 400px portraits
+     already cropped to the face, so they are used as they are. It numbers only the top
+     20, though: the other 31 have a photo and a name and no position. */
+  The_Democrats: {
+    site: { page: 'https://democrats.org.il/team/', parse: 'jet-listing', leadRank: 1, leadMark: 'יו"ר' },
+  },
 };
 
 const args = process.argv.slice(2);
 const preview = args.includes('--preview');
 const refetch = args.includes('--refetch');
 const only = args.filter(a => !a.startsWith('--'));
+
+const dec = s => { try { return decodeURIComponent(s); } catch { return s; } };
+/* Hebrew gershayim/geresh (U+05F4/U+05F3) are normalised to ASCII quotes here. Sites mix
+   them freely — "עו״ד" beside "עו\"ד" — and a title regex that misses one leaves the title
+   glued to the front of the name, where it also breaks the alphabetical ordering. */
+const ents = s => s.replace(/&quot;|&#8220;|&#8221;/g, '"').replace(/&#039;|&apos;|&#8217;/g, "'")
+  .replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\u05F4/g, '"').replace(/\u05F3/g, "'");
+const flat = s => ents(s.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
 
 /* ── graphic ── */
 
@@ -103,37 +121,87 @@ function cardCanvas(img, g, n) {
   return c;
 }
 
-/* ── site originals ── */
+/* ── site readers ──
+ * Each returns { ranked: Map<rank, {name, title, url}>, unranked: [{name, title, url}] }. */
 
-async function fetchOriginals(name, site, count) {
-  const dir = `${WORK}/${name}_src`;
-  fs.mkdirSync(dir, { recursive: true });
-  const html = await (await fetch(site.page, { headers: UA })).text();
+/* Photo filenames that start with the candidate's rank: "12-רם-בן-ברק-1536x1024.jpg".
+   The size suffix is stripped to reach the original upload. */
+function parseFilenameRank(html) {
   const re = /https?:\/\/[^"'\s,)\\]+?\/wp-content\/uploads\/\d{4}\/\d{2}\/[^"'\s,)\\]+?\.(?:jpg|jpeg|png)/gi;
-
-  const byRank = new Map();
+  const ranked = new Map();
   for (const raw of html.match(re) || []) {
-    let u; try { u = decodeURIComponent(raw); } catch { u = raw; }
+    const u = dec(raw);
     const m = u.match(/\/(\d+)-(.+?)(?:-\d+x\d+)?\.(jpg|jpeg|png)$/i);
     if (!m) continue;
     const rank = +m[1];
-    if (rank < 1 || rank > count || byRank.has(rank)) continue;
-    byRank.set(rank, { rank, name: m[2].replace(/-/g, ' ').replace(/ \d+$/, ''), url: u.replace(/-\d+x\d+(\.\w+)$/, '$1') });
+    if (rank < 1 || ranked.has(rank)) continue;
+    ranked.set(rank, { name: m[2].replace(/-/g, ' ').replace(/ \d+$/, ''), title: null, url: u.replace(/-\d+x\d+(\.\w+)$/, '$1') });
   }
-
-  for (const c of byRank.values()) {
-    const f = `${dir}/${String(c.rank).padStart(2, '0')}.jpg`;
-    c.file = f;
-    if (fs.existsSync(f) && !refetch) continue;
-    const r = await fetch(encodeURI(c.url), { headers: UA });
-    if (!r.ok) { console.warn(`⚠ ${name} #${c.rank}: HTTP ${r.status} for ${c.url}`); byRank.delete(c.rank); continue; }
-    fs.writeFileSync(f, Buffer.from(await r.arrayBuffer()));
-    await new Promise(s => setTimeout(s, 120));
-  }
-  return byRank;
+  return { ranked, unranked: [] };
 }
 
-/* ── framing the original by matching the graphic's card into it ── */
+/* A JetEngine/Elementor listing: one .jet-listing-grid__item per candidate, carrying a
+   data-post-id, an <img>, an optional heading widget holding the rank, and text-editor
+   widgets holding [title?, first name, last name]. The page renders the same candidates
+   twice in two layouts, so items are folded together on data-post-id and a rank found in
+   either copy wins. */
+function parseJetListing(html, site) {
+  const chunks = html.split(/class="[^"]*jet-listing-grid__item/).slice(1);
+  const byId = new Map();
+  const widget = (ch, kind) => [...ch.matchAll(new RegExp(`data-widget_type="${kind}\\.default"[^>]*>([\\s\\S]*?)(?=<div class="elementor-element|<\\/div>\\s*<\\/div>\\s*<\\/div>)`, 'g'))]
+    .map(m => flat(m[1])).filter(Boolean);
+
+  for (const ch of chunks) {
+    const im = ch.match(/<img[^>]+?src="([^"]+?\/wp-content\/uploads\/[^"]+?)"/);
+    if (!im) continue;
+    const id = (ch.match(/data-post-id="(\d+)"/) || [])[1] || im[1];
+    const rank = widget(ch, 'heading').find(h => /^\d+$/.test(h));
+    /* The card ends in a share call-to-action that is a text widget like any other. */
+    const fields = widget(ch, 'text-editor').filter(f => !/^(צלמו|שתפו)/.test(f));
+    const prev = byId.get(id);
+    if (prev) { if (rank && !prev.rank) prev.rank = +rank; continue; }
+    byId.set(id, { rank: rank ? +rank : null, fields, url: dec(im[1]) });
+  }
+
+  const ranked = new Map(), unranked = [];
+  for (const it of byId.values()) {
+    /* The leader is presented as a role rather than a number ("יו"ר"), above the grid. */
+    if (!it.rank && site.leadMark && it.fields[0] === site.leadMark) it.rank = site.leadRank;
+    const lead = it.fields.length > 1 && /^(ח"כ|עו"ד|ד"ר|פרופ'|אדר'|הרב|אלוף|אל"מ|סרן|רס"ן|יו"ר)/.test(it.fields[0]);
+    const title = lead ? it.fields[0] : null;
+    const name = (lead ? it.fields.slice(1) : it.fields).join(' ');
+    const rec = { name, title, url: it.url };
+    if (it.rank) ranked.set(it.rank, rec); else unranked.push(rec);
+  }
+  unranked.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+  return { ranked, unranked };
+}
+
+async function readSite(name, site) {
+  const html = await (await fetch(site.page, { headers: UA })).text();
+  const out = site.parse === 'jet-listing' ? parseJetListing(html, site) : parseFilenameRank(html);
+  fs.mkdirSync(WORK, { recursive: true });
+  fs.writeFileSync(`${WORK}/${name}_manifest.json`, JSON.stringify({
+    page: site.page, read: new Date().toISOString().slice(0, 10),
+    ranked: [...out.ranked.entries()].sort((a, b) => a[0] - b[0]).map(([rank, r]) => ({ rank, ...r })),
+    unranked: out.unranked,
+  }, null, 1));
+  return out;
+}
+
+async function download(name, key, url) {
+  const dir = `${WORK}/${name}_src`;
+  fs.mkdirSync(dir, { recursive: true });
+  const f = `${dir}/${key}${path.extname(new URL(url).pathname) || '.jpg'}`;
+  if (fs.existsSync(f) && !refetch) return f;
+  const r = await fetch(encodeURI(url), { headers: UA });
+  if (!r.ok) { console.warn(`⚠ ${name} ${key}: HTTP ${r.status} for ${url}`); return null; }
+  fs.writeFileSync(f, Buffer.from(await r.arrayBuffer()));
+  await new Promise(s => setTimeout(s, 120));
+  return f;
+}
+
+/* ── framing an original by matching the graphic's card into it ── */
 
 function gray(img, w, h) {
   const c = createCanvas(w, h), x = c.getContext('2d');
@@ -185,6 +253,13 @@ function frameFromCard(photo, card) {
   return { score: f.score, box: [f.x * scale, f.y * scale, f.k * scale, f.k * scale] };
 }
 
+/* A site photo with no graphic to frame it: square ones are already cropped to the face,
+   anything else gets the middle. */
+function wholeFrame(img) {
+  const side = Math.min(img.width, img.height);
+  return [(img.width - side) / 2, (img.height - side) / 2, side, side];
+}
+
 /* ── output ── */
 
 function square(label, img, [sx, sy, sw, sh]) {
@@ -207,9 +282,9 @@ function contactSheet(name, cuts) {
   cuts.forEach((cut, i) => {
     const x = pad + (i % cols) * (cell + pad), y = pad + Math.floor(i / cols) * (cell + pad + 14);
     ctx.drawImage(cut.canvas, x, y, cell, cell);
-    ctx.fillStyle = cut.from === 'graphic' ? '#e8a' : '#ddd';
+    ctx.fillStyle = cut.from === 'graphic' ? '#e8a' : cut.key[0] === 'u' ? '#8ad' : '#ddd';
     ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(`${cut.rank}${cut.from === 'graphic' ? ' (graphic)' : ''}`, x + cell / 2, y + cell + 11);
+    ctx.fillText(`${cut.key}${cut.from === 'graphic' ? ' (graphic)' : ''}`, x + cell / 2, y + cell + 11);
   });
   fs.mkdirSync(WORK, { recursive: true });
   const f = `${WORK}/${name}.png`;
@@ -219,49 +294,66 @@ function contactSheet(name, cuts) {
 
 /* ── run ── */
 
-for (const name of Object.keys(GRIDS)) {
+for (const [name, party] of Object.entries(PARTIES)) {
   if (only.length && !only.includes(name)) continue;
-  const g = GRIDS[name];
+  const g = party.grid;
 
-  const src = path.join(ASSETS, 'sources', g.file);
-  if (!fs.existsSync(src)) { console.error(`✗ ${name}: no source graphic at ${src}`); continue; }
-  const graphic = await loadImage(src);
+  let graphic = null;
+  if (party.graphic) {
+    const src = path.join(ASSETS, 'sources', party.graphic);
+    if (!fs.existsSync(src)) { console.error(`✗ ${name}: no source graphic at ${src}`); continue; }
+    graphic = await loadImage(src);
+  }
+
+  const site = party.site ? await readSite(name, party.site) : { ranked: new Map(), unranked: [] };
+  const count = g ? g.count : Math.max(0, ...site.ranked.keys());
+
+  if (party.site) {
+    const missing = [];
+    for (let r = 1; r <= count; r++) if (!site.ranked.has(r)) missing.push(r);
+    console.log(`${name}: ${site.ranked.size} ranked + ${site.unranked.length} unranked from ${party.site.page}` +
+      (missing.length ? `; ranks ${missing.join(', ')} not on the site` : ''));
+  }
 
   const listFile = path.join(ASSETS, 'lists', `${name}.json`);
   const list = fs.existsSync(listFile) ? JSON.parse(fs.readFileSync(listFile, 'utf8')) : null;
-  if (list && list.candidates.length !== g.count)
-    console.warn(`⚠ ${name}: grid says ${g.count} cards, ${listFile} has ${list.candidates.length} candidates`);
-
-  const originals = SITES[name] ? await fetchOriginals(name, SITES[name], g.count) : new Map();
-  if (SITES[name]) {
-    const missing = [];
-    for (let r = 1; r <= g.count; r++) if (!originals.has(r)) missing.push(r);
-    console.log(`${name}: ${originals.size}/${g.count} originals from ${SITES[name].page}` +
-      (missing.length ? `; ranks ${missing.join(', ')} fall back to the graphic` : ''));
-  }
+  if (list && count && list.candidates.length !== count)
+    console.warn(`⚠ ${name}: ${count} ranked candidates here, ${list.candidates.length} in ${listFile}`);
 
   const cuts = [], provenance = [];
-  for (let n = 0; n < g.count; n++) {
-    const rank = n + 1;
-    const card = cardCanvas(graphic, g, n);
-    const orig = originals.get(rank);
-    let placed = null, photo = null;
-    if (orig) {
-      photo = await loadImage(orig.file);
-      placed = frameFromCard(photo, card);
-      if (!placed || placed.score < 0.55) {
-        console.warn(`⚠ ${name} #${rank}: weak match (${placed ? placed.score.toFixed(2) : 'none'}) — using the graphic instead`);
-        placed = null;
+
+  const bake = async (key, rec, cardIndex) => {
+    const file = rec ? await download(name, key, rec.url) : null;
+    if (file) {
+      const photo = await loadImage(file);
+      let placed = null;
+      if (graphic && cardIndex != null) {
+        placed = frameFromCard(photo, cardCanvas(graphic, g, cardIndex));
+        if (placed && placed.score < 0.55) {
+          console.warn(`⚠ ${name} ${key}: weak match (${placed.score.toFixed(2)}) — using the graphic instead`);
+          placed = null;
+        }
+      } else {
+        placed = { score: null, box: wholeFrame(photo) };
+      }
+      if (placed) {
+        cuts.push({ key, from: 'site', canvas: square(`${name} ${key}`, photo, placed.box) });
+        provenance.push({ key, from: 'site', url: rec.url, ...(placed.score == null ? {} : { ncc: +placed.score.toFixed(3) }) });
+        return;
       }
     }
-    if (placed) {
-      cuts.push({ rank, from: 'site', canvas: square(`${name} #${rank}`, photo, placed.box) });
-      provenance.push({ rank, from: 'site', url: orig.url, ncc: +placed.score.toFixed(3) });
+    if (graphic && cardIndex != null) {
+      cuts.push({ key, from: 'graphic', canvas: square(`${name} ${key}`, graphic, boxFor(g, cardIndex, graphic.width, graphic.height)) });
+      provenance.push({ key, from: 'graphic' });
     } else {
-      cuts.push({ rank, from: 'graphic', canvas: square(`${name} #${rank}`, graphic, boxFor(g, n, graphic.width, graphic.height)) });
-      provenance.push({ rank, from: 'graphic' });
+      console.warn(`⚠ ${name} ${key}: no usable source, skipped`);
     }
-  }
+  };
+
+  for (let rank = 1; rank <= count; rank++)
+    await bake(String(rank).padStart(2, '0'), site.ranked.get(rank), g ? rank - 1 : null);
+  for (let i = 0; i < site.unranked.length; i++)
+    await bake('u' + String(i + 1).padStart(2, '0'), site.unranked[i], null);
 
   if (preview) { console.log(`${name}: contact sheet → ${contactSheet(name, cuts)}`); continue; }
 
@@ -269,11 +361,14 @@ for (const name of Object.keys(GRIDS)) {
   fs.mkdirSync(dir, { recursive: true });
   for (const f of fs.readdirSync(dir)) if (/\.jpe?g$/i.test(f)) fs.unlinkSync(path.join(dir, f));
   for (const cut of cuts)
-    fs.writeFileSync(path.join(dir, `${String(cut.rank).padStart(2, '0')}.jpg`), cut.canvas.toBuffer('image/jpeg', QUALITY));
+    fs.writeFileSync(path.join(dir, `${cut.key}.jpg`), cut.canvas.toBuffer('image/jpeg', QUALITY));
 
   const fromSite = provenance.filter(p => p.from === 'site').length;
-  const soft = cuts.filter(c => c.canvas.width < OUT).map(c => c.rank);
-  fs.writeFileSync(path.join(dir, 'SOURCES.json'), JSON.stringify({ party: name, generated: new Date().toISOString().slice(0, 10), site: SITES[name]?.page ?? null, graphic: g.file, portraits: provenance }, null, 1));
+  const soft = cuts.filter(c => c.canvas.width < OUT).map(c => c.key);
+  fs.writeFileSync(path.join(dir, 'SOURCES.json'), JSON.stringify({
+    party: name, generated: new Date().toISOString().slice(0, 10),
+    site: party.site?.page ?? null, graphic: party.graphic ?? null, portraits: provenance,
+  }, null, 1));
   console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ${cuts.length - fromSite} from the graphic` +
     (soft.length ? `; ${soft.length} under ${OUT}px and soft: ${soft.join(', ')}` : '') + ')');
 }
