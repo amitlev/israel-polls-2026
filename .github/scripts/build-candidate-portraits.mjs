@@ -23,8 +23,9 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 const ASSETS = 'assets/candidate-lists';
 const WORK = '.leaderheads/candidates';
-const OUT = 192;            // baked square per portrait, matching the leader heads
-const QUALITY = 0.85;       // JPEG — these are photographs, and a PNG of one is ~6x the bytes
+const OUT = 192;            // CAP on the baked square, matching the leader heads — never an upscale
+const QUALITY = 92;         // JPEG, 0-100 (NOT 0-1 — @napi-rs/canvas takes the percentage).
+                            // These are photographs; a PNG of one is ~4x the bytes.
 
 /* Per graphic, all boxes in fractions of the source image:
  *   cols/rows  the grid as printed
@@ -67,11 +68,13 @@ function boxFor(g, n, W, H) {
    a nearly-square box to square it up would pull in the graphic's own background, which
    is what the aspect warning is here to catch instead. */
 function square(name, n, img, [sx, sy, sw, sh]) {
-  if (n === 0 && sw < OUT) console.warn(`⚠ ${name}: cards are ${Math.round(sw)}px in the source, baked to ${OUT} — portraits will be soft`);
   const skew = Math.abs(sw / sh - 1);
   if (skew > 0.05) console.warn(`⚠ ${name} card ${n + 1}: crop box is ${(skew * 100).toFixed(0)}% off square (${Math.round(sw)}x${Math.round(sh)}) — it will be stretched`);
-  const c = createCanvas(OUT, OUT), ctx = c.getContext('2d');
-  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, OUT, OUT);
+  /* Never enlarge past what the graphic actually holds. A card printed at 154px baked to
+     192 is bigger bytes and the same detail, and it hides how coarse the source was. */
+  const side = Math.min(OUT, Math.round(sw));
+  const c = createCanvas(side, side), ctx = c.getContext('2d');
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, side, side);
   return c;
 }
 
@@ -114,5 +117,6 @@ for (const [name, g] of Object.entries(GRIDS)) {
   fs.mkdirSync(dir, { recursive: true });
   for (const cut of cuts)
     fs.writeFileSync(path.join(dir, `${String(cut.rank).padStart(2, '0')}.jpg`), cut.canvas.toBuffer('image/jpeg', QUALITY));
-  console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${img.width}×${img.height} source)`);
+  const side = cuts[0].canvas.width;
+  console.log(`${name}: ${cuts.length} portraits at ${side}px → ${dir}/  (${img.width}×${img.height} source${side < OUT ? `, cards only ${side}px — these will be soft` : ''})`);
 }

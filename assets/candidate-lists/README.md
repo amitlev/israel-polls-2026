@@ -88,8 +88,15 @@ their tops give the row pitch, and the photo area is the gap between a plate top
 card above it. Eyeballed numbers drift a few pixels per row, and by the bottom row the
 name plate is inside the crop.
 
-They are **JPEG, not PNG**. These are photographs with no transparency, and a PNG of one
-runs about six times the bytes — 2MB for one party's 25, against 100KB.
+They are **JPEG, not PNG** — photographs with no transparency, where a PNG runs about four
+times the bytes. Note that `@napi-rs/canvas` takes JPEG quality as a **percentage, 0-100**,
+not the 0-1 the browser `toDataURL` API uses. Passing `0.85` is quality *one*, and it does
+not throw; it just quietly returns a 1KB smear.
+
+**The graphic is the resolution ceiling.** Cards in Yisrael Beiteinu's are 154px across, so
+that is what the portraits are — `OUT` is a cap, never an upscale, and the bake prints the
+card size on every run so a coarse source is visible rather than inferred from a blurry
+result. Sharper portraits need a bigger source file, not a bigger `OUT`.
 
 ## Licensing
 
