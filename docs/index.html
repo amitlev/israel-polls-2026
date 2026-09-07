@@ -2309,6 +2309,11 @@ document.getElementById('resultsBody').addEventListener('click', e => {
   segEl.querySelectorAll('button').forEach(b => b.className = '');
   btn.className = 'sel-' + btn.getAttribute('data-bloc');
   const f = getFiltered(); renderBlocHalf(f); renderHero(f); renderTugWar(f);   // donut, bloc trend, hero and the rope all depend on the assignment
+  /* The seat grid too, in its blocs cut. This handler deliberately calls renderers by name
+     rather than renderAll(), because re-rendering the table would rebuild the very buttons
+     the reader just clicked — so anything new that depends on the assignment has to be
+     added here as well, and will silently ignore bloc changes if it is not. */
+  if (typeof window.renderKnesset === 'function') window.renderKnesset(f);
 });
 document.getElementById('toggleLog').addEventListener('click', () => {
   const log = document.getElementById('pollLog'); log.classList.toggle('show');
