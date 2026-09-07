@@ -1,0 +1,352 @@
+{
+  "party": "Yashar",
+  "partyName": "ישר!",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת ישר! לכנסת ה-26, כפי שהוגשה",
+    "publisher": "כיפה / דבר",
+    "published": "2026-09-07",
+    "url": "https://kipa.co.il/חדשות/1231184-0",
+    "licence": "Names are facts reported by the press; portraits are NON-FREE party-site photographs used to identify the candidates",
+    "note": "The order is the submitted list, taken from two independent reports that agree on all 40 names (kipa 1231184, davar1 696299). The Central Elections Committee's own page (gov.il/he/pages/candidates-lists-26) publishes only the party letters and names so far, not the ordered candidates — re-check the ranks against it once the approved lists are published. Photos come from the party's own team page, which has 18 of the top 22 and predates the final list, so ranks 4, 6, 10 and 20 have none."
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "גדי איזנקוט",
+      "title": "רב-אלוף במיל'",
+      "mk": "former",
+      "gender": "m",
+      "photoKey": "Gadi Eisenkot",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/gadi-eisenkot.webp"
+      }
+    },
+    {
+      "rank": 2,
+      "name": "יורם כהן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/yoram-cohen.webp"
+      }
+    },
+    {
+      "rank": 3,
+      "name": "אורית פרקש הכהן",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
+      }
+    },
+    {
+      "rank": 4,
+      "name": "עדי אלטשולר",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 5,
+      "name": "מתן כהנא",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/matan-kahana-1.webp"
+      }
+    },
+    {
+      "rank": 6,
+      "name": "חילי טרופר",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 7,
+      "name": "שאול מרידור",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/shaul-meridor-1.webp"
+      }
+    },
+    {
+      "rank": 8,
+      "name": "תאיר איפרגן",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/tair_ifargan.webp"
+      }
+    },
+    {
+      "rank": 9,
+      "name": "אושרת גני גונן",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/אושרת-e1785318426848.png"
+      }
+    },
+    {
+      "rank": 10,
+      "name": "שירה שפירא",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 11,
+      "name": "ענבר הרוש גיטי",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-harush-giti.webp"
+      }
+    },
+    {
+      "rank": 12,
+      "name": "אלעזר שטרן",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/שטרן-סופי-e1787554647455.png"
+      }
+    },
+    {
+      "rank": 13,
+      "name": "כמיל אבו רוקן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/כמיל-רקע-שקוף-e1784736932714.png"
+      }
+    },
+    {
+      "rank": 14,
+      "name": "דבורה שריפיאן בכר",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/dvora-sharipian-bachar.webp"
+      }
+    },
+    {
+      "rank": 15,
+      "name": "אלקס ריף",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/alex-riff.webp"
+      }
+    },
+    {
+      "rank": 16,
+      "name": "ענבר יחזקאלי",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-yehezkeli-1.webp"
+      }
+    },
+    {
+      "rank": 17,
+      "name": "רועי פולקמן",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/פולקמן-e1787562888384.png"
+      }
+    },
+    {
+      "rank": 18,
+      "name": "ישראל זרי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/20260804_190314_0000-e1785915320431.png"
+      }
+    },
+    {
+      "rank": 19,
+      "name": "טל אוחנה חכמון",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/טל.png"
+      }
+    },
+    {
+      "rank": 20,
+      "name": "אליסף פרץ",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 21,
+      "name": "יפה טבג'ה",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/יפה.png"
+      }
+    },
+    {
+      "rank": 22,
+      "name": "ניר חג'בי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "photo": {
+        "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/09/IMG_3684-1-e1788428648677.webp"
+      }
+    },
+    {
+      "rank": 23,
+      "name": "רון ברקאי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 24,
+      "name": "שי פישר",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 25,
+      "name": "ליאן פולק דוד",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 26,
+      "name": "רועי כהן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 27,
+      "name": "זיו רוזן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 28,
+      "name": "ג'וסלין בש",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 29,
+      "name": "אלון פוטרמן",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 30,
+      "name": "טלי מולנר",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 31,
+      "name": "גיל אבריאל",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 32,
+      "name": "שירן בן דוד עוזרי",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 33,
+      "name": "אלירן אליה",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 34,
+      "name": "הלן גלבר",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 35,
+      "name": "שלומי יחיאב",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 36,
+      "name": "הילה מאיר",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 37,
+      "name": "רן בן עטיה",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 38,
+      "name": "אליענה זקס",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 39,
+      "name": "גידי זאגא",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 40,
+      "name": "משה דוידוביץ",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    }
+  ]
+}

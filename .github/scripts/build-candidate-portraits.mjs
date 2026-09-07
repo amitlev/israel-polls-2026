@@ -101,6 +101,15 @@ const PARTIES = {
   The_Democrats: {
     site: { page: 'https://democrats.org.il/team/', parse: 'jet-listing', leadRank: 1, leadMark: 'יו"ר' },
   },
+
+  /* No graphic and no reader: the party's team page carries no rank anywhere — not in the
+     filename, not in the DOM — so the rank/photo pairing is written onto the candidates in
+     lists/Yashar.json by hand and reviewed there. It covers 18 of the top 22; the page
+     predates the final list, so ranks 4, 6, 10 and 20 have no photograph. */
+  Yashar: {},
+
+  /* Names only. No list graphic and no party site with photographs was found. */
+  Amcha_Yisrael: {},
 };
 
 const args = process.argv.slice(2);
@@ -332,7 +341,18 @@ for (const [name, party] of Object.entries(PARTIES)) {
   }
 
   const site = party.site ? await readSite(name, party.site) : { ranked: new Map(), unranked: [] };
-  const count = g ? g.count : Math.max(0, ...site.ranked.keys());
+
+  /* A photo URL written straight onto a candidate in lists/*.json wins over anything a
+     site reader found. Every party site is a different pile of markup, and some are not
+     worth a reader of their own — Yashar's team page carries no rank anywhere, in the
+     filename or the DOM, so the pairing is done by hand once and committed where it can
+     be reviewed rather than re-derived from a layout that will change. */
+  const listEarly = fs.existsSync(path.join(ASSETS, 'lists', `${name}.json`))
+    ? JSON.parse(fs.readFileSync(path.join(ASSETS, 'lists', `${name}.json`), 'utf8')) : null;
+  for (const c of (listEarly?.candidates || []))
+    if (c.photo && c.photo.url) site.ranked.set(c.rank, { name: c.name, title: c.title ?? null, url: c.photo.url });
+
+  const count = g ? g.count : Math.max(listEarly ? listEarly.candidates.length : 0, 0, ...site.ranked.keys());
 
   if (party.site) {
     const missing = [];
@@ -414,19 +434,20 @@ async function spriteFor(name) {
     .map(f => /^(\d{2})\.jpe?g$/i.exec(f))
     .filter(Boolean).map(m => +m[1]).filter(r => r <= MAX_SEATS).sort((a, b) => a - b);
   if (!ranks.length) return null;
-  /* Ranks are dense 1..N, and the grid is indexed by rank, so a gap would silently shift
-     every later face onto the wrong person. */
-  const missing = ranks.filter((r, i) => r !== i + 1);
-  if (missing.length) throw new Error(`${name}: portraits are not a dense 1..N run (first break at ${missing[0]})`);
+  const imgs = {};
+  for (const r of ranks) imgs[r] = await loadImage(path.join(dir, `${String(r).padStart(2, '0')}.jpg`));
 
+  /* `have` maps a sprite cell back to the rank it holds, and the grid looks a rank up in it
+     rather than assuming cell = rank - 1. Coverage is not dense: Yashar's team page has 18
+     of its top 22, so ranks 4, 6, 10 and 20 have no cell at all. Assuming density would
+     shift every later face onto the wrong person. */
   const n = ranks.length, cols = Math.min(SPRITE_COLS, n), rows = Math.ceil(n / cols);
   const c = createCanvas(cols * SPRITE, rows * SPRITE), ctx = c.getContext('2d');
-  for (const r of ranks) {
-    const img = await loadImage(path.join(dir, `${String(r).padStart(2, '0')}.jpg`));
-    const i = r - 1;
+  ranks.forEach((r, i) => {
+    const img = imgs[r];
     ctx.drawImage(img, (i % cols) * SPRITE, Math.floor(i / cols) * SPRITE, SPRITE, SPRITE);
-  }
-  return { s: `data:image/webp;base64,${c.toBuffer('image/webp', SPRITE_Q).toString('base64')}`, n, c: cols, px: SPRITE };
+  });
+  return { s: `data:image/webp;base64,${c.toBuffer('image/webp', SPRITE_Q).toString('base64')}`, n, c: cols, px: SPRITE, have: ranks };
 }
 
 /* Replace-or-append after an anchor, the same idiom build-party-logos.mjs uses: the

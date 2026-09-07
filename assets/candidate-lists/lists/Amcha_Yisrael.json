@@ -1,0 +1,145 @@
+{
+  "party": "Amcha Yisrael",
+  "partyName": "עמך ישראל",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת עמך ישראל לכנסת ה-26, כפי שהוגשה",
+    "publisher": "כיפה",
+    "published": "2026-09-07",
+    "url": "https://kipa.co.il/חדשות/1231186-0",
+    "licence": "Names are facts reported by the press",
+    "note": "ORDER NOT CONFIRMED. Only one report carries a numbered submitted list (kipa 1231186); the launch-event write-ups on c14 and emess name the same people in two further, mutually inconsistent orders, because those are narrative rather than ranked. The names are solid, the ranks are not — re-check once the Central Elections Committee publishes the approved lists. No party site with photographs was found.",
+    "verify": "ranks beyond 1 and 2 need confirming against the approved list"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "עופר וינטר",
+      "title": "תא\"ל במיל'",
+      "mk": "none",
+      "gender": "m",
+      "photoKey": "Ofer Winter"
+    },
+    {
+      "rank": 2,
+      "name": "יוסף חדאד",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 3,
+      "name": "נטעלי שם טוב",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 4,
+      "name": "ערן בן-ארי",
+      "title": "עו\"ד",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 5,
+      "name": "פלר חסן-נחום",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 6,
+      "name": "ללי דרעי",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 7,
+      "name": "רונן בודנרו",
+      "title": "רס\"ן במיל'",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 8,
+      "name": "דוידי בן ציון",
+      "title": "רס\"ן במיל'",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 9,
+      "name": "אביב עזרא",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 10,
+      "name": "סיגל קראוניק-עטיה",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 11,
+      "name": "אלי ג'ינו",
+      "title": "אל\"מ במיל'",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 12,
+      "name": "אריק רובין",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 13,
+      "name": "עלם איברהים",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 14,
+      "name": "משה הר-ציון",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 15,
+      "name": "לילך חיים-אידלברג",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 16,
+      "name": "משה טולדנו",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 17,
+      "name": "רז מלכה",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 18,
+      "name": "דור יצחק",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    }
+  ]
+}
