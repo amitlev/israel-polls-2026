@@ -2995,14 +2995,21 @@ tryRefresh();
   const ROSTER  = window.CANDIDATES_DATA || {};
   const slugOf  = id => id.replace(/[^A-Za-z0-9]/g, '_');
 
-  const T = 34, GAP = 4, PITCH = T + GAP, PAD = 8, HEAD = 22, GROUP_GAP = 16, RULE = 7;
+  const T = 34, GAP = 4, PITCH = T + GAP, PAD = 8, HEAD = 26, GUTTER = 22, RULE = 8;
   const W = 900;
 
   /* Group orders are fixed, and the gender one is alphabetical in Hebrew rather than
      sorted by size — the panel should not look like it is ranking anybody. */
   const MODES = {
+    /* `columns` is the visual order RIGHT to LEFT, and it is fixed for the blocs: the
+       coalition sits on the right because that is where the right-wing bloc goes, which is
+       a political convention rather than a reading direction. The tug-of-war and the bloc
+       donut already refuse to mirror for the same reason, so an English reader sees the
+       same arrangement a Hebrew one does. The other two cuts carry no such convention, so
+       they follow the reading direction instead. */
     blocs:  { key: s => loadBlocAssign()[s.id],
-              groups: [['coal','קואליציה'], ['opp','אופוזיציה'], ['other','אחר']] },
+              groups: [['coal','קואליציה'], ['opp','אופוזיציה'], ['other','אחר']],
+              columns: ['coal', 'other', 'opp'] },
     tenure: { key: s => !s.person || s.person.mk == null ? 'unknown' : s.person.mk === 'none' ? 'new' : s.person.mk,
               groups: [['current','ח"כים מכהנים'], ['former','ח"כים לשעבר'], ['new','חדשים'], ['unknown','לא ידוע']] },
     gender: { key: s => !s.person || !s.person.g ? 'unknown' : s.person.g,
@@ -3024,42 +3031,69 @@ tryRefresh();
     return out;
   }
 
-  /* ── where each seat goes ── */
+  /* ── where each seat goes ──
+   * Groups are side-by-side COLUMNS, not stacked rows, and each column is as wide a share
+   * of the panel as its share of the 120 seats — so the picture reads as three (or four)
+   * blocks whose widths are themselves the answer. Seats fill their column in rows. */
   function layout(seats, forMode) {
     const ltr = document.documentElement.getAttribute('dir') === 'ltr';
-    const cols = Math.max(6, Math.floor((W - PAD * 2 + GAP) / PITCH));
     const m = MODES[forMode || mode];
     const bucket = {}; m.groups.forEach(([k]) => bucket[k] = []);
-    seats.forEach(s => { const k = m.key(s); (bucket[k] || bucket[m.groups[m.groups.length - 1][0]]).push(s); });
+    const last = m.groups[m.groups.length - 1][0];
+    seats.forEach(s => { const k = m.key(s); (bucket[k] || bucket[last]).push(s); });
+
+    const label = {}; m.groups.forEach(([k, l]) => label[k] = l);
+    let order = m.columns ? m.columns.slice() : m.groups.map(g => g[0]);
+    if (!m.columns && ltr) order.reverse();          /* right-to-left order either way */
+    const present = order.filter(k => bucket[k].length);
+    if (!present.length) return { pos: {}, heads: [], rules: [], height: 120 };
+
+    /* Split the available tile-columns between the groups in proportion to their seats,
+       never giving a group more columns than it has seats, then settle the rounding. */
+    const budget = Math.max(present.length * 2,
+      Math.floor((W - 2 * PAD + GAP - (present.length - 1) * GUTTER) / PITCH));
+    const counts = present.map(k => bucket[k].length);
+    const total = counts.reduce((a, b) => a + b, 0);
+    const cols = counts.map(n => Math.min(n, Math.max(2, Math.round(budget * n / total))));
+    for (let drift = cols.reduce((a, b) => a + b, 0) - budget; drift !== 0; ) {
+      const i = drift > 0 ? cols.indexOf(Math.max(...cols)) : cols.indexOf(Math.min(...cols));
+      if (drift > 0 && cols[i] <= 2) break;
+      if (drift < 0 && cols[i] >= counts[i]) break;
+      cols[i] += drift > 0 ? -1 : 1;
+      drift += drift > 0 ? -1 : 1;
+    }
 
     const pos = {}, heads = [], rules = [];
-    let y = PAD;
-    m.groups.forEach(([k, label]) => {
-      const items = bucket[k];
-      if (!items.length) return;
-      heads.push({ label, n: items.length, y: y + 12 });
-      y += HEAD;
-      items.forEach((s, i) => {
-        const col = i % cols, row = Math.floor(i / cols);
-        pos[s.key] = { x: ltr ? PAD + col * PITCH : W - PAD - T - col * PITCH, y: y + row * PITCH };
+    let rightEdge = W - PAD, maxRows = 0;
+    present.forEach((k, gi) => {
+      const items = bucket[k], c = cols[gi];
+      const width = c * PITCH - GAP;
+      const left = rightEdge - width;
+      heads.push({ label: label[k], n: items.length, y: PAD + 12, x: ltr ? left : rightEdge, anchor: ltr ? 'start' : 'end' });
+
+      items.forEach((s, j) => {
+        const col = j % c, row = Math.floor(j / c);
+        pos[s.key] = { x: ltr ? left + col * PITCH : rightEdge - T - col * PITCH, y: HEAD + row * PITCH };
       });
-      /* A coloured rule under each run of one party, per row — that is what keeps the
-         internal division by list visible without labelling 120 tiles. */
-      const rows = Math.ceil(items.length / cols);
+
+      /* A coloured rule under each run of one party, per row — what keeps the internal
+         division by list visible without labelling 120 tiles. */
+      const rows = Math.ceil(items.length / c);
+      maxRows = Math.max(maxRows, rows);
       for (let row = 0; row < rows; row++) {
-        const line = items.slice(row * cols, (row + 1) * cols);
+        const line = items.slice(row * c, (row + 1) * c);
         let i = 0;
         while (i < line.length) {
           let j = i; while (j + 1 < line.length && line[j + 1].id === line[i].id) j++;
           const a = pos[line[i].key], b = pos[line[j].key];
-          rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: y + row * PITCH + T + 2,
+          rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: HEAD + row * PITCH + T + 2,
                        color: line[i].party.color, name: line[i].party.name, span: j - i + 1 });
           i = j + 1;
         }
       }
-      y += rows * PITCH + RULE + GROUP_GAP;
+      rightEdge = left - GUTTER;
     });
-    return { pos, heads, rules, height: Math.max(120, y - GROUP_GAP + PAD) };
+    return { pos, heads, rules, height: HEAD + maxRows * PITCH + RULE + PAD };
   }
 
   /* ── nodes ── */
@@ -3112,10 +3146,8 @@ tryRefresh();
     const height = Math.max(...Object.keys(MODES).map(m => layout(seats, m).height));
     svg.setAttribute('viewBox', `0 0 ${W} ${height}`);
     const chrome = svg.querySelector('#kChrome');
-    const ltr = document.documentElement.getAttribute('dir') === 'ltr';
-    const ax = ltr ? PAD : W - PAD, anchor = ltr ? 'start' : 'end';
     chrome.innerHTML =
-      L.heads.map(h => `<text x="${ax}" y="${h.y}" text-anchor="${anchor}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
+      L.heads.map(h => `<text x="${h.x}" y="${h.y}" text-anchor="${h.anchor}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
         `<tspan dx="6" fill="${th.axis}" font-size="11" font-weight="700">${h.n}</tspan></text>`).join('') +
       L.rules.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="3" rx="1.5" fill="${r.color}"/>` +
         (r.span >= 3 ? `<text x="${r.x + r.w / 2}" y="${r.y + 12}" text-anchor="middle" fill="${th.axis}" font-size="8.5" font-weight="700">${esc(r.name)}</text>` : '')).join('');

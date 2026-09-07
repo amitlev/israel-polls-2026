@@ -6,7 +6,7 @@ A live, self-contained dashboard for tracking Israeli 2026 Knesset election poll
 
 - Per-party seat averages and medians with party-leader photos, over 141+ polls (Jan-Jul 2026)
 - TV-style coalition/opposition half-donut with a 61-seat majority marker
-- **A 120-seat Knesset made of faces** — the seat average cashed out into 120 actual candidates, drawn from the parties' published lists, and re-cuttable by bloc, by ותק (sitting MK / former MK / new) or by gender. Switching the cut moves every face across the screen to its new place rather than redrawing
+- **A 120-seat Knesset made of faces** — the seat average cashed out into 120 actual candidates, drawn from the parties' published lists, and re-cuttable by bloc, by ותק (sitting MK / former MK / new) or by gender. Each group is a vertical column as wide a share of the panel as its share of the 120, so the widths are themselves the answer; the coalition column sits on the right in every language, the same convention the tug-of-war and the donut already follow. Switching the cut moves every face across the screen to its new place rather than redrawing
 - Trend charts for parties and blocs, with independent date-range sliders
 - Assign any party to coalition / opposition / other and watch the blocs recompute
 - Auto-refreshes new polls from [Wikipedia's polling page](https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election) every time it opens
