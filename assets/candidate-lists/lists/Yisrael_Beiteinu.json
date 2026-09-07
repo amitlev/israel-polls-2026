@@ -13,30 +13,180 @@
     "note": "Transcribed by hand from the graphic."
   },
   "candidates": [
-    { "rank": 1,  "name": "אביגדור ליברמן",   "title": null,           "mk": "current" },
-    { "rank": 2,  "name": "רפי בן שטרית",      "title": null,           "mk": null },
-    { "rank": 3,  "name": "טליה לנקרי",        "title": "אל\"מ במיל'",  "mk": null },
-    { "rank": 4,  "name": "עודד פורר",         "title": null,           "mk": "current" },
-    { "rank": 5,  "name": "יוליה מלינובסקי",   "title": null,           "mk": "current" },
-    { "rank": 6,  "name": "שרון שרעבי",        "title": null,           "mk": null },
-    { "rank": 7,  "name": "חמד עמאר",          "title": null,           "mk": "current" },
-    { "rank": 8,  "name": "יבגני סובה",        "title": null,           "mk": "current" },
-    { "rank": 9,  "name": "אלוירה קוליחמן",    "title": null,           "mk": null },
-    { "rank": 10, "name": "דן אילוז",          "title": null,           "mk": "former" },
-    { "rank": 11, "name": "לילי בן עמי",       "title": null,           "mk": null },
-    { "rank": 12, "name": "יעל בנבנישתי",      "title": "ד\"ר",         "mk": null },
-    { "rank": 13, "name": "דוד אזולאי",        "title": null,           "mk": null },
-    { "rank": 14, "name": "לימור מגן-תלם",     "title": null,           "mk": "former" },
-    { "rank": 15, "name": "ישראל בן שטרית",    "title": "סרן במיל'",    "mk": null },
-    { "rank": 16, "name": "שרון רופא אופיר",   "title": null,           "mk": "former" },
-    { "rank": 17, "name": "מור דקל",           "title": null,           "mk": null },
-    { "rank": 18, "name": "מיכאלה לוין-שמיר",  "title": "עו\"ד",        "mk": null },
-    { "rank": 19, "name": "אוליביה רפוביץ'",   "title": "אל\"מ במיל'",  "mk": null },
-    { "rank": 20, "name": "יעקב (ינקי) מוזס",  "title": "רס\"ן במיל'",  "mk": null },
-    { "rank": 21, "name": "עמי קור",           "title": null,           "mk": null },
-    { "rank": 22, "name": "מאיה פלומבוים",     "title": null,           "mk": null },
-    { "rank": 23, "name": "עדי מורדכייב",      "title": "עו\"ד",        "mk": null },
-    { "rank": 24, "name": "מיכל אורון עזאני",  "title": null,           "mk": null },
-    { "rank": 25, "name": "סתיו בויאנג'ו-מצא", "title": "עו\"ד",        "mk": null }
+    {
+      "rank": 1,
+      "name": "אביגדור ליברמן",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 2,
+      "name": "רפי בן שטרית",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 3,
+      "name": "טליה לנקרי",
+      "title": "אל\"מ במיל'",
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 4,
+      "name": "עודד פורר",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 5,
+      "name": "יוליה מלינובסקי",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 6,
+      "name": "שרון שרעבי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 7,
+      "name": "חמד עמאר",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 8,
+      "name": "יבגני סובה",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 9,
+      "name": "אלוירה קוליחמן",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 10,
+      "name": "דן אילוז",
+      "title": null,
+      "mk": "former",
+      "gender": "m"
+    },
+    {
+      "rank": 11,
+      "name": "לילי בן עמי",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 12,
+      "name": "יעל בנבנישתי",
+      "title": "ד\"ר",
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 13,
+      "name": "דוד אזולאי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 14,
+      "name": "לימור מגן-תלם",
+      "title": null,
+      "mk": "former",
+      "gender": "f"
+    },
+    {
+      "rank": 15,
+      "name": "ישראל בן שטרית",
+      "title": "סרן במיל'",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 16,
+      "name": "שרון רופא אופיר",
+      "title": null,
+      "mk": "former",
+      "gender": "f"
+    },
+    {
+      "rank": 17,
+      "name": "מור דקל",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 18,
+      "name": "מיכאלה לוין-שמיר",
+      "title": "עו\"ד",
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 19,
+      "name": "אוליביה רפוביץ'",
+      "title": "אל\"מ במיל'",
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 20,
+      "name": "יעקב (ינקי) מוזס",
+      "title": "רס\"ן במיל'",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 21,
+      "name": "עמי קור",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 22,
+      "name": "מאיה פלומבוים",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 23,
+      "name": "עדי מורדכייב",
+      "title": "עו\"ד",
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 24,
+      "name": "מיכל אורון עזאני",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 25,
+      "name": "סתיו בויאנג'ו-מצא",
+      "title": "עו\"ד",
+      "mk": "none",
+      "gender": "f"
+    }
   ]
 }

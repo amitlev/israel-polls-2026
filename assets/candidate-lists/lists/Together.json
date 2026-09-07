@@ -13,40 +13,257 @@
     "note": "Order is from the graphic and corroborated by the site, which numbers its photo filenames. Names are the site's; where the graphic spells one differently that is kept in nameOnGraphic. Rank 32 is on the graphic but has no card on the site at all."
   },
   "candidates": [
-    { "rank": 1,  "name": "נפתלי בנט",          "title": null, "mk": null, "photoKey": "Naftali Bennett" },
-    { "rank": 2,  "name": "יאיר לפיד",           "title": null, "mk": null, "photoKey": "Yair Lapid" },
-    { "rank": 3,  "name": "קרן טרנר",            "title": null, "mk": null },
-    { "rank": 4,  "name": "מירב בן ארי",         "title": null, "mk": null },
-    { "rank": 5,  "name": "לירן אבישר בן חורין", "title": null, "mk": null },
-    { "rank": 6,  "name": "נעם תיבון",           "title": null, "mk": null },
-    { "rank": 7,  "name": "מיכל נגרי",           "title": null, "mk": null, "nameOnGraphic": "מיכל הירש נגרי" },
-    { "rank": 8,  "name": "איתן גינזבורג",       "title": null, "mk": null },
-    { "rank": 9,  "name": "מירב כהן",            "title": null, "mk": null },
-    { "rank": 10, "name": "יונתן שלו",           "title": null, "mk": null },
-    { "rank": 11, "name": "ברוריה נעים ארמן",    "title": null, "mk": null },
-    { "rank": 12, "name": "רם בן ברק",           "title": null, "mk": null },
-    { "rank": 13, "name": "אמיר סטרוגו",         "title": null, "mk": null },
-    { "rank": 14, "name": "נאור שירי",           "title": null, "mk": null },
-    { "rank": 15, "name": "ניסן זאבי",           "title": null, "mk": null },
-    { "rank": 16, "name": "ולדימיר בליאק",       "title": null, "mk": null },
-    { "rank": 17, "name": "אורלי הראל",          "title": null, "mk": null },
-    { "rank": 18, "name": "יוראי להב הרצנו",     "title": null, "mk": null },
-    { "rank": 19, "name": "שחר ורון",            "title": null, "mk": null },
-    { "rank": 20, "name": "יסמין סאקס פרידמן",   "title": null, "mk": null },
-    { "rank": 21, "name": "אסתי איילון קובו",    "title": null, "mk": null },
-    { "rank": 22, "name": "נטע אטיאס",           "title": null, "mk": null },
-    { "rank": 23, "name": "ג'רמי סלטן",          "title": null, "mk": null, "nameOnGraphic": "ג'רמי סולטן" },
-    { "rank": 24, "name": "משה \"קינלי\" טור-פז", "title": null, "mk": null },
-    { "rank": 25, "name": "צבי פלוטניצקי",       "title": null, "mk": null },
-    { "rank": 26, "name": "אולסיה קנטור",        "title": null, "mk": null, "nameOnGraphic": "אוליסיה קנטור" },
-    { "rank": 27, "name": "סימון דוידסון",       "title": null, "mk": null },
-    { "rank": 28, "name": "מתי גיל",             "title": null, "mk": null },
-    { "rank": 29, "name": "שלי טל מירון",        "title": null, "mk": null },
-    { "rank": 30, "name": "תומר וינר",           "title": null, "mk": null },
-    { "rank": 31, "name": "רוני פנטנש מלכאי",    "title": null, "mk": null },
-    { "rank": 32, "name": "תמי מזאל שחר",        "title": null, "mk": null, "verify": "on the graphic only — the party site has no card for rank 32" },
-    { "rank": 33, "name": "מטי צרפתי הרכבי",     "title": null, "mk": null },
-    { "rank": 34, "name": "יעל לין שטרן",        "title": null, "mk": null, "nameOnGraphic": "יעל שטרן" },
-    { "rank": 35, "name": "עמית ברדה",           "title": null, "mk": null }
+    {
+      "rank": 1,
+      "name": "נפתלי בנט",
+      "title": null,
+      "mk": "former",
+      "photoKey": "Naftali Bennett",
+      "gender": "m"
+    },
+    {
+      "rank": 2,
+      "name": "יאיר לפיד",
+      "title": null,
+      "mk": "current",
+      "photoKey": "Yair Lapid",
+      "gender": "m"
+    },
+    {
+      "rank": 3,
+      "name": "קרן טרנר",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 4,
+      "name": "מירב בן ארי",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 5,
+      "name": "לירן אבישר בן חורין",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 6,
+      "name": "נעם תיבון",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 7,
+      "name": "מיכל נגרי",
+      "title": null,
+      "mk": "none",
+      "nameOnGraphic": "מיכל הירש נגרי",
+      "gender": "f"
+    },
+    {
+      "rank": 8,
+      "name": "איתן גינזבורג",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 9,
+      "name": "מירב כהן",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 10,
+      "name": "יונתן שלו",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 11,
+      "name": "ברוריה נעים ארמן",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 12,
+      "name": "רם בן ברק",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 13,
+      "name": "אמיר סטרוגו",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 14,
+      "name": "נאור שירי",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 15,
+      "name": "ניסן זאבי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 16,
+      "name": "ולדימיר בליאק",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 17,
+      "name": "אורלי הראל",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 18,
+      "name": "יוראי להב הרצנו",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 19,
+      "name": "שחר ורון",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 20,
+      "name": "יסמין סאקס פרידמן",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 21,
+      "name": "אסתי איילון קובו",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 22,
+      "name": "נטע אטיאס",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 23,
+      "name": "ג'רמי סלטן",
+      "title": null,
+      "mk": "none",
+      "nameOnGraphic": "ג'רמי סולטן",
+      "gender": "m"
+    },
+    {
+      "rank": 24,
+      "name": "משה \"קינלי\" טור-פז",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 25,
+      "name": "צבי פלוטניצקי",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 26,
+      "name": "אולסיה קנטור",
+      "title": null,
+      "mk": "none",
+      "nameOnGraphic": "אוליסיה קנטור",
+      "gender": "f"
+    },
+    {
+      "rank": 27,
+      "name": "סימון דוידסון",
+      "title": null,
+      "mk": "current",
+      "gender": "m"
+    },
+    {
+      "rank": 28,
+      "name": "מתי גיל",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 29,
+      "name": "שלי טל מירון",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 30,
+      "name": "תומר וינר",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    },
+    {
+      "rank": 31,
+      "name": "רוני פנטנש מלכאי",
+      "title": null,
+      "mk": "none",
+      "gender": "f"
+    },
+    {
+      "rank": 32,
+      "name": "תמי מזאל שחר",
+      "title": null,
+      "mk": "none",
+      "verify": "on the graphic only — the party site has no card for rank 32",
+      "gender": "f"
+    },
+    {
+      "rank": 33,
+      "name": "מטי צרפתי הרכבי",
+      "title": null,
+      "mk": "current",
+      "gender": "f"
+    },
+    {
+      "rank": 34,
+      "name": "יעל לין שטרן",
+      "title": null,
+      "mk": "none",
+      "nameOnGraphic": "יעל שטרן",
+      "gender": "f"
+    },
+    {
+      "rank": 35,
+      "name": "עמית ברדה",
+      "title": null,
+      "mk": "none",
+      "gender": "m"
+    }
   ]
 }

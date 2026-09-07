@@ -69,11 +69,11 @@ silently dropped from every poll. See the "New-party detection" note in the root
   against "יעל שטרן". The site wins, because it is the copy the party maintains; the
   graphic's spelling is kept beside it rather than thrown away, since neither source is
   reliably the fuller one.
-- **`mk`** is the parliamentary status: `"current"` where the graphic printed **ח"כ**,
-  `"former"` where it printed **חכ"ל** (ח"כ לשעבר), `null` otherwise. It records what the
-  party's own graphic claimed — it is not checked against the Knesset roster. The one
-  deliberate exception is the party leader, whom the graphic leaves unmarked because the
-  header already names them.
+- **`mk`** is the parliamentary status — `"current"`, `"former"` or `"none"` — and it comes
+  from the Knesset's own roll, not from the party. `npm run enrich:candidates` fills it (see
+  below). `null` means *not yet determined*, which is not the same as `"none"`: a null must
+  never be grouped in with genuinely new candidates.
+- **`gender`** is `"f"` or `"m"`, from the same script. `null` again means undetermined.
 - **`title`** is the professional or military title and *only* that — `ד"ר`, `עו"ד`,
   `אל"מ במיל'`, `סרן במיל'`. Never ח"כ or חכ"ל; those are `mk`, and carrying them in both
   places would let the two disagree.
@@ -90,6 +90,35 @@ silently dropped from every poll. See the "New-party detection" note in the root
   order and must never be shown as one** — and each entry's `photo` names its portrait
   (`u07` → `portraits/The_Democrats/u07.jpg`), which is what keeps the file numbering stable
   when a name is added and the alphabetical positions shift.
+
+## `mk` and `gender`
+
+`npm run enrich:candidates` fills both from the Knesset's OData service
+(`KNS_Person` + `KNS_PersonToPosition`, ~1,200 people and ~8,000 terms, cached under
+`.leaderheads/knesset/`). Report-only by default; `-- --write` applies it.
+
+Four things it knows that are easy to get wrong:
+
+- **`KNS_Position` is gendered.** 43 is "חבר הכנסת" and 61 is "חברת הכנסת". Filtering on 43
+  alone silently drops every woman in the Knesset's history — it read Naama Lazimi, Efrat
+  Rayten and Shelly Tal Meron as having never served.
+- **`IsCurrent`, not "has a term in the 25th".** A term row records that someone served, not
+  that they still do. Dan Illouz's 25th-Knesset term ended on 2026-08-13, so the naive rule
+  called him a sitting MK where Yisrael Beiteinu's own graphic correctly says former.
+- **An exact name match is not proof of identity.** The roll holds one דוד אזולאי — the Shas
+  MK, who died in 2018 — and Yisrael Beiteinu's 13th candidate matched him perfectly. No
+  string matching catches that, so every current/former call is printed on each run and the
+  `RESOLVED` table records the ones a human has ruled on.
+- **A given name is not evidence of gender.** The roll answers for anyone who has served;
+  for everyone else there is a `NAME_GENDER` table of names that are unambiguous in Hebrew,
+  and a per-person `GENDER` table for the ones that are not. This list already carries a
+  שרון who is a man and a שרון who is a woman, and an אוליביה of each — the second being
+  Olivier rather than Olivia. Check them against the faces: `npm run build:candidates --
+  --preview` tints every label by its recorded gender and marks ותק with ● / ○.
+
+Where the roll disagrees with what the party's graphic printed, both are reported and
+neither wins automatically. That is how Yair Golan's entry got fixed: Meretz missed the
+threshold in 2022, so he is a *former* MK and the hand-entered "current" was wrong.
 
 ## Site readers
 

@@ -8,7 +8,8 @@
     "update:govil": "node .github/scripts/update-govil-polls.mjs",
     "build:heads": "node .github/scripts/build-leader-heads.mjs",
     "build:logos": "node .github/scripts/build-party-logos.mjs",
-    "build:candidates": "node .github/scripts/build-candidate-portraits.mjs"
+    "build:candidates": "node .github/scripts/build-candidate-portraits.mjs",
+    "enrich:candidates": "node .github/scripts/enrich-candidates.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^0.1.80",

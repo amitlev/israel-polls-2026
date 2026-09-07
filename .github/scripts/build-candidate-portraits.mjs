@@ -273,18 +273,32 @@ function square(label, img, [sx, sy, sw, sh]) {
   return c;
 }
 
-function contactSheet(name, cuts) {
+/* The label is tinted by the candidate's recorded gender and marked with their ותק, so a
+   wrong value in lists/*.json is one glance at one image rather than 111 JSON rows. That
+   check has to be visual: gender is derived from the Knesset roll where the person has
+   served and from a given-name table otherwise, and neither can see a face. */
+const GENDER_INK = { f: '#f49ac1', m: '#7ec8ff' };
+const MK_MARK = { current: '\u25cf', former: '\u25cb' };   // filled = sitting, hollow = former
+
+function contactSheet(name, cuts, meta) {
   const cols = 6, cell = 150, pad = 5;
   const rows = Math.ceil(cuts.length / cols);
-  const c = createCanvas(cols * (cell + pad) + pad, rows * (cell + pad + 14) + pad);
+  const c = createCanvas(cols * (cell + pad) + pad, rows * (cell + pad + 26) + pad);
   const ctx = c.getContext('2d');
   ctx.fillStyle = '#222'; ctx.fillRect(0, 0, c.width, c.height);
   cuts.forEach((cut, i) => {
-    const x = pad + (i % cols) * (cell + pad), y = pad + Math.floor(i / cols) * (cell + pad + 14);
+    const x = pad + (i % cols) * (cell + pad), y = pad + Math.floor(i / cols) * (cell + pad + 26);
     ctx.drawImage(cut.canvas, x, y, cell, cell);
+    const m = meta.get(cut.key);
+    ctx.textAlign = 'center';
     ctx.fillStyle = cut.from === 'graphic' ? '#e8a' : cut.key[0] === 'u' ? '#8ad' : '#ddd';
-    ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(`${cut.key}${cut.from === 'graphic' ? ' (graphic)' : ''}`, x + cell / 2, y + cell + 11);
+    ctx.font = '11px sans-serif';
+    ctx.fillText(`${cut.key}${cut.from === 'graphic' ? ' (graphic)' : ''}${m && m.mk !== 'none' ? ' ' + (MK_MARK[m.mk] || '?') : ''}`, x + cell / 2, y + cell + 11);
+    if (m) {
+      ctx.fillStyle = GENDER_INK[m.gender] || '#f66';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(m.gender ? m.name : m.name + ' — NO GENDER', x + cell / 2, y + cell + 23);
+    }
   });
   fs.mkdirSync(WORK, { recursive: true });
   const f = `${WORK}/${name}.png`;
@@ -317,6 +331,9 @@ for (const [name, party] of Object.entries(PARTIES)) {
 
   const listFile = path.join(ASSETS, 'lists', `${name}.json`);
   const list = fs.existsSync(listFile) ? JSON.parse(fs.readFileSync(listFile, 'utf8')) : null;
+  const meta = new Map();
+  for (const cand of (list?.candidates || [])) meta.set(String(cand.rank).padStart(2, '0'), cand);
+  for (const cand of (list?.unranked || [])) meta.set(cand.photo, cand);
   if (list && count && list.candidates.length !== count)
     console.warn(`⚠ ${name}: ${count} ranked candidates here, ${list.candidates.length} in ${listFile}`);
 
@@ -355,7 +372,7 @@ for (const [name, party] of Object.entries(PARTIES)) {
   for (let i = 0; i < site.unranked.length; i++)
     await bake('u' + String(i + 1).padStart(2, '0'), site.unranked[i], null);
 
-  if (preview) { console.log(`${name}: contact sheet → ${contactSheet(name, cuts)}`); continue; }
+  if (preview) { console.log(`${name}: contact sheet → ${contactSheet(name, cuts, meta)}`); continue; }
 
   const dir = path.join(ASSETS, 'portraits', name);
   fs.mkdirSync(dir, { recursive: true });
