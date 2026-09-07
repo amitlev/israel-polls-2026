@@ -192,7 +192,9 @@
   },
   {
    "key": "32",
-   "from": "graphic"
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/32-תמי-מזאל-2.png",
+   "ncc": 0.876
   },
   {
    "key": "33",

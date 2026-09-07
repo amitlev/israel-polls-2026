@@ -37,6 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { FILES, regenAll } from './lib/restore-chunks.mjs';
 
 const ASSETS = 'assets/candidate-lists';
 const WORK = '.leaderheads/candidates';
@@ -44,6 +45,17 @@ const OUT = 192;            // CAP on the baked square, matching the leader head
 const QUALITY = 92;         // JPEG, 0-100 (NOT 0-1 — @napi-rs/canvas takes the percentage).
                             // These are photographs; a PNG of one is ~4x the bytes.
 const UA = { 'User-Agent': 'israel-polls-2026-dashboard/1.0 (https://github.com/amitlev/israel-polls-2026; candidate portrait bake)' };
+
+/* What gets spliced into the dashboard, which is a different question from what gets
+   committed to portraits/. The seat grid draws faces at ~34px, so 64 is a retina tile and
+   anything larger is bytes with nothing in them. They go in as ONE sprite per party rather
+   than 30 data URIs: WebP compresses a sheet better than 30 separate images, and it is one
+   base64 string in the HTML instead of thirty.
+   Bytes here are not paid once. Every poll update rewrites all 20 .restore chunks in full,
+   twice a day, so anything added to the page is re-committed some 730 times a year. That
+   is the whole reason for 64px and for sprites — do not raise either casually. */
+const SPRITE = 64, SPRITE_COLS = 8, SPRITE_Q = 80;
+const MAX_SEATS = 40;   // no party has ever polled near this; ranks past it can win no seat
 
 /* ── the parties ────────────────────────────────────────────────────────────────────
  *
@@ -388,4 +400,76 @@ for (const [name, party] of Object.entries(PARTIES)) {
   }, null, 1));
   console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ${cuts.length - fromSite} from the graphic` +
     (soft.length ? `; ${soft.length} under ${OUT}px and soft: ${soft.join(', ')}` : '') + ')');
+}
+
+
+/* ── the blobs the dashboard reads ──
+ * Built from what is committed under portraits/ and lists/, not from this run's output, so
+ * `-- Together` still splices every party rather than blanking the other sixteen. */
+
+async function spriteFor(name) {
+  const dir = path.join(ASSETS, 'portraits', name);
+  if (!fs.existsSync(dir)) return null;
+  const ranks = fs.readdirSync(dir)
+    .map(f => /^(\d{2})\.jpe?g$/i.exec(f))
+    .filter(Boolean).map(m => +m[1]).filter(r => r <= MAX_SEATS).sort((a, b) => a - b);
+  if (!ranks.length) return null;
+  /* Ranks are dense 1..N, and the grid is indexed by rank, so a gap would silently shift
+     every later face onto the wrong person. */
+  const missing = ranks.filter((r, i) => r !== i + 1);
+  if (missing.length) throw new Error(`${name}: portraits are not a dense 1..N run (first break at ${missing[0]})`);
+
+  const n = ranks.length, cols = Math.min(SPRITE_COLS, n), rows = Math.ceil(n / cols);
+  const c = createCanvas(cols * SPRITE, rows * SPRITE), ctx = c.getContext('2d');
+  for (const r of ranks) {
+    const img = await loadImage(path.join(dir, `${String(r).padStart(2, '0')}.jpg`));
+    const i = r - 1;
+    ctx.drawImage(img, (i % cols) * SPRITE, Math.floor(i / cols) * SPRITE, SPRITE, SPRITE);
+  }
+  return { s: `data:image/webp;base64,${c.toBuffer('image/webp', SPRITE_Q).toString('base64')}`, n, c: cols, px: SPRITE };
+}
+
+/* Replace-or-append after an anchor, the same idiom build-party-logos.mjs uses: the
+   replacement is passed as a function so a `$&` inside base64 can never be interpreted,
+   and the append branch closes and reopens <script> so each blob keeps its own block. */
+function splice(pairs) {
+  for (const f of FILES) {
+    let html = fs.readFileSync(f, 'utf8');
+    let anchor = /(window\.PARTY_LOGOS_DATA = \{.*?\};\n)/s;
+    for (const [global, blob] of pairs) {
+      const line = `window.${global} = ${JSON.stringify(blob)};`;
+      const existing = new RegExp(`window\\.${global} = \\{.*?\\};`, 's');
+      if (existing.test(html)) html = html.replace(existing, () => line);
+      else {
+        if (!anchor.test(html)) throw new Error(`could not find where to splice ${global} in ${f}`);
+        html = html.replace(anchor, (_, m) => `${m}</script>\n<script>\n${line}\n`);
+      }
+      anchor = new RegExp(`(window\\.${global} = \\{.*?\\};\\n)`, 's');
+    }
+    fs.writeFileSync(f, html);
+  }
+  regenAll();
+}
+
+if (!preview) {
+  const sprites = {}, people = {};
+  for (const name of Object.keys(PARTIES)) {
+    const sp = await spriteFor(name);
+    if (sp) sprites[name] = sp;
+    const listFile = path.join(ASSETS, 'lists', `${name}.json`);
+    if (!fs.existsSync(listFile)) continue;
+    const list = JSON.parse(fs.readFileSync(listFile, 'utf8'));
+    /* Ranked only. A seat is a position, and the `unranked` array has none — the README is
+       emphatic that its alphabetical order must never be read as a list order. */
+    people[name] = (list.candidates || []).filter(c => c.rank <= MAX_SEATS)
+      .sort((a, b) => a.rank - b.rank)
+      .map(c => ({ r: c.rank, n: c.name, g: c.gender ?? null, mk: c.mk ?? null }));
+  }
+  const before = fs.statSync(FILES[0]).size;
+  splice([['CANDIDATE_SPRITES_DATA', sprites], ['CANDIDATES_DATA', people]]);
+  const kb = n => (n / 1024).toFixed(0) + 'KB';
+  const spriteBytes = Object.values(sprites).reduce((a, s) => a + s.s.length, 0);
+  console.log(`\nspliced ${Object.keys(sprites).length} sprites (${kb(spriteBytes)}) and ` +
+    `${Object.values(people).reduce((a, p) => a + p.length, 0)} candidates into both HTML files; ` +
+    `${kb(before)} \u2192 ${kb(fs.statSync(FILES[0]).size)}`);
 }
