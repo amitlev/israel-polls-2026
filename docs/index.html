@@ -1034,7 +1034,46 @@ if (window.IL_LANG !== 'he') {
   Object.keys(OUTLET_HE).forEach(k => { const o = (window.IL_OUTLET[k] || {})[L]; if (o) OUTLET_HE[k] = o; });
 }
 
-let POLLS = [...BASE_POLLS];
+/* From 2026-09-09 00:01 Israel time the Arab lists are shown the way they are running:
+   הרשימה המשותפת and רע"ם, with no separate חד"ש-תע"ל and בל"ד. Israel is on IDT (UTC+3)
+   in September, so this is a fixed instant rather than a local-midnight calculation.
+
+   The merge SUMS rather than hides. The Joint List *is* Hadash-Ta'al + Balad, and no poll
+   ever carries both framings at once, so folding the halves into the whole is a no-op on
+   the polls that asked the Joint List question and an exact fold on the ones that asked
+   the other. Every poll still totals 120 and no bloc total moves. Ra'am is untouched.
+
+   It happens here, once, where POLLS is built — and again on the refresh path — so all
+   eight widgets, the forecast's own window and the seat grid inherit it without eight
+   separate edits. update-polls.mjs is deliberately NOT changed: Wikipedia may keep
+   publishing separate columns and the scraper must keep storing them, because this is a
+   presentation rule and the raw data has to stay re-derivable.
+
+   What this does NOT fix: in the 23 polls from 29 Jan to 26 Apr the "Joint List" column
+   meant all three lists *including* Ra'am (mean 13.17 seats, against 6.89 from 11 Jun
+   onward). Summing the halves is right for the later polls and changes nothing about the
+   earlier ones, so that stretch stays over-counted and a date range dragged back before
+   June still shows the bloc jump. Splitting the pre-June column into its own key remains
+   the outstanding fix. */
+const ARAB_MERGE_AT = Date.UTC(2026, 8, 8, 21, 1);
+const arabMerged = () => Date.now() >= ARAB_MERGE_AT;
+const ARAB_HALVES = ["Hadash-Ta'al", 'Balad'];
+
+function mergeArabLists(polls) {
+  if (!arabMerged()) return polls;
+  return polls.map(poll => {
+    const vals = ['Joint List', ...ARAB_HALVES].map(k => poll[k]).filter(v => v !== null && v !== undefined);
+    if (!vals.length) return poll;   /* a poll that named none of them keeps its nulls */
+    const out = { ...poll, 'Joint List': vals.reduce((a, b) => a + b, 0) };
+    for (const k of ARAB_HALVES) delete out[k];
+    return out;
+  });
+}
+
+/* The same flag a party superseded by a merger already carries (Yesh Atid, Bennett 2026). */
+if (arabMerged()) PARTIES.forEach(p => { if (ARAB_HALVES.includes(p.id)) p.active = false; });
+
+let POLLS = mergeArabLists([...BASE_POLLS]);
 let lastFiltered = [];
 const WIKI_URL = "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election";
 const MAX_BAKED_DATE = BASE_POLLS.map(p => p.date).sort().pop();
@@ -1303,7 +1342,7 @@ async function fetchFreshPolls() {
     if (fresh.length > 0) {
       const oldMax = POLLS.map(p => p.date).sort().pop();
       const wasAtEnd = dateSlider.getHiIso() === oldMax;   // only auto-extend if the user was viewing up to the latest
-      POLLS = [...POLLS, ...fresh].sort((a,b) => a.date < b.date ? -1 : 1);
+      POLLS = [...POLLS, ...mergeArabLists(fresh)].sort((a,b) => a.date < b.date ? -1 : 1);
       initBounds(true); rebuildOutlets();
       if (wasAtEnd) dateSlider.setRange(dateSlider.getLoIso(), POLLS[POLLS.length-1].date, true); // reveal the new polls
       if (typeof window.updateForecast === 'function') window.updateForecast(); // re-run the bloc-majority forecast on the new data
@@ -1334,8 +1373,12 @@ async function tryRefresh() {
    set of voters, and anything that reads them as three simultaneous lists —
    adding them up, or drawing them independently — is wrong.
    Per-poll code needs no special care (each poll only ever fills one framing);
-   it is code that averages or simulates across polls that has to know. */
-const ARAB_JOINT_GROUP = ['Joint List', "Hadash-Ta'al", 'Balad'];
+   it is code that averages or simulates across polls that has to know.
+
+   Once mergeArabLists() has folded the halves into the whole there is only one framing
+   left, so the collapse that averaging and simulation code does becomes a no-op — from
+   this one switch, rather than from an edit at every site that uses it. */
+const ARAB_JOINT_GROUP = arabMerged() ? ['Joint List'] : ['Joint List', ...ARAB_HALVES];
 
 /* Where each party starts on the rope. Deliberately separate from GOV_PARTIES above:
    that list is the sitting government's actual membership and is used to validate
