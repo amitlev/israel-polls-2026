@@ -4,6 +4,7 @@ A live, self-contained dashboard for tracking Israeli 2026 Knesset election poll
 
 **Features**
 
+- **A ballot slip counting down to the vote** — days to 27 Oct 2026 on a white paper slip, and a live countdown to the polls closing at 22:00. The day count is resolved in Asia/Jerusalem so a reader abroad still sees Israel's answer, and poll close is a fixed instant: Israeli daylight time ends on the last Sunday of October, the 25th, so 22:00 that day is UTC+2 rather than +3
 - Per-party seat averages and medians with party-leader photos, over 141+ polls (Jan-Jul 2026)
 - TV-style coalition/opposition half-donut with a 61-seat majority marker
 - **A 120-seat Knesset made of faces** — the seat average cashed out into 120 actual candidates, drawn from the parties' published lists, and re-cuttable by bloc, by ותק (sitting MK / former MK / new) or by gender. Each group is a vertical column as wide a share of the panel as its share of the 120, so the widths are themselves the answer; the coalition column sits on the right in every language, the same convention the tug-of-war and the donut already follow. Switching the cut moves every face across the screen to its new place rather than redrawing

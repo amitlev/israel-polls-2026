@@ -169,6 +169,17 @@
     "העתקה נכשלה": { ar: "فشل النسخ", en: "Copy failed" },
     "לוח הסקרים המלא": { ar: "لوحة الاستطلاعات الكاملة", en: "Full polling dashboard" },
     /* chrome */
+    "ימים לבחירות": { ar: "أيام حتى الانتخابات", en: "days to the election" },
+    "יום לבחירות": { ar: "يوم حتى الانتخابات", en: "day to the election" },
+    "יום הבחירות": { ar: "يوم الانتخابات", en: "Election day" },
+    "היום": { ar: "اليوم", en: "Today" },
+    "הסתיים": { ar: "انتهت", en: "Over" },
+    "עד לסגירת הקלפיות": { ar: "حتى إغلاق صناديق الاقتراع", en: "until the polls close" },
+    "הקלפיות נסגרו": { ar: "أُغلقت صناديق الاقتراع", en: "The polls have closed" },
+    "ימים": { ar: "أيام", en: "days" },
+    "שעות": { ar: "ساعات", en: "hours" },
+    "דקות": { ar: "دقائق", en: "min" },
+    "שניות": { ar: "ثوان", en: "sec" },
     "כך תיראה הכנסת": { ar: "هكذا سيبدو الكنيست", en: "How the Knesset would look" },
     "גושים": { ar: "الكتل", en: "Blocs" },
     "ותק": { ar: "الأقدمية", en: "Tenure" },
@@ -768,6 +779,31 @@
   .hero-sub { color:var(--muted); font-size:14.5px; line-height:1.6; margin:0 0 14px; max-width:48ch; }
   .hero-forecast { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--muted); background:var(--card-2); border:1px solid var(--border); border-radius:30px; padding:7px 15px; }
   .hero-forecast .hf-pct { font-size:19px; font-weight:900; }
+  .hero-inner { display:flex; align-items:flex-start; gap:26px; flex-wrap:wrap; }
+  .hero-lead { flex:1 1 380px; min-width:0; }
+  .hero-clock { flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:10px; }
+
+  /* A real ballot slip is white paper with black letters, so this one stays white in dark
+     mode too — the same call the party-logo tiles make, and for the same reason: inverting
+     it would stop it reading as the thing it is imitating. */
+  .ballot { background:#fdfdfb; color:#111; border:1px solid #cfcabd; border-radius:3px;
+    padding:14px 30px 11px; text-align:center; min-width:150px;
+    box-shadow:0 1px 0 #fff inset, 0 3px 10px rgba(12,31,63,.16), 0 10px 24px rgba(12,31,63,.09);
+    transform:rotate(-1.1deg); font-variant-numeric:tabular-nums; }
+  .ballot-num { font-size:52px; font-weight:900; line-height:1; letter-spacing:-.03em; }
+  .ballot-name { font-size:13px; font-weight:800; letter-spacing:.01em; margin-top:7px;
+    padding-top:7px; border-top:1px solid #e2ddd0; }
+  .ballot.is-today .ballot-num { font-size:34px; }
+
+  .countdown { text-align:center; }
+  .cd-label { font-size:10.5px; font-weight:700; color:var(--faint); letter-spacing:.03em; margin-bottom:5px; }
+  .cd-units { display:flex; gap:6px; direction:ltr; }
+  .cd-u { background:var(--card-2); border:1px solid var(--border); border-radius:9px;
+    padding:5px 9px; min-width:46px; display:flex; flex-direction:column; align-items:center; }
+  .cd-u b { font-size:17px; font-weight:900; color:var(--ink); line-height:1.15; font-variant-numeric:tabular-nums; }
+  .cd-u i { font-size:9.5px; font-style:normal; font-weight:700; color:var(--faint); margin-top:1px; }
+  .countdown.is-over .cd-units { opacity:.45; }
+
   .hero-kpis { max-width:1280px; margin:0 auto; padding:8px 20px 22px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .hero-kpi { background:var(--card-2); border:1px solid var(--border); border-radius:13px; padding:12px 16px; }
   .hero-kpi .kv { font-size:19px; font-weight:900; letter-spacing:-.01em; color:var(--ink); }
@@ -782,6 +818,7 @@
   .m-summary { display:none; }
   @media (max-width:720px){
     .hero-inner { padding:18px 16px 4px; }
+    .hero-clock { flex-basis:100%; margin-top:4px; }
     .hero-kpis { grid-template-columns:1fr; padding:8px 16px 16px; }
     .wrap { padding:14px 14px; }
     .controls { gap:10px 16px; }
@@ -857,6 +894,21 @@
       <p class="hero-sub" id="heroSub"></p>
       <div class="hero-forecast" id="heroForecast"></div>
     </div>
+    <aside class="hero-clock">
+      <div class="ballot" id="ballot">
+        <div class="ballot-num" id="ballotNum" data-no-i18n>—</div>
+        <div class="ballot-name" id="ballotName">ימים לבחירות</div>
+      </div>
+      <div class="countdown">
+        <div class="cd-label" id="cdLabel">עד לסגירת הקלפיות</div>
+        <div class="cd-units" id="cdUnits">
+          <span class="cd-u"><b id="cdD" data-no-i18n>--</b><i>ימים</i></span>
+          <span class="cd-u"><b id="cdH" data-no-i18n>--</b><i>שעות</i></span>
+          <span class="cd-u"><b id="cdM" data-no-i18n>--</b><i>דקות</i></span>
+          <span class="cd-u"><b id="cdS" data-no-i18n>--</b><i>שניות</i></span>
+        </div>
+      </div>
+    </aside>
   </div>
   <div class="hero-kpis" id="heroKpis"></div>
 </section>
@@ -2940,6 +2992,76 @@ tryRefresh();
   }
   if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded',wire);
 })();
+
+/* ─── Days to the election, and the countdown to the polls closing ──────────────────
+ * Election day is 27 October 2026; the polls close at 22:00 Israel time.
+ *
+ * Israel is on IST (UTC+2) by then, not IDT: daylight time ends on the last Sunday of
+ * October, which in 2026 is the 25th. So 22:00 becomes 20:00 UTC and the target is a
+ * fixed instant, the same way ARAB_MERGE_AT is.
+ *
+ * The day count is NOT that instant divided by 86,400,000. "How many days until the
+ * election" is a question about calendar days in Israel, and a reader in another time
+ * zone must still see Israel's answer — so both dates are resolved in Asia/Jerusalem and
+ * subtracted as dates, which also makes the DST change a non-event.
+ */
+(function(){
+  const CLOSE_AT = Date.UTC(2026, 9, 27, 20, 0, 0);   /* 27 Oct 2026, 22:00 IST */
+  const ELECTION_DAY = '2026-10-27';
+
+  const ilFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const ilDate = d => ilFmt.format(d);
+  const daysBetween = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
+
+  const el = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, '0');
+
+  function tick() {
+    const now = Date.now();
+    const days = daysBetween(ilDate(new Date(now)), ELECTION_DAY);
+
+    const ballot = el('ballot'), num = el('ballotNum'), name = el('ballotName');
+    if (ballot) {
+      /* Election day and after get a word rather than a number: "0 ימים לבחירות" reads as
+         a broken counter, and a negative one reads as a bug. */
+      if (days > 0) {
+        num.textContent = days;
+        name.textContent = days === 1 ? 'יום לבחירות' : 'ימים לבחירות';
+        ballot.classList.remove('is-today');
+      } else if (days === 0) {
+        num.textContent = 'היום';
+        name.textContent = 'יום הבחירות';
+        ballot.classList.add('is-today');
+      } else {
+        num.textContent = 'הסתיים';
+        name.textContent = 'יום הבחירות';
+        ballot.classList.add('is-today');
+      }
+      ballot.setAttribute('aria-label', `${num.textContent} ${name.textContent}`);
+    }
+
+    let left = Math.max(0, CLOSE_AT - now);
+    const over = left === 0;
+    const d = Math.floor(left / 86400000); left -= d * 86400000;
+    const h = Math.floor(left / 3600000);  left -= h * 3600000;
+    const m = Math.floor(left / 60000);    left -= m * 60000;
+    const sec = Math.floor(left / 1000);
+    if (el('cdD')) {
+      el('cdD').textContent = d;
+      el('cdH').textContent = pad(h);
+      el('cdM').textContent = pad(m);
+      el('cdS').textContent = pad(sec);
+    }
+    const label = el('cdLabel');
+    if (label) label.textContent = over ? 'הקלפיות נסגרו' : 'עד לסגירת הקלפיות';
+    const cd = label && label.parentElement;
+    if (cd) cd.classList.toggle('is-over', over);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
 </script>
 <script>
 /* ===== Theme toggle ===== */
