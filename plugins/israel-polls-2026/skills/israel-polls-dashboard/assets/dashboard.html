@@ -169,6 +169,21 @@
     "העתקה נכשלה": { ar: "فشل النسخ", en: "Copy failed" },
     "לוח הסקרים המלא": { ar: "لوحة الاستطلاعات الكاملة", en: "Full polling dashboard" },
     /* chrome */
+    "כך תיראה הכנסת": { ar: "هكذا سيبدو الكنيست", en: "How the Knesset would look" },
+    "גושים": { ar: "الكتل", en: "Blocs" },
+    "ותק": { ar: "الأقدمية", en: "Tenure" },
+    "מגדר": { ar: "الجنس", en: "Gender" },
+    "ח\"כים מכהנים": { ar: "أعضاء كنيست حاليون", en: "Sitting MKs" },
+    "ח\"כים לשעבר": { ar: "أعضاء كنيست سابقون", en: "Former MKs" },
+    "חדשים": { ar: "جدد", en: "New" },
+    "לא ידוע": { ar: "غير معروف", en: "Unknown" },
+    "גברים": { ar: "رجال", en: "Men" },
+    "נשים": { ar: "نساء", en: "Women" },
+    "ח\"כ מכהן": { ar: "عضو كنيست حالي", en: "Sitting MK" },
+    "ח\"כ לשעבר": { ar: "عضو كنيست سابق", en: "Former MK" },
+    "טרם פורסם מועמד": { ar: "لم يُعلَن عن مرشّح بعد", en: "No candidate published yet" },
+    "מקום %n": { ar: "المرتبة %n", en: "Slot %n" },
+    "120 מנדטים לפי ממוצע הסקרים, מחולקים בשיטת השארית הגדולה. %n מתוך 120 המקומות מאוישים ברשימות מועמדים שפורסמו.": { ar: "120 مقعدًا حسب متوسط الاستطلاعات، موزّعة بطريقة أكبر الفواضل. %n من أصل 120 مقعدًا مأهولة بقوائم مرشّحين منشورة.", en: "120 seats from the polling average, apportioned by largest remainder. %n of the 120 are filled from published candidate lists." },
     "לוח סקרי הבחירות לכנסת 2026": { ar: "لوحة استطلاعات انتخابات الكنيست 2026", en: "Israel 2026 Knesset Election Polls" },
     "סקרי הבחירות לכנסת 2026": { ar: "استطلاعات انتخابات الكنيست 2026", en: "Israel 2026 Knesset Election Polls" },
     "לוח סקרי הבחירות 2026": { ar: "لوحة استطلاعات الانتخابات 2026", en: "Israel 2026 Election Polls" },
@@ -633,6 +648,21 @@
   .bloc-seg button.sel-opp { background:var(--blue); color:#fff; }
   .bloc-seg button.sel-other { background:var(--gray); color:#fff; }
 
+  /* The 120-seat grid. Seats are positioned by a CSS transform rather than by x/y so that
+     switching how they are grouped is a transition the browser runs, not a redraw: the
+     nodes never move in the DOM, only their transform changes. Everything else in this
+     file redraws by innerHTML replacement, which is why nothing else here tweens. */
+  .knesset-seg { margin-inline-start:auto; }
+  .knesset-seg button { font-size:10.5px; padding:3px 10px; }
+  .knesset-seg button.sel { background:var(--accent); color:#fff; }
+  /* Only the transition lives here. Everything the seat grid LOOKS like is set as SVG
+     presentation attributes instead, because the PNG export serialises the <svg> on its
+     own and a standalone SVG carries none of this stylesheet: a `.seat-ring { fill:none }`
+     rule turns into SVG's default fill — black — and every one of the 120 faces exports
+     as a solid black square. */
+  #knessetSvg .seat { transition:transform .55s cubic-bezier(.22,.61,.36,1); }
+  @media (prefers-reduced-motion: reduce) { #knessetSvg .seat { transition:none; } }
+
   .chart-wrap { direction:ltr; padding:4px 0; }
   .empty-state { text-align:center; color:var(--faint); padding:28px 0; font-size:12.5px; }
   .note { font-size:10.5px; color:var(--faint); margin-top:6px; line-height:1.6; }
@@ -880,6 +910,23 @@
       <div class="q-chips" id="qChips"></div>
       <div class="q-answer empty" id="qAnswer">בחרו שאלה, או לחצו על אחת ההצעות, לקבלת תשובה מיידית המחושבת מכלל הסקרים.</div>
       <div class="ask-hint">התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא התחברות, ללא חשבון חיצוני וללא עלות.</div>
+    </div>
+  </div>
+
+  <div class="panel" data-widget="knesset" style="margin-bottom:16px">
+    <div class="panel-accent" style="background:linear-gradient(to left,var(--red) 50%,var(--blue) 50%)"></div>
+    <div class="panel-head">
+      <span class="panel-title">כך תיראה הכנסת</span>
+      <span class="panel-badge" id="knessetBadge"></span>
+      <span class="bloc-seg knesset-seg" id="knessetModes">
+        <button data-mode="blocs">גושים</button>
+        <button data-mode="tenure">ותק</button>
+        <button data-mode="gender">מגדר</button>
+      </span>
+    </div>
+    <div class="panel-body">
+      <div class="chart-wrap"><svg id="knessetSvg" viewBox="0 0 900 400" style="width:100%;height:auto"></svg></div>
+      <div class="note" id="knessetNote" style="text-align:center"></div>
     </div>
   </div>
 
@@ -1399,6 +1446,73 @@ function loadBlocAssign() {
   return blocAssign;
 }
 function saveBlocAssign() { try { localStorage.setItem('ilpolls_blocs', JSON.stringify(blocAssign)); } catch (e) {} }
+
+/* ── Integer seats, summing to exactly 120 ──
+ * Nothing else in this file produces one. The party table rounds each party's average
+ * independently, and those do not add up: in a recent window they come to about 129.
+ *
+ * Two things make the difference, and both are the same lessons the Monte Carlo forecast
+ * below had to learn the hard way.
+ *
+ * A party is averaged over EVERY poll in the window with `poll[id] || 0`, not only over
+ * the polls that named it. Every poll already sums to 120, so a part-time party — a
+ * mid-cycle arrival, or an alternative-scenario column — must be averaged over all of
+ * them or it is credited a full-time score.
+ *
+ * ARAB_JOINT_GROUP is thresholded as one unit and split back afterwards, because its
+ * members are alternative framings of one set of voters rather than three lists. Drawing
+ * them separately here would seat a Joint List member and the Hadash-Ta'al member they
+ * are made of at the same time. After the 9 Sep merge the group has one member and this
+ * is a no-op.
+ *
+ * Then largest-remainder apportionment, because independent rounding is exactly what does
+ * not sum to 120. */
+function seatVector(filtered) {
+  if (!filtered.length) return {};
+  const active = PARTIES.filter(p => p.active !== false);
+  const mu = {};
+
+  if (window.USE_WEIGHTED) {
+    const effects = computeHouseEffects(POLLS), refT = isoToT(dateSlider.getHiIso());
+    const pairs = filtered.map(poll => ({
+      adj: houseEffectAdjust(poll, effects),
+      w: recencyWeight(poll, refT, RECENCY_HALFLIFE_DAYS) * sampleSizeWeight(poll.respondents ?? poll.sampleSize),
+    }));
+    active.forEach(p => { mu[p.id] = weightedMean(pairs.map(x => ({ v: x.adj[p.id] || 0, w: x.w }))); });
+  } else {
+    active.forEach(p => { mu[p.id] = mean(filtered.map(x => x[p.id] || 0)); });
+  }
+
+  const THRESHOLD = 0.0325 * 120;   /* same figure the forecast uses */
+  const units = [], grouped = active.filter(p => ARAB_JOINT_GROUP.includes(p.id) && mu[p.id] > 0);
+  active.forEach(p => { if (!ARAB_JOINT_GROUP.includes(p.id)) units.push({ mu: mu[p.id], members: [{ id: p.id, share: 1 }] }); });
+  if (grouped.length) {
+    /* The forecast splits this unit back across its framings, because it is summing bloc
+       totals and each framing may sit in a different bloc. Here the seats are PEOPLE, so
+       splitting would seat seven Joint List members beside one Hadash-Ta'al member — the
+       same voters twice, and two faces for one seat. Give the whole unit to the framing
+       the pollsters actually used most. After the 9 Sep merge there is only one. */
+    const total = grouped.reduce((a, p) => a + mu[p.id], 0);
+    const lead = grouped.reduce((a, b) => (mu[b.id] > mu[a.id] ? b : a));
+    units.push({ mu: total, members: [{ id: lead.id, share: 1 }] });
+  }
+
+  const kept = [];
+  let sum = 0;
+  for (const u of units) {
+    if (u.mu < THRESHOLD) continue;
+    for (const m of u.members) { const v = u.mu * m.share; if (v > 0) { kept.push({ id: m.id, v }); sum += v; } }
+  }
+  if (!sum) return {};
+
+  const seats = {};
+  let used = 0;
+  kept.forEach(k => { k.exact = k.v * 120 / sum; seats[k.id] = Math.floor(k.exact); used += seats[k.id]; });
+  kept.sort((a, b) => (b.exact % 1) - (a.exact % 1));
+  for (let i = 0; used < 120; i++, used++) seats[kept[i % kept.length].id]++;
+  for (const id in seats) if (!seats[id]) delete seats[id];
+  return seats;
+}
 function pollBlocs(p) {
   const assign = loadBlocAssign(); const allIds = PARTIES.map(x => x.id);
   const known = allIds.filter(n => p[n] !== null && p[n] !== undefined).length;
@@ -2856,9 +2970,233 @@ tryRefresh();
   onScroll();
 })();
 
+/* ─── "כך תיראה הכנסת" — the seat count as 120 people ───────────────────────────────
+ * Every other panel answers how many seats. This one answers who sits in them, and then
+ * re-cuts those 120 by things a seat count cannot show: how many are sitting MKs, how
+ * many have never served, how many are women.
+ *
+ * Three things about it are deliberate.
+ *
+ * It is one <svg> with a viewBox, so the PNG export and the share screenshot come for
+ * free — exportable() finds the SVG and fromSvg() serialises it. That only works while
+ * every image it references is a data: URI, which the sprites are.
+ *
+ * Each party's faces are ONE sprite in <defs>, referenced per seat with <use>. A
+ * <pattern> per candidate would inline the whole base64 string 120 times when
+ * XMLSerializer runs and the exported PNG would be enormous.
+ *
+ * Seats are positioned with a CSS transform and never move in the DOM, so switching the
+ * grouping is a transition the browser runs rather than a redraw. Nodes are rebuilt only
+ * when the seat composition changes — new polls, filters, a bloc reassignment, the
+ * weighted toggle — and a mode switch, which never changes composition, always animates.
+ */
+(function(){
+  const SPRITES = window.CANDIDATE_SPRITES_DATA || {};
+  const ROSTER  = window.CANDIDATES_DATA || {};
+  const slugOf  = id => id.replace(/[^A-Za-z0-9]/g, '_');
+
+  const T = 34, GAP = 4, PITCH = T + GAP, PAD = 8, HEAD = 22, GROUP_GAP = 16, RULE = 7;
+  const W = 900;
+
+  /* Group orders are fixed, and the gender one is alphabetical in Hebrew rather than
+     sorted by size — the panel should not look like it is ranking anybody. */
+  const MODES = {
+    blocs:  { key: s => loadBlocAssign()[s.id],
+              groups: [['coal','קואליציה'], ['opp','אופוזיציה'], ['other','אחר']] },
+    tenure: { key: s => !s.person || s.person.mk == null ? 'unknown' : s.person.mk === 'none' ? 'new' : s.person.mk,
+              groups: [['current','ח"כים מכהנים'], ['former','ח"כים לשעבר'], ['new','חדשים'], ['unknown','לא ידוע']] },
+    gender: { key: s => !s.person || !s.person.g ? 'unknown' : s.person.g,
+              groups: [['m','גברים'], ['f','נשים'], ['unknown','לא ידוע']] },
+  };
+  let mode = 'blocs';
+
+  /* ── the 120 ── */
+  function seatList(filtered) {
+    const seats = seatVector(filtered);
+    const byId = {}; PARTIES.forEach(p => byId[p.id] = p);
+    const order = Object.keys(seats).sort((a, b) => seats[b] - seats[a] || a.localeCompare(b));
+    const out = [];
+    order.forEach(id => {
+      const roster = ROSTER[slugOf(id)] || [];
+      for (let r = 1; r <= seats[id]; r++)
+        out.push({ id, party: byId[id], rank: r, person: roster.find(x => x.r === r) || null, key: id + '#' + r });
+    });
+    return out;
+  }
+
+  /* ── where each seat goes ── */
+  function layout(seats, forMode) {
+    const ltr = document.documentElement.getAttribute('dir') === 'ltr';
+    const cols = Math.max(6, Math.floor((W - PAD * 2 + GAP) / PITCH));
+    const m = MODES[forMode || mode];
+    const bucket = {}; m.groups.forEach(([k]) => bucket[k] = []);
+    seats.forEach(s => { const k = m.key(s); (bucket[k] || bucket[m.groups[m.groups.length - 1][0]]).push(s); });
+
+    const pos = {}, heads = [], rules = [];
+    let y = PAD;
+    m.groups.forEach(([k, label]) => {
+      const items = bucket[k];
+      if (!items.length) return;
+      heads.push({ label, n: items.length, y: y + 12 });
+      y += HEAD;
+      items.forEach((s, i) => {
+        const col = i % cols, row = Math.floor(i / cols);
+        pos[s.key] = { x: ltr ? PAD + col * PITCH : W - PAD - T - col * PITCH, y: y + row * PITCH };
+      });
+      /* A coloured rule under each run of one party, per row — that is what keeps the
+         internal division by list visible without labelling 120 tiles. */
+      const rows = Math.ceil(items.length / cols);
+      for (let row = 0; row < rows; row++) {
+        const line = items.slice(row * cols, (row + 1) * cols);
+        let i = 0;
+        while (i < line.length) {
+          let j = i; while (j + 1 < line.length && line[j + 1].id === line[i].id) j++;
+          const a = pos[line[i].key], b = pos[line[j].key];
+          rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: y + row * PITCH + T + 2,
+                       color: line[i].party.color, name: line[i].party.name, span: j - i + 1 });
+          i = j + 1;
+        }
+      }
+      y += rows * PITCH + RULE + GROUP_GAP;
+    });
+    return { pos, heads, rules, height: Math.max(120, y - GROUP_GAP + PAD) };
+  }
+
+  /* ── nodes ── */
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+  function defs() {
+    const sp = Object.entries(SPRITES).map(([slug, s]) => {
+      const rows = Math.ceil(s.n / s.c);
+      return `<image id="ksp-${slug}" href="${s.s}" width="${s.c * s.px}" height="${rows * s.px}" preserveAspectRatio="none"/>`;
+    }).join('');
+    /* One silhouette geometry for all three; only the hair outline differs, and the
+       unknown one has no hair rather than a made-up one. */
+    const av = (id, extra) => `<symbol id="kav-${id}" viewBox="0 0 64 64">${extra}` +
+      `<circle cx="32" cy="25" r="11"/><path d="M9 60c0-12.5 10.3-19 23-19s23 6.5 23 19z"/></symbol>`;
+    return `<defs><clipPath id="kSeatClip"><rect width="${T}" height="${T}" rx="7"/></clipPath>${sp}` +
+      av('m', '<path d="M20 22c0-8 5-12 12-12s12 4 12 12l-2 1c-1-6-4-8-10-8s-9 2-10 8z"/>') +
+      av('f', '<path d="M18 30c0-12 6-19 14-19s14 7 14 19c0 4-1 6-2 7l2 8-8-3c1-4 1-8 0-11-3 2-9 3-14 1-2-1-3-3-4-5-1 3-1 7 0 10l-2 4-1-4c-1-2-1-4 1-7z"/>') +
+      av('x', '') + '</defs>';
+  }
+
+  function seatNode(s) {
+    const sp = SPRITES[slugOf(s.id)];
+    const has = sp && s.rank <= sp.n;
+    let inner;
+    if (has) {
+      const i = s.rank - 1, col = i % sp.c, row = Math.floor(i / sp.c), k = T / sp.px;
+      inner = `<g transform="scale(${k.toFixed(4)}) translate(${-col * sp.px},${-row * sp.px})"><use href="#ksp-${slugOf(s.id)}"/></g>`;
+    } else {
+      const g = s.person && s.person.g ? s.person.g : 'x';
+      inner = `<rect width="${T}" height="${T}" fill="${s.party.color}"/>` +
+        `<use href="#kav-${g}" width="${T}" height="${T}" fill="#fff" opacity="${g === 'x' ? .38 : .55}"/>`;
+    }
+    return `<g class="seat" data-key="${esc(s.key)}">` +
+      `<g clip-path="url(#kSeatClip)">${inner}</g>` +
+      `<rect width="${T}" height="${T}" rx="7" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="1"/></g>`;
+  }
+
+  let builtSig = '';
+  function build(svg, seats) {
+    svg.innerHTML = defs() + '<g id="kChrome"></g><g id="kSeats">' + seats.map(seatNode).join('') + '</g>';
+  }
+
+  function paint(svg, seats, animate) {
+    const L = layout(seats), th = chartTheme();
+    /* Every mode gets the tallest mode's frame. The three groupings need different numbers
+       of rows, and letting the viewBox follow the current one makes the panel resize under
+       the reader while the seats are still travelling to their new places. */
+    const height = Math.max(...Object.keys(MODES).map(m => layout(seats, m).height));
+    svg.setAttribute('viewBox', `0 0 ${W} ${height}`);
+    const chrome = svg.querySelector('#kChrome');
+    const ltr = document.documentElement.getAttribute('dir') === 'ltr';
+    const ax = ltr ? PAD : W - PAD, anchor = ltr ? 'start' : 'end';
+    chrome.innerHTML =
+      L.heads.map(h => `<text x="${ax}" y="${h.y}" text-anchor="${anchor}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
+        `<tspan dx="6" fill="${th.axis}" font-size="11" font-weight="700">${h.n}</tspan></text>`).join('') +
+      L.rules.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="3" rx="1.5" fill="${r.color}"/>` +
+        (r.span >= 3 ? `<text x="${r.x + r.w / 2}" y="${r.y + 12}" text-anchor="middle" fill="${th.axis}" font-size="8.5" font-weight="700">${esc(r.name)}</text>` : '')).join('');
+
+    svg.querySelectorAll('.seat').forEach(n => {
+      const p = L.pos[n.getAttribute('data-key')];
+      if (!p) { n.style.opacity = '0'; return; }
+      n.style.opacity = '1';
+      if (!animate) n.style.transition = 'none';
+      n.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      if (!animate) { void n.getBoundingClientRect(); n.style.transition = ''; }
+    });
+  }
+
+  window.renderKnesset = function(filtered) {
+    const svg = document.getElementById('knessetSvg');
+    if (!svg) return;
+    const seats = seatList(filtered);
+    const badge = document.getElementById('knessetBadge');
+    if (badge) badge.textContent = filtered.length ? `${filtered.length} סקרים` : '';
+    const note = document.getElementById('knessetNote');
+    if (note) {
+      const known = seats.filter(s => s.person).length;
+      note.textContent = seats.length
+        ? `120 מנדטים לפי ממוצע הסקרים, מחולקים בשיטת השארית הגדולה. ${known} מתוך 120 המקומות מאוישים ברשימות מועמדים שפורסמו.`
+        : '';
+    }
+    /* Rebuild only when the seats themselves changed. A mode switch never does, which is
+       what lets it animate instead of redrawing. */
+    const sig = seats.map(s => s.key).join(',') + '|' + (document.documentElement.dataset.theme || '') +
+      '|' + document.documentElement.getAttribute('dir');
+    const fresh = sig !== builtSig;
+    if (fresh) { build(svg, seats); builtSig = sig; }
+    paint(svg, seats, !fresh);
+    lastSeats = seats;
+  };
+
+  let lastSeats = [];
+
+  /* ── mode buttons ── */
+  const MK_HE = { current: 'ח"כ מכהן', former: 'ח"כ לשעבר', none: 'מועמד חדש' };
+  function wire() {
+    const seg = document.getElementById('knessetModes');
+    if (!seg) return;
+    const mark = () => seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.dataset.mode === mode));
+    seg.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      mode = b.dataset.mode; window.knessetMode = mode; mark();
+      const svg = document.getElementById('knessetSvg');
+      if (svg && lastSeats.length) paint(svg, lastSeats, true);
+    });
+    mark();
+
+    const svg = document.getElementById('knessetSvg');
+    if (!svg) return;
+    svg.addEventListener('mousemove', e => {
+      const g = e.target.closest('.seat');
+      if (!g) { hideTT(); return; }
+      const s = lastSeats.find(x => x.key === g.getAttribute('data-key'));
+      if (!s) { hideTT(); return; }
+      const who = s.person ? esc(s.person.n) : 'טרם פורסם מועמד';
+      const tag = s.person && s.person.mk && s.person.mk !== 'none' ? ` · ${MK_HE[s.person.mk]}` : '';
+      showTT(`<b>${who}</b><br>${esc(s.party.name)} · מקום ${s.rank}${tag}`, e.clientX, e.clientY);
+    });
+    svg.addEventListener('mouseleave', hideTT);
+  }
+
+  window.setKnessetMode = function(m) { if (MODES[m]) { mode = m; window.knessetMode = m; } };
+  window.knessetMode = mode;
+
+  /* renderAll is already defined and has already run once by the time this block is
+     reached, so patch it and then draw once — the same shape the weighted module uses. */
+  const _origRenderAll = renderAll;
+  renderAll = function(){ _origRenderAll.apply(this, arguments); window.renderKnesset(lastFiltered); };
+  wire();
+  window.renderKnesset(lastFiltered && lastFiltered.length ? lastFiltered : getFiltered());
+})();
+
+
 /* ===== Per-widget methodology (ⓘ hover) ===== */
 (function(){
   const METHOD = {
+    'כך תיראה הכנסת': 'ממוצע המנדטים לכל מפלגה בטווח הנבחר, מחולק ל‑120 מושבים בשיטת השארית הגדולה — ולכן הסכום הוא תמיד 120 בדיוק, בשונה מעמודת הממוצע בטבלה שבה כל מפלגה מעוגלת בנפרד. הממוצע מחושב על כל הסקרים בטווח (מפלגה שסקר לא ציין נספרת בו כ‑0), מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0, ומסגרות הריצה הערביות נבחנות כיחידה אחת כדי שלא יופיעו פעמיים. כל מושב מאויש במועמד לפי מקומו ברשימה שהמפלגה פרסמה; מושב שאין לו מועמד ידוע מקבל דמות ניטרלית.',
     'שאל את הנתונים': 'התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא בינה מלאכותית, ללא התחברות וללא עלות. בחרו שאלה או לחצו על הצעה מהירה.',
     'לפי מפלגה': {
       off: 'ממוצע וחציון המנדטים לכל מפלגה, מחושבים רק על הסקרים שדיווחו נתון עבורה בטווח הנבחר. מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0. בכפתורים ניתן לשייך כל מפלגה לגוש. "הרשימה המשותפת" היא חד"ש–תע"ל + בל"ד בריצה משותפת — כל סקר בודק מסגרת אחת בלבד, ולכן אין לחבר את שלוש השורות.',
@@ -3184,6 +3522,7 @@ tryRefresh();
       if (diff.length) s.b = diff.join(',');
       if (window.USE_WEIGHTED) s.wt = '1';
       if (window.USE_ADJUST) s.adj = '1';
+      if (window.knessetMode && window.knessetMode !== 'blocs') s.k = window.knessetMode;
     } catch(e){ /* a half-built page still shares a usable link */ }
     return s;
   }
@@ -3219,6 +3558,15 @@ tryRefresh();
     };
     const f1 = flip('weightedToggle', q.get('wt') === '1');
     const f2 = flip('adjToggle', q.get('adj') === '1');
+    /* The seat grid's grouping is widget state rather than a filter, so a shared link or
+       an embed opens on the cut it was shared in. */
+    const k = q.get('k');
+    if (k && typeof window.setKnessetMode === 'function') {
+      window.setKnessetMode(k);
+      const seg = document.getElementById('knessetModes');
+      if (seg) seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.dataset.mode === k));
+      touched = true;
+    }
     if (touched && !f1 && !f2 && typeof renderAll === 'function') renderAll();
     return touched || f1 || f2;
   }

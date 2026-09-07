@@ -6,6 +6,7 @@ A live, self-contained dashboard for tracking Israeli 2026 Knesset election poll
 
 - Per-party seat averages and medians with party-leader photos, over 141+ polls (Jan-Jul 2026)
 - TV-style coalition/opposition half-donut with a 61-seat majority marker
+- **A 120-seat Knesset made of faces** — the seat average cashed out into 120 actual candidates, drawn from the parties' published lists, and re-cuttable by bloc, by ותק (sitting MK / former MK / new) or by gender. Switching the cut moves every face across the screen to its new place rather than redrawing
 - Trend charts for parties and blocs, with independent date-range sliders
 - Assign any party to coalition / opposition / other and watch the blocs recompute
 - Auto-refreshes new polls from [Wikipedia's polling page](https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Israeli_legislative_election) every time it opens
@@ -54,6 +55,11 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
   - The three `ARAB_JOINT_GROUP` framings are drawn as **one unit**, thresholded on their combined size and then split back across the framings in proportion to their means. Drawing them independently let a simulation return a Knesset containing both the Joint List and the Hadash–Ta'al it is made of, in about a tenth of draws; because those framings usually failed the threshold separately but clear it together, it also kept deleting the "other" bloc and redistributing its seats, which pushed the simulated opposition about 2 seats above what the tug-of-war showed.
   - Because a scenario mixture is collapsed into one mean, a list that runs in only some polls arrives at the simulation near the threshold (e.g. Hadash–Ta'al at ~3.9 when it runs separately in two thirds of the window) and is zeroed in roughly half the draws, with its seats redistributed by the renormalisation. That is the right *aggregate* behaviour — those seats really do go elsewhere when a list does not run or does not cross — but it is not the same as modelling "runs at 6, or does not run at all" explicitly.
   - The panel deliberately uses **its own 21-day window over every pollster**, not the page's date-range and outlet filters, and says so in its badge ("last N polls"). One consequence of the share/embed work: a shared or embedded forecast widget ignores the `from`/`to`/`o` parameters that every other widget honours.
+- **The 120-seat grid (`knesset`) is the only widget that needs whole seats**, and producing them is not the same arithmetic as the party table. Three things it does differently, each of them a bug first:
+  - It averages every party over **all** the polls in the window (`poll[id] || 0`), not only the polls that named it. Every poll already sums to 120, so a part-time party averaged only over its own polls is credited a full-time score — the same mistake the forecast documents, which put the tracked means at ~129 seats.
+  - It **apportions by largest remainder** to exactly 120. Rounding each party independently, as the table's ממוצע column does, does not sum to 120 and cannot.
+  - It collapses `ARAB_JOINT_GROUP` to a **single framing** rather than splitting the unit back across its members the way the forecast does. The forecast splits because it is summing bloc totals; here the seats are people, and splitting seated seven Joint List members beside one Hadash–Ta'al member — the same voters twice, two faces for one seat.
+  - Coverage is the honest limit: only the parties with a list in `assets/candidate-lists/` fill their seats with real people. Everything else gets a neutral avatar and lands in an explicit "לא ידוע" group in the ותק and gender cuts, rather than being quietly folded into "new" or into a gender.
 - **New-party detection.** Wikipedia's table occasionally adds a party column (e.g. Unity, Amcha Yisrael) that `headerKey()` doesn't recognize yet — until it's added to `ALL_KEYS`/`headerKey()`/`PARTIES` (in both `update-polls.mjs` and `docs/index.html`), that party's seats are silently dropped from every poll rather than shown, and worse, when Wikipedia's "Joint List" column isn't colspan-merged, an unrelated bug can shift every later column's data (this happened for real — see the Aug 2026 Yashar/Democrats corruption fixed in this repo's history). To catch this automatically going forward, `update-polls.mjs` now flags any header cell it can't recognize in the currently-active table; the twice-daily workflow surfaces that as a GitHub issue (opened once, commented on for repeat detections) instead of a log line nobody reads. The same check also runs client-side (as a `console.warn`) when the dashboard refreshes from Wikipedia in the browser.
 - A party's `active` flag in `PARTIES` controls whether it's shown at all (used for parties superseded by a later merger, e.g. `Yesh Atid`/`Bennett 2026` after the `Together` merger) — when Wikipedia's table stops populating one tracked key in favor of a differently-named one for the same real-world party (as happened with `Yesodot Yisrael` → `Reservists`/"Zionist Home"), flip the flags to match which key current polls actually populate, rather than assuming the newer-added key is always the active one.
 
@@ -74,13 +80,14 @@ Two things must stay hand-wired because translation happens *after* render: the 
 
 ## Share and embed
 
-Every panel carries a `data-widget` id — `tug`, `ask`, `parties`, `party-trend`, `blocs`, `bloc-trend`, `forecast`, `pm`. That id is the whole contract, so it should outlive markup changes:
+Every panel carries a `data-widget` id — `tug`, `ask`, `knesset`, `parties`, `party-trend`, `blocs`, `bloc-trend`, `forecast`, `pm`. That id is the whole contract, so it should outlive markup changes:
 
 | URL | What it does |
 | --- | --- |
 | `?w=<id>` | opens the full dashboard scrolled to that widget, with a brief highlight |
 | `?embed=<id>` | renders that widget alone, no header, controls or footer |
 | `&lang=he\|ar\|en` | pins the language; a shared link keeps the language it was shared in |
+| `&k=blocs\|tenure\|gender` | the seat grid's grouping, so a shared link or embed opens on the cut it was shared in |
 
 ### The screenshot
 
