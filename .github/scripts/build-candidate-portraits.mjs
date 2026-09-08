@@ -44,6 +44,7 @@ const ASSETS = 'assets/candidate-lists';
    survives the rebuild — the same contract assets/leader-heads/cutouts/ has. Without it the
    editor would be pointless: every bake deletes the party's portraits and regenerates them. */
 const OVERRIDES = `${ASSETS}/overrides`;
+const WIKIDATA = `${ASSETS}/wikidata`;   /* downloaded by fetch-wikidata-portraits.mjs */
 const WORK = '.leaderheads/candidates';
 const OUT = 192;            // CAP on the baked square, matching the leader heads — never an upscale
 const QUALITY = 92;         // JPEG, 0-100 (NOT 0-1 — @napi-rs/canvas takes the percentage).
@@ -435,9 +436,21 @@ for (const [name, party] of Object.entries(PARTIES)) {
     if (graphic && cardIndex != null) {
       cuts.push({ key, from: 'graphic', canvas: square(`${name} ${key}`, graphic, boxFor(g, cardIndex, graphic.width, graphic.height)) });
       provenance.push({ key, from: 'graphic' });
-    } else {
-      console.warn(`⚠ ${name} ${key}: no usable source, skipped`);
+      return;
     }
+    /* Last resort: a portrait from the candidate's Wikidata item, downloaded by
+       fetch-wikidata-portraits.mjs. Ranked below the graphic and the site on purpose — those
+       show the candidate as the party wants them seen, in a photograph taken for this
+       campaign, where a Commons file may be ten years old. For the four biggest lists it is
+       the only source there is, because none of them published a graphic or a site. */
+    const fromWikidata = path.join(WIKIDATA, name, `${key}.jpg`);
+    if (fs.existsSync(fromWikidata)) {
+      const img = await loadImage(fromWikidata);
+      cuts.push({ key, from: 'wikidata', canvas: square(`${name} ${key}`, img, [0, 0, img.width, img.height]) });
+      provenance.push({ key, from: 'wikidata' });
+      return;
+    }
+    console.warn(`⚠ ${name} ${key}: no usable source, skipped`);
   };
 
   for (let rank = 1; rank <= count; rank++)
@@ -466,13 +479,16 @@ for (const [name, party] of Object.entries(PARTIES)) {
     console.warn(`⚠ ${name}: ${orphans.length} committed portraits have no source in this run and were left alone: ${orphans.join(', ')}`);
 
   const fromSite = provenance.filter(p => p.from === 'site').length;
+  const fromWikidata = provenance.filter(p => p.from === 'wikidata').length;
   const fromOverride = provenance.filter(p => p.from === 'override').length;
   const soft = cuts.filter(c => c.canvas.width < OUT).map(c => c.key);
   fs.writeFileSync(path.join(dir, 'SOURCES.json'), JSON.stringify({
     party: name, generated: new Date().toISOString().slice(0, 10),
     site: party.site?.page ?? null, graphic: party.graphic ?? null, portraits: provenance,
   }, null, 1));
-  console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ${cuts.length - fromSite - fromOverride} from the graphic` +
+  console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ` +
+    `${cuts.length - fromSite - fromOverride - fromWikidata} from the graphic` +
+    (fromWikidata ? `, ${fromWikidata} from Wikidata` : '') +
     (fromOverride ? `, ${fromOverride} hand-picked` : '') +
     (soft.length ? `; ${soft.length} under ${OUT}px and soft: ${soft.join(', ')}` : '') + ')');
 }

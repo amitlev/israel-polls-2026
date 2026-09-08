@@ -3,5 +3,42 @@
  "generated": "2026-09-08",
  "site": null,
  "graphic": null,
- "portraits": []
+ "portraits": [
+  {
+   "key": "01",
+   "from": "wikidata"
+  },
+  {
+   "key": "02",
+   "from": "wikidata"
+  },
+  {
+   "key": "03",
+   "from": "wikidata"
+  },
+  {
+   "key": "04",
+   "from": "wikidata"
+  },
+  {
+   "key": "05",
+   "from": "wikidata"
+  },
+  {
+   "key": "07",
+   "from": "wikidata"
+  },
+  {
+   "key": "08",
+   "from": "wikidata"
+  },
+  {
+   "key": "09",
+   "from": "wikidata"
+  },
+  {
+   "key": "12",
+   "from": "wikidata"
+  }
+ ]
 }

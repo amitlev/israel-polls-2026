@@ -20,9 +20,17 @@
    "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
   },
   {
+   "key": "04",
+   "from": "wikidata"
+  },
+  {
    "key": "05",
    "from": "site",
    "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/matan-kahana-1.webp"
+  },
+  {
+   "key": "06",
+   "from": "wikidata"
   },
   {
    "key": "07",
@@ -93,6 +101,18 @@
    "key": "22",
    "from": "site",
    "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/09/IMG_3684-1-e1788428648677.webp"
+  },
+  {
+   "key": "33",
+   "from": "wikidata"
+  },
+  {
+   "key": "35",
+   "from": "wikidata"
+  },
+  {
+   "key": "40",
+   "from": "wikidata"
   }
  ]
 }

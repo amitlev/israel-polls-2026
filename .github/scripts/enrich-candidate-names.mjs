@@ -127,6 +127,13 @@ const WIKIDATA = {
   'Likud 6': 'Q487304',              // ישראל כ"ץ — "שר הביטחון", not the sociology professor
   'Likud 13': 'Q113389177',          // אלמוג כהן — "פוליטיקאי ישראלי", not the footballer
   'Likud 18': 'Q2583214',            // חיים כץ — "פוליטיקאי ישראלי", not the rabbi
+  /* Both wrong people, caught by looking at the contact sheet: Wikidata's משה רוזנטל is a
+     film director photographed at Sundance, and its דוד אוחנה is a man in a polo shirt.
+     Neither is a Degel HaTorah candidate. The names they supplied were right — a
+     transliteration of the Hebrew is the same either way — but the FACE would not have been,
+     and a face is the thing this dataset exists to get right. */
+  'UTJ 5': null,           // משה רוזנטל
+  'UTJ 10': null,          // דוד אוחנה
   'Yashar 2': null,        // יורם כהן — six items share the name; none of them is this one
   'Together 10': null,     // יונתן שלו — the only item is a doctoral-thesis record from 1996
 };

@@ -78,7 +78,7 @@ const NAME_GENDER = {
   יואל: 'm', יוחאי: 'm', יוחנן: 'm', יפת: 'm', מאיר: 'm', מיכאל: 'm', סמיר: 'm',
   עודד: 'm', פארס: 'm', צביאל: 'm', ציון: 'm', צפריר: 'm', רצון: 'm', דודו: 'm',
   אבראהים: 'm', עבד: 'm', אליקים: 'm', יהודה: 'm', סאמי: 'm', בכר: 'm',
-  'ג\'עפר': 'm', מהא: 'f',
+  מהא: 'f',
   אולסיה: 'f', אורלי: 'f', אלוירה: 'f', אליס: 'f', אסתי: 'f',
   ברוריה: 'f', הדס: 'f', טליה: 'f', יעל: 'f', לילי: 'f', מאיה: 'f', מהרטה: 'f',
   מיכאלה: 'f', מיכל: 'f', נאווה: 'f', סומיה: 'f', ענבל: 'f', קטי: 'f', קרן: 'f',
@@ -133,6 +133,9 @@ const GENDER = {
   'Likud 36': 'm',              // אפי נוה
   /* כחול לבן said its first ten would be half women, at slots 2, 3, 5, 8 and 10. Slot 5. */
   'National_Unity 5': 'f',      // רותם אבידר צאליק
+  /* فاتن is a woman's name almost everywhere it is used, and this is a man. Exactly the
+     reason given names live in a per-person table once they are known to be unreliable. */
+  'Joint_List 4': 'm',          // פאתן ע'טאס
 };
 
 /* Matches a human has ruled on, keyed by "<Party_id> <rank>". A PersonID accepts that
@@ -161,6 +164,9 @@ const RESOLVED = {
   'National_Unity 2': 23635,  // פנינה תמנו שטה, in the roll as פנינה תמנו
   'Likud 12': 30058,          // מיקי זוהר, in the roll under his legal name מכלוף מיקי זוהר
   'Joint_List 3': 30751,      // סאמי אבו שחאדה, in the roll as סמי — one alef apart
+  'Likud 6': 468,             // ישראל כ"ץ — #3260 is a namesake who never served
+  'National_Unity 1': 30657,  // בני גנץ, in the roll under his legal name בנימין
+  'UTJ 2': 30846,             // יצחק גולדקנופף, in the roll as גולדקנופ — one ף short
 };
 
 /* ── the Knesset roll ── */

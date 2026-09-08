@@ -7,6 +7,18 @@
   {
    "key": "01",
    "from": "override"
+  },
+  {
+   "key": "02",
+   "from": "wikidata"
+  },
+  {
+   "key": "03",
+   "from": "wikidata"
+  },
+  {
+   "key": "05",
+   "from": "wikidata"
   }
  ]
 }

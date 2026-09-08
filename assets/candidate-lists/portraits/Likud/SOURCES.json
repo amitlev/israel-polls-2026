@@ -3,5 +3,122 @@
  "generated": "2026-09-08",
  "site": null,
  "graphic": null,
- "portraits": []
+ "portraits": [
+  {
+   "key": "01",
+   "from": "wikidata"
+  },
+  {
+   "key": "02",
+   "from": "wikidata"
+  },
+  {
+   "key": "03",
+   "from": "wikidata"
+  },
+  {
+   "key": "04",
+   "from": "wikidata"
+  },
+  {
+   "key": "05",
+   "from": "wikidata"
+  },
+  {
+   "key": "06",
+   "from": "wikidata"
+  },
+  {
+   "key": "07",
+   "from": "wikidata"
+  },
+  {
+   "key": "08",
+   "from": "wikidata"
+  },
+  {
+   "key": "10",
+   "from": "wikidata"
+  },
+  {
+   "key": "11",
+   "from": "wikidata"
+  },
+  {
+   "key": "12",
+   "from": "wikidata"
+  },
+  {
+   "key": "13",
+   "from": "wikidata"
+  },
+  {
+   "key": "14",
+   "from": "wikidata"
+  },
+  {
+   "key": "17",
+   "from": "wikidata"
+  },
+  {
+   "key": "18",
+   "from": "wikidata"
+  },
+  {
+   "key": "19",
+   "from": "wikidata"
+  },
+  {
+   "key": "20",
+   "from": "wikidata"
+  },
+  {
+   "key": "21",
+   "from": "wikidata"
+  },
+  {
+   "key": "22",
+   "from": "wikidata"
+  },
+  {
+   "key": "23",
+   "from": "wikidata"
+  },
+  {
+   "key": "24",
+   "from": "wikidata"
+  },
+  {
+   "key": "25",
+   "from": "wikidata"
+  },
+  {
+   "key": "26",
+   "from": "wikidata"
+  },
+  {
+   "key": "31",
+   "from": "wikidata"
+  },
+  {
+   "key": "32",
+   "from": "wikidata"
+  },
+  {
+   "key": "33",
+   "from": "wikidata"
+  },
+  {
+   "key": "35",
+   "from": "wikidata"
+  },
+  {
+   "key": "38",
+   "from": "wikidata"
+  },
+  {
+   "key": "40",
+   "from": "wikidata"
+  }
+ ]
 }

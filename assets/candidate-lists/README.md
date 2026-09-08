@@ -245,6 +245,36 @@ server-rendering the grid holding 31 of their candidates, and one run silently d
 committed portraits. Anything with no source in a given run is now reported and left alone,
 and removing one is a deliberate `git rm`.
 
+## Portraits from Wikidata
+
+`npm run fetch:portraits` downloads the portrait (P18) on a candidate's Wikidata item into
+`wikidata/<Party_id>/<key>.jpg`, for candidates who have no photograph from any other source.
+`-- --write` actually downloads; without it, it reports.
+
+It is the **third** source of a face and deliberately the weakest. A party graphic and a party
+site both show the candidate as the party wants them seen, in a photograph taken for this
+campaign; a Commons file may be ten years old and cropped for something else. So the bake
+prefers `overrides/`, then the site, then the graphic, and reaches for these only when there is
+nothing else — which for הליכוד, ש"ס, יהדות התורה, הציונות הדתית and הרשימה המשותפת is every
+candidate, because none of them published a graphic or a site with photographs.
+
+**Which item a name resolves to is not decided here.** It is read from the cache
+`enrich-candidate-names.mjs` writes, so a portrait can only come from an item that already
+survived that script's guards — not dead, not one of several people sharing the name, not an
+auto-imported stub. The identity work is done once, in one place.
+
+**Cropping is a heuristic and the contact sheets are not optional.** A square is taken centred
+horizontally and anchored 6% down, because that is where a head is in a portrait. It is not
+face detection. Run `npm run build:candidates -- --preview` and look at every face: that is how
+two wrong people were caught in יהדות התורה — Wikidata's משה רוזנטל is a film director
+photographed at Sundance and its דוד אוחנה is a man in a polo shirt, neither of them a Degel
+HaTorah candidate. Both are now `null` in `WIKIDATA`. The names those items supplied were fine,
+since a transliteration of the Hebrew is the same either way; the *face* would not have been.
+
+Licensing: these are Wikimedia Commons files and the crops are derivative works of them. Every
+file used is listed with its Commons filename in `wikidata/<Party_id>/SOURCES.md`, the same way
+`assets/leader-heads/SOURCES.md` records the leader photographs.
+
 ## Site readers
 
 `PARTIES[…].site.parse` picks how a party's page is read, and each reader is written against
