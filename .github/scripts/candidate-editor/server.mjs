@@ -8,9 +8,11 @@
  * the repo rather than a hosted thing with a database of its own: the JSON stays the source
  * of truth, and nothing here can drift away from it.
  *
- * Photos are written to overrides/ rather than portraits/, because every bake deletes a
- * party's portraits and regenerates them from the graphic or the site. An override survives
- * that, exactly as assets/leader-heads/cutouts/ does for the tug-of-war heads.
+ * Nothing edited here is overwritten by an update. Fields carry a `pinned` list, and the
+ * enrichment scripts skip a pinned field; photos are written to overrides/ rather than
+ * portraits/, because every bake regenerates a party's portraits from the graphic or the
+ * site. An override survives that, exactly as assets/leader-heads/cutouts/ does for the
+ * tug-of-war heads. Both are the same rule: an automatic source never outranks a person.
  *
  * Binds to 127.0.0.1 only. It writes to the working tree and runs a build on request, so it
  * has no business being reachable from anywhere else.
@@ -55,18 +57,41 @@ function readAll() {
   });
 }
 
-/* Patch one candidate in place, leaving every other field and the file's shape alone. */
-function patch({ party, key, fields }) {
+/* The fields a person can set here, in the order they are listed back. `pinned` holds a
+   subset of these, and the enrichment scripts leave a pinned field alone — see below. */
+const FIELDS = ['name', 'nameEn', 'nameAr', 'gender', 'mk'];
+
+/* Patch one candidate in place, leaving every other field and the file's shape alone.
+ *
+ * Anything edited here is also PINNED. Without that, the next `npm run enrich:candidates`
+ * or `enrich:names` would quietly overwrite it: those scripts derive mk, gender, nameEn and
+ * nameAr from the Knesset roll and Wikidata every time they run, and they cannot tell a
+ * value they wrote last week from one a person corrected since. The pin is the record of
+ * "a human decided this", which is exactly the thing an automatic source must not outrank.
+ *
+ * It lives on the candidate rather than in a file of its own so that it travels with the
+ * value it protects — one row in `git diff`, and no second place to forget to update. */
+function patch({ party, key, fields, pin, unpin }) {
   const p = path.join(LISTS, `${party}.json`);
   const list = JSON.parse(fs.readFileSync(p, 'utf8'));
   const find = arr => (arr || []).find(c => (c.rank != null ? String(c.rank).padStart(2, '0') : c.photo) === key);
   const c = find(list.candidates) || find(list.unranked);
   if (!c) throw new Error(`no candidate ${party} ${key}`);
-  for (const [k, v] of Object.entries(fields)) {
+
+  const held = new Set(c.pinned || []);
+  for (const [k, v] of Object.entries(fields || {})) {
     if (v === '' || v === undefined) delete c[k];      /* an emptied field is absent, not "" */
     else c[k] = v;
+    if (FIELDS.includes(k)) held.add(k);               /* editing it is pinning it */
   }
-  for (const k of ['name', 'nameEn', 'nameAr', 'gender', 'mk']) if (!(k in c)) c[k] = null;
+  for (const k of pin || []) if (FIELDS.includes(k)) held.add(k);
+  /* Releasing a pin leaves the value alone and hands the field back to the scripts, which
+     will overwrite it on their next run. That is the point of the button. */
+  for (const k of unpin || []) held.delete(k);
+
+  for (const k of FIELDS) if (!(k in c)) c[k] = null;
+  delete c.pinned;                                     /* re-added last, and sorted, so the diff is stable */
+  if (held.size) c.pinned = FIELDS.filter(k => held.has(k));
   fs.writeFileSync(p, JSON.stringify(list, null, 2) + '\n');
   return c;
 }

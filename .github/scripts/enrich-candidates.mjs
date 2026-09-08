@@ -31,6 +31,11 @@
  * and neither wins automatically — that is either a stale graphic or a bad match, and
  * both deserve a human.
  *
+ * A field listed in a candidate's `pinned` is left exactly as it is. That is how a
+ * correction made in the candidate editor survives this script: the roll is the best
+ * automatic source, but it is not better than a person who looked. Pinned fields are
+ * reported each run so a stale pin stays visible rather than silently outliving its reason.
+ *
  *   npm run enrich:candidates             report only, writes nothing
  *   npm run enrich:candidates -- --write  apply to lists/*.json
  *   npm run enrich:candidates -- --refetch  ignore the cached API pull
@@ -220,7 +225,7 @@ const GRAPHIC_SAID = { current: 'ח"כ', former: 'חכ"ל' };
 const NAME_GENDER_N = {};
 for (const k in NAME_GENDER) NAME_GENDER_N[norm(k)] = NAME_GENDER[k];
 
-const report = { changed: [], disagree: [], ambiguous: [], noGender: [], served: [] };
+const report = { changed: [], disagree: [], ambiguous: [], noGender: [], served: [], pinned: [] };
 
 for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
   const p = path.join(LISTS, file);
@@ -231,6 +236,8 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
   for (const c of rows) {
     const who = `${list.partyName} ${c.rank ?? c.photo} ${c.name}`;
     const key = `${slug} ${c.rank ?? c.photo}`;
+    /* Set by hand in the editor. The roll does not get to overwrite a person's decision. */
+    const held = new Set(c.pinned || []);
     let { hits, loose } = match(c.name, people);
     if (key in RESOLVED) {
       /* Select from the whole roll, not from what the matcher found. Filtering its hits
@@ -245,7 +252,8 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
     if (hits.length > 1) {
       mk = null;
       report.ambiguous.push(`${who} — ${hits.length} people in the roll match (${hits.map(h => h.id).join(', ')})`);
-      c.verify = `name matches ${hits.length} people in the Knesset roll; mk and gender left undetermined`;
+      if (!held.has('mk') && !held.has('gender'))
+        c.verify = `name matches ${hits.length} people in the Knesset roll; mk and gender left undetermined`;
     } else if (hits.length === 1) {
       const h = hits[0];
       mk = h.sitting ? 'current' : h.served ? 'former' : 'none';
@@ -258,17 +266,23 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
     /* The party's own graphic is corroboration, not an override — a disagreement is
        either a stale graphic or a bad match, and both want a human. */
     const before = c.mk;
-    if (before && mk && before !== mk)
+    if (before && mk && before !== mk && !held.has('mk'))
       report.disagree.push(`${who} — graphic said ${GRAPHIC_SAID[before] || before}, roll says ${mk}`);
 
     if (GENDER[key] != null) gender = GENDER[key];
     if (gender == null) gender = NAME_GENDER_N[tokens(c.name)[0]] ?? null;
-    if (gender == null) report.noGender.push(`${who} — given name "${tokens(c.name)[0]}"`);
+    if (gender == null && !held.has('gender')) report.noGender.push(`${who} — given name "${tokens(c.name)[0]}"`);
 
     if (mk === 'current' || mk === 'former') report.served.push(`${mk === 'current' ? 'ח"כ ' : 'לשעבר'} ${who}`);
-    if (before !== mk || c.gender !== gender) report.changed.push(`${who}: mk ${before ?? '—'} → ${mk ?? '—'}, gender ${c.gender ?? '—'} → ${gender ?? '—'}`);
-    c.mk = mk;
-    c.gender = gender;
+    if (!held.has('mk') && !held.has('gender') && (before !== mk || c.gender !== gender))
+      report.changed.push(`${who}: mk ${before ?? '—'} → ${mk ?? '—'}, gender ${c.gender ?? '—'} → ${gender ?? '—'}`);
+
+    /* Report what the roll would have said, so a pin that has outlived its reason — the
+       roll corrected, the person elected since — shows up instead of quietly diverging. */
+    for (const [f, v] of [['mk', mk], ['gender', gender]]) {
+      if (!held.has(f)) { c[f] = v; continue; }
+      report.pinned.push(`${who} — ${f} pinned to ${c[f] ?? '—'}${c[f] === v ? '' : `, the roll says ${v ?? '—'}`}`);
+    }
   }
 
   if (write) fs.writeFileSync(p, JSON.stringify(list, null, 2) + '\n');
@@ -278,5 +292,6 @@ const show = (title, arr) => { if (arr.length) { console.log(`\n${title} (${arr.
 show('AMBIGUOUS — check these by hand', report.ambiguous);
 show('DISAGREEMENT between the party graphic and the Knesset roll', report.disagree);
 show('NO GENDER — add the given name to NAME_GENDER', report.noGender);
+show('PINNED — set by hand in the editor and left alone', report.pinned.sort());
 show('MATCHED TO THE KNESSET ROLL — check these are the right people', report.served.sort());
 console.log(`\n${report.changed.length} candidates changed. ${write ? 'Written.' : 'Report only — pass --write to apply.'}`);

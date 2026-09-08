@@ -87,6 +87,14 @@ silently dropped from every poll. See the "New-party detection" note in the root
   places would let the two disagree.
 - **`photoKey`** is optional, and set only for someone who already has a baked leader head
   in `assets/leader-heads/cutouts/`, so the two never diverge.
+- **`pinned`** lists the fields a person set by hand, and the enrichment scripts leave those
+  alone. Without it a correction lives until the next `enrich:candidates` or `enrich:names`
+  run and no longer: those scripts re-derive `mk`, `gender`, `nameEn` and `nameAr` from the
+  Knesset roll and Wikidata every time, and cannot tell a value they wrote themselves from
+  one a person fixed since. The editor pins whatever it writes; the lock beside each field
+  releases it again, handing the field back to the automatic source. Every pin is printed on
+  each run, alongside what the source *would* have said, so a pin that has outlived its
+  reason stays visible rather than quietly diverging. Absent means nothing is pinned.
 - **`verify`** marks a field that could not be read confidently off the source, or that
   looks wrong in the source itself — The Democrats' site prints "יאיא פינק" where its own
   photo filename says יאיר. It is a note to a human, not something the dashboard reads;
@@ -172,6 +180,12 @@ It edits **these files**, not a database of its own: fields go back into `lists/
 a photo into `overrides/`, so every change shows up in `git diff` and is reviewed like any
 other commit. Field order and everything the editor does not touch are preserved, so a diff
 shows the one line that changed.
+
+**Nothing edited here is overwritten by an update.** Editing a field pins it (`pinned`,
+above) and the enrichment scripts skip it; a photo is written where a rebuild cannot reach
+it. Both are the same rule — an automatic source never outranks a person who looked — and
+both are reversible: the 🔓 beside a field hands it back to the Knesset roll or Wikidata,
+and "הסר עקיפה" hands the photo back to the graphic or the party site.
 
 A photo can come from a file, a pasted URL, or — where the candidate is a public figure —
 Wikidata's own portrait, offered as a button. Drag the square to frame it. It is written to

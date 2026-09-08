@@ -22,6 +22,10 @@
  * Also reports Wikidata's portrait (P18) for anyone who has one, since a party site that
  * carries no photographs may still have candidates who are public figures.
  *
+ * A field listed in a candidate's `pinned` is left exactly as it is — that is how a name
+ * typed into the candidate editor survives this script. Wikidata is the best automatic
+ * source for the names it has, and it is still not better than a person who checked.
+ *
  *   npm run enrich:names             report only, writes nothing
  *   npm run enrich:names -- --write  apply to lists/*.json
  *   npm run enrich:names -- --refetch  ignore the cached lookups
@@ -121,7 +125,7 @@ async function lookup(he) {
   return out;
 }
 
-const report = { en: 0, ar: 0, both: 0, none: [], img: [] };
+const report = { en: 0, ar: 0, both: 0, none: [], img: [], pinned: [] };
 let total = 0;
 
 for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
@@ -132,8 +136,12 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
     const pin = WIKIDATA[`${file.replace('.json', '')} ${c.rank ?? c.photo}`];
     const hit = pin ? await byId(pin) : await lookup(c.name);
     process.stdout.write(`\r  ${total} looked up`);
-    c.nameEn = hit?.en ?? null;
-    c.nameAr = hit?.ar ?? null;
+    /* Set by hand in the editor; Wikidata does not get to overwrite a person's decision. */
+    const held = new Set(c.pinned || []);
+    for (const [f, v] of [['nameEn', hit?.en ?? null], ['nameAr', hit?.ar ?? null]]) {
+      if (!held.has(f)) { c[f] = v; continue; }
+      report.pinned.push(`${list.partyName} ${c.rank ?? c.photo} ${c.name} — ${f} pinned to ${c[f] ?? '—'}${c[f] === v ? '' : `, Wikidata says ${v ?? '—'}`}`);
+    }
     if (c.nameEn) report.en++;
     if (c.nameAr) report.ar++;
     if (c.nameEn && c.nameAr) report.both++;
@@ -149,6 +157,11 @@ fs.writeFileSync(CACHE, JSON.stringify(cache));
 
 console.log(`\n\n${total} candidates: ${report.en} have an English name, ${report.ar} Arabic, ${report.both} both.`);
 console.log(`${report.none.length} have neither and stay Hebrew on screen.`);
+if (report.pinned.length) {
+  console.log(`\nPINNED — set by hand in the editor and left alone (${report.pinned.length})`);
+  for (const l of report.pinned.sort()) console.log('  ' + l);
+  console.log('');
+}
 console.log(`${report.img.length} have a Wikidata portrait.`);
 if (!write) console.log('\nReport only — pass --write to apply.');
 fs.writeFileSync('.leaderheads/knesset/name-gaps.txt', report.none.join('\n'));

@@ -38,6 +38,12 @@
   .rk .ov { color:var(--ok); }
   .f { display:grid; gap:5px; }
   .f input { width:100%; }
+  .fw { display:flex; gap:5px; align-items:center; }
+  .fw input { flex:1; min-width:0; }
+  .lk { background:transparent; border:0; padding:1px 3px; font-size:13px; line-height:1;
+    cursor:pointer; opacity:.28; filter:grayscale(1); }
+  .lk.on { opacity:1; filter:none; }
+  .lk:hover { opacity:.75; }
   .f input[dir=ltr] { direction:ltr; text-align:left; }
   .row { display:flex; gap:6px; align-items:center; }
   .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
@@ -68,6 +74,7 @@
   <select id="party"></select>
   <input type="text" id="q" placeholder="חיפוש שם…" style="width:180px">
   <label class="hint"><input type="checkbox" id="onlyGaps"> רק חסרים</label>
+  <span class="hint">🔒 = נעול מפני עדכון אוטומטי</span>
   <span class="sp"></span>
   <span id="status"></span>
   <button id="build" class="ghost">בנה מחדש</button>
@@ -128,6 +135,16 @@ const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 const seg = (name, val, opts) => `<span class="seg" data-field="${name}">` +
   opts.map(([v, l]) => `<button data-v="${v}" class="${(val ?? '') === v ? 'on' : ''}">${l}</button>`).join('') + '</span>';
 
+/* A pinned field is one the enrichment scripts must not touch. Editing anything pins it
+   automatically, so the lock is mostly a status light — but it opens too, for when you want
+   the Knesset roll or Wikidata to have the field back. */
+const PINNED_HINT = 'נעול — עדכון אוטומטי לא ידרוס את זה. לחץ כדי לשחרר.';
+const OPEN_HINT = 'פתוח — עדכון אוטומטי עשוי לדרוס את זה. לחץ כדי לנעול.';
+const lock = (r, field) => {
+  const on = (r.pinned || []).includes(field);
+  return `<button class="lk ${on ? 'on' : ''}" data-lock="${field}" title="${on ? PINNED_HINT : OPEN_HINT}">${on ? '🔒' : '🔓'}</button>`;
+};
+
 function render() {
   const list = rows();
   const p = $('#party').value;
@@ -139,26 +156,26 @@ function render() {
         ${r.hasPhoto || r.override
           ? `<img class="ph" src="/${r.override ? 'override' : 'portrait'}/${r.party}/${r.key}.jpg?t=${Date.now()}" alt="">`
           : `<div class="ph none">אין תמונה</div>`}
-        <div class="rk">${r.key}${r.override ? ' <span class="ov">●</span>' : ''}</div>
+        <div class="rk">${r.key}${r.override ? ' <span class="ov" title="תמונה שנבחרה ידנית — בנייה מחדש לא תדרוס אותה">🔒</span>' : ''}</div>
       </div>
       <div class="f">
-        <input type="text" data-field="name" value="${esc(r.name)}" placeholder="שם בעברית">
-        <input type="text" dir="ltr" data-field="nameEn" value="${esc(r.nameEn)}" placeholder="English name">
-        <input type="text" data-field="nameAr" value="${esc(r.nameAr)}" placeholder="الاسم بالعربية">
+        <div class="fw"><input type="text" data-field="name" value="${esc(r.name)}" placeholder="שם בעברית">${lock(r, 'name')}</div>
+        <div class="fw"><input type="text" dir="ltr" data-field="nameEn" value="${esc(r.nameEn)}" placeholder="English name">${lock(r, 'nameEn')}</div>
+        <div class="fw"><input type="text" data-field="nameAr" value="${esc(r.nameAr)}" placeholder="الاسم بالعربية">${lock(r, 'nameAr')}</div>
         <div class="row">
-          ${seg('gender', r.gender, [['f', 'אישה'], ['m', 'גבר'], ['', '?']])}
-          ${seg('mk', r.mk, [['current', 'מכהן'], ['former', 'לשעבר'], ['none', 'חדש'], ['', '?']])}
+          ${seg('gender', r.gender, [['f', 'אישה'], ['m', 'גבר'], ['', '?']])}${lock(r, 'gender')}
+          ${seg('mk', r.mk, [['current', 'מכהן'], ['former', 'לשעבר'], ['none', 'חדש'], ['', '?']])}${lock(r, 'mk')}
         </div>
         ${r.verify ? `<div class="vf">⚑ ${esc(r.verify)}</div>` : ''}
       </div>
     </div>`).join('');
 }
 
-async function save(card, fields) {
+async function save(card, body) {
   card.classList.add('dirty');
   setStatus('שומר…');
   const r = await fetch('/api/candidate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ party: card.dataset.party, key: card.dataset.key, fields }) });
+    body: JSON.stringify({ party: card.dataset.party, key: card.dataset.key, ...body }) });
   const j = await r.json();
   card.classList.remove('dirty');
   if (j.error) return setStatus('שגיאה: ' + j.error, 'var(--warn)');
@@ -166,18 +183,33 @@ async function save(card, fields) {
   const d = DATA.find(x => x.party === card.dataset.party);
   const row = d.rows.find(x => x.key === card.dataset.key);
   Object.assign(row, j.candidate);
+  row.pinned = j.candidate.pinned || [];
+  /* Repaint this card's locks in place; re-rendering the grid would drop focus mid-typing. */
+  for (const b of card.querySelectorAll('.lk')) {
+    const on = row.pinned.includes(b.dataset.lock);
+    b.classList.toggle('on', on);
+    b.textContent = on ? '🔒' : '🔓';
+    b.title = on ? PINNED_HINT : OPEN_HINT;
+  }
 }
 
 $('#grid').addEventListener('change', e => {
   const inp = e.target.closest('input[data-field]'); if (!inp) return;
-  save(inp.closest('.c'), { [inp.dataset.field]: inp.value.trim() });
+  save(inp.closest('.c'), { fields: { [inp.dataset.field]: inp.value.trim() } });
 });
 $('#grid').addEventListener('click', e => {
+  const lk = e.target.closest('.lk');
+  if (lk) {
+    const card = lk.closest('.c');
+    const row = DATA.find(x => x.party === card.dataset.party).rows.find(x => x.key === card.dataset.key);
+    const on = (row.pinned || []).includes(lk.dataset.lock);
+    return save(card, on ? { unpin: [lk.dataset.lock] } : { pin: [lk.dataset.lock] });
+  }
   const b = e.target.closest('.seg button');
   if (b) {
     const s = b.closest('.seg');
     s.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
-    return save(b.closest('.c'), { [s.dataset.field]: b.dataset.v });
+    return save(b.closest('.c'), { fields: { [s.dataset.field]: b.dataset.v } });
   }
   const ph = e.target.closest('.ph');
   if (ph) openPhoto(ph.closest('.c'));
