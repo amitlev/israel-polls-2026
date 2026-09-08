@@ -35,7 +35,7 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/yoram-cohen.webp"
       },
-      "nameEn": "Yoram Cohen",
+      "nameEn": null,
       "nameAr": null
     },
     {
@@ -48,7 +48,7 @@
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
       },
       "nameEn": "Orit Farkash-HaCohen",
-      "nameAr": "أوريت فركاش اليهودي"
+      "nameAr": null
     },
     {
       "rank": 4,
@@ -158,8 +158,8 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/כמיל-רקע-שקוף-e1784736932714.png"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Kamil Abu Rukun",
+      "nameAr": "كميل أبو ركن"
     },
     {
       "rank": 14,
@@ -230,8 +230,8 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/טל.png"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Tal Ohana",
+      "nameAr": "تال أوحانا"
     },
     {
       "rank": 20,

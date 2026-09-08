@@ -127,8 +127,8 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "David Azulai",
-      "nameAr": "دافيد أزولاي"
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 14,
@@ -180,7 +180,7 @@
       "name": "אוליביה רפוביץ'",
       "title": "אל\"מ במיל'",
       "mk": "none",
-      "gender": "f",
+      "gender": "m",
       "nameEn": null,
       "nameAr": null
     },

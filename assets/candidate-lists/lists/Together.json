@@ -103,7 +103,7 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Jonathan Shalev",
+      "nameEn": null,
       "nameAr": null
     },
     {
@@ -193,8 +193,8 @@
       "title": null,
       "mk": "current",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Jasmine Friedman",
+      "nameAr": "ياسمين فريدمان"
     },
     {
       "rank": 21,
@@ -230,8 +230,8 @@
       "title": null,
       "mk": "current",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Moshe Tur-Paz",
+      "nameAr": "موشيه تور باز"
     },
     {
       "rank": 25,
@@ -276,8 +276,11 @@
       "title": null,
       "mk": "current",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shelly Tal Meron",
+      "nameAr": "شيلي ميرون",
+      "pinned": [
+        "nameEn"
+      ]
     },
     {
       "rank": 30,

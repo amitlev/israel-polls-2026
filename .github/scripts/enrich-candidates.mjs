@@ -88,7 +88,11 @@ const GENDER = {
   'Yisrael_Beiteinu 17': 'f',   // מור דקל
   'Yisrael_Beiteinu 23': 'm',   // עדי מורדכייב
   'Yisrael_Beiteinu 25': 'f',   // סתיו בויאנג'ו-מצא
-  'Yisrael_Beiteinu 19': 'f',   // אוליביה רפוביץ'
+  /* אוליביה is almost always a woman's name in Hebrew and this is the second man on these
+     lists carrying it. Read as 'f' here until the name pass turned up his Hebrew Wikipedia
+     article (Q94427585, "איש תקשורת, פרשן ויועץ אסטרטגי", P21 male) — which agrees with the
+     portrait. Two independent sources against a guess from the given name. */
+  'Yisrael_Beiteinu 19': 'm',   // אוליביה רפוביץ'
   'Together 5': 'f',            // לירן אבישר בן חורין
   'Together 6': 'm',            // נעם תיבון
   'Together 19': 'm',           // שחר ורון

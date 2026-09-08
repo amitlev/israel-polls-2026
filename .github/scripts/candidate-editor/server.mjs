@@ -47,7 +47,9 @@ function readAll() {
     const party = slug(f);
     const rows = [...(list.candidates || []), ...(list.unranked || [])].map(c => {
       const key = c.rank != null ? String(c.rank).padStart(2, '0') : c.photo;
-      const wd = wikidata[c.name];
+      /* `hit:` is the item enrich:names actually settled on, which is not always the one its
+         first search returned — a person pinned by id, or one found through Wikipedia. */
+      const wd = wikidata[`hit:${c.name}`] || wikidata[c.name];
       return { ...c, key,
         hasPhoto: fs.existsSync(path.join(PORTRAITS, party, `${key}.jpg`)),
         override: fs.existsSync(path.join(OVERRIDES, party, `${key}.jpg`)),

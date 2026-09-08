@@ -55,10 +55,13 @@
       "name": "יאיר פינק",
       "title": null,
       "mk": "none",
-      "verify": "the site prints \"יאיא פינק\"; its own photo filename says יאיר, so this reads as a typo on the site",
+      "verify": "the site prints \"יאיא פינק\" and so does Hebrew Wikipedia (Q122260479) — a nickname, not the typo this note first read it as. Held under the formal יאיר, with Yair Fink pinned over Wikidata's \"Yaya Fink\"",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yair Fink",
+      "nameAr": null,
+      "pinned": [
+        "nameEn"
+      ]
     },
     {
       "rank": 6,
@@ -67,7 +70,7 @@
       "mk": "former",
       "gender": "f",
       "nameEn": "Gaby Lasky",
-      "nameAr": "sharmota"
+      "nameAr": null
     },
     {
       "rank": 7,
@@ -75,7 +78,7 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "m",
-      "nameEn": "Omry Ronen",
+      "nameEn": "Omri Ronen",
       "nameAr": null
     },
     {
@@ -348,7 +351,7 @@
       "photo": "u17",
       "gender": "f",
       "nameEn": "Yael Cohen Paran",
-      "nameAr": "ياعيل جرمان"
+      "nameAr": null
     },
     {
       "name": "ירון ניב",

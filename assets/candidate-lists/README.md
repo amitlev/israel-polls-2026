@@ -149,25 +149,57 @@ name we hold and it is an instance of human (Q5). A near-match is refused, becau
 would otherwise resolve to whichever Eli Cohen has the better-optimised item, and a wrong
 name on a face is worse than a Hebrew one.
 
-Two things it cannot do on its own:
+Three things reach past that without loosening it:
 
-- **Hebrew spells names several ways.** The comparison flattens what is orthographic rather
-  than personal — geresh, hyphens, ווליד against ואליד — but that only helps when the search
-  returned the item at all. When Wikidata's Hebrew index does not reach a person there is no
-  label left to compare, and only an id helps. That is what the `WIKIDATA` table is for; all
-  three entries in it are Ra'am's Arab MKs, who are on Wikidata with full he/en/ar labels
-  under Hebrew spellings the Israeli press does not use.
-- **This matters most exactly where coverage is worst.** For an Arab candidate the Arabic
-  name is the real one, and leaving it out shows an Arabic reader a Hebrew transliteration
-  of their own name.
+- **Sitelink titles.** A missing label is not a missing name. Shelly Tal Meron's item is
+  labelled שלי מירון and has no English label at all, while the English Wikipedia article
+  about her is titled "Shelly Tal Meron". Used only where the label is absent.
+- **Hebrew Wikipedia's search**, when Wikidata's returns nothing. Wikidata searches labels
+  and aliases; Wikipedia searches the article, and reaches people the other cannot —
+  משה "קינלי" טור-פז returns nothing on Wikidata and his own article on the first hit. Only
+  an article titled *exactly* the name is taken; everything else goes to a review report.
+- **`WIKIDATA`**, an item id a person has ruled is the right one — or `null` to rule one out.
+  It is the only way to accept a near-match. Ra'am's three Arab MKs are the case that forced
+  it: all three are on Wikidata with full he/en/ar labels, under Hebrew spellings the Israeli
+  press does not use, so the search returns nothing and there is no label left to compare.
+  This matters most exactly where coverage is worst — for an Arab candidate the Arabic name
+  is the real one, and leaving it out shows an Arabic reader a transliteration of their own
+  name back from Hebrew.
+
+### An exact name is not an identity
+
+Three guards refuse a match that passes the name test, each of them earned:
+
+- **The person has died** (P570). A Slavic scholar who died in 2012, a Greek-Jewish officer
+  killed in 1940, and Shas's דוד אזולאי, who died in 2018 — whose name the sibling script had
+  already rejected once for `mk`, in its own table, which this one could not see.
+- **Several items match the name exactly.** Wikidata holds six יורם כהן, and the one the
+  search ranked first was a bare ORCID record. A name that resolves to several people
+  resolves to none of them.
+- **No article in any language and no Hebrew description.** That is the shape of a record
+  imported from ORCID or a thesis index; nobody has written about the person in Hebrew, so
+  matching their Hebrew name is a coincidence.
+
+Each costs at most a name that stays Hebrew, which is the safe direction to fail in.
+
+`DROP` handles the remaining case, where the item is the right person but one of its fields
+is not. Wikidata is edited by anyone: Gaby Lasky's Arabic label is a slur, Yael Cohen Paran's
+is a different politician's name, and Orit Farkash-HaCohen's renders הכהן as "the Jew". Those
+three Arabic labels are dropped by hand.
 
 Coverage is far from complete and the report prints the gap rather than hiding it: of 198
-candidates, 107 have an English name and 47 Arabic. The rest are private individuals whose
-name has never been written in either language anywhere, and they stay Hebrew — which is
-honest, and is what the source actually holds.
+candidates, 109 have an English name and 48 Arabic. The rest are private
+individuals whose name has never been written in either language anywhere, and they stay
+Hebrew — which is honest, and is what the source actually holds.
 
-The same pass records Wikidata's portrait (P18) for anyone who has one — 93 of them, listed
-in `.leaderheads/knesset/wikidata-portraits.txt`. Nothing consumes those yet.
+The same pass records Wikidata's portrait (P18) for anyone who has one — 99 of them,
+listed in `.leaderheads/knesset/wikidata-portraits.txt`. Nothing consumes those yet.
+
+Four reports land in `.leaderheads/knesset/` on every run: `name-matches.txt`, every accepted
+match with the item's own description of who it is, so the whole set stays readable by a
+person rather than only countable; `name-gaps.txt`, who is left; `name-review.txt`, articles
+found under a name that is not quite the one the party printed — leads for a human, and the
+source of four of the pins above; and `wikidata-portraits.txt`.
 
 ## The editor
 
