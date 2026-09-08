@@ -19,28 +19,36 @@
       "title": "אלוף במיל.",
       "mk": "former",
       "photoKey": "Yair Golan",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yair Golan",
+      "nameAr": "يائير غولان"
     },
     {
       "rank": 2,
       "name": "נעמה לזימי",
       "title": null,
       "mk": "current",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Naama Lazimi",
+      "nameAr": null
     },
     {
       "rank": 3,
       "name": "גלעד קריב",
       "title": "הרב",
       "mk": "current",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Gilad Kariv",
+      "nameAr": null
     },
     {
       "rank": 4,
       "name": "אפרת רייטן",
       "title": "עו\"ד",
       "mk": "current",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Efrat Rayten",
+      "nameAr": null
     },
     {
       "rank": 5,
@@ -48,112 +56,144 @@
       "title": null,
       "mk": "none",
       "verify": "the site prints \"יאיא פינק\"; its own photo filename says יאיר, so this reads as a typo on the site",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 6,
       "name": "גבי לסקי",
       "title": "עו\"ד",
       "mk": "former",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Gaby Lasky",
+      "nameAr": "sharmota"
     },
     {
       "rank": 7,
       "name": "עמרי רונן",
       "title": "עו\"ד",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Omry Ronen",
+      "nameAr": null
     },
     {
       "rank": 8,
       "name": "מיכל רוזין",
       "title": null,
       "mk": "former",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Michal Rozin",
+      "nameAr": "ميخال روزين"
     },
     {
       "rank": 9,
       "name": "משה רדמן אבוטבול",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Moshe Radman Abutbul",
+      "nameAr": null
     },
     {
       "rank": 10,
       "name": "סומיה בשיר",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Somaya Bashir",
+      "nameAr": "سمية بشير"
     },
     {
       "rank": 11,
       "name": "נמרוד שפר",
       "title": "אלוף במיל.",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Nimrod Sheffer",
+      "nameAr": null
     },
     {
       "rank": 12,
       "name": "מורן זר קצנשטיין",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Moran Zer Katzenstein",
+      "nameAr": null
     },
     {
       "rank": 13,
       "name": "אבי דבוש",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Avi Dabush",
+      "nameAr": "آفي دابوش"
     },
     {
       "rank": 14,
       "name": "אמילי מואטי",
       "title": null,
       "mk": "former",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Emilie Moatti",
+      "nameAr": null
     },
     {
       "rank": 15,
       "name": "תומר אביטל",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Tomer Avital",
+      "nameAr": null
     },
     {
       "rank": 16,
       "name": "נאווה רוזוליו",
       "title": "עו\"ד",
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Nava Rozolyo",
+      "nameAr": null
     },
     {
       "rank": 17,
       "name": "רם שפע",
       "title": null,
       "mk": "former",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Ram Shefa",
+      "nameAr": null
     },
     {
       "rank": 18,
       "name": "עלי סלאלחה",
       "title": null,
       "mk": "former",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Ali Salalcha",
+      "nameAr": "علي صلالحة"
     },
     {
       "rank": 19,
       "name": "רתם סיון",
       "title": "ד\"ר",
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 20,
       "name": "ערן עציון",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Eran Etzion",
+      "nameAr": null
     }
   ],
   "unranked": [
@@ -162,217 +202,279 @@
       "title": "אדר'",
       "mk": "none",
       "photo": "u01",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "אביתר באר",
       "title": null,
       "mk": "none",
       "photo": "u02",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "אוליביה עמנואל דה לם",
       "title": null,
       "mk": "none",
       "photo": "u03",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "אחסאן חלאילה",
       "title": "ד\"ר",
       "mk": "none",
       "photo": "u04",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Ehsan Khlaily",
+      "nameAr": null
     },
     {
       "name": "איהאב שליאן",
       "title": null,
       "mk": "none",
       "photo": "u05",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "ihab shlayan",
+      "nameAr": "إيهاب شليان"
     },
     {
       "name": "איתי לשם",
       "title": null,
       "mk": "none",
       "photo": "u06",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Itai Leshem",
+      "nameAr": "إيتاي ليشم"
     },
     {
       "name": "אליס גולדמן",
       "title": "עו\"ד",
       "mk": "none",
       "photo": "u07",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Elis Goldman",
+      "nameAr": null
     },
     {
       "name": "אמיר ח'ניפס",
       "title": "ד\"ר",
       "mk": "none",
       "photo": "u08",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Amir Khnifess",
+      "nameAr": null
     },
     {
       "name": "בנימין דניאל מיניץ",
       "title": null,
       "mk": "none",
       "photo": "u09",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "גאלב סלאמנה",
       "title": "עו\"ד",
       "mk": "none",
       "photo": "u10",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Ghaleb Salamna",
+      "nameAr": null
     },
     {
       "name": "גיל ביילין",
       "title": null,
       "mk": "none",
       "photo": "u11",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Gil Beilin",
+      "nameAr": null
     },
     {
       "name": "דימה שפירא",
       "title": null,
       "mk": "none",
       "photo": "u12",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Dima Shapira",
+      "nameAr": null
     },
     {
       "name": "דני אלגרט",
       "title": null,
       "mk": "none",
       "photo": "u13",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Dani Elgarat",
+      "nameAr": null
     },
     {
       "name": "הדס רגולסקי",
       "title": null,
       "mk": "none",
       "photo": "u14",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Hadas Ragolsky",
+      "nameAr": null
     },
     {
       "name": "יאיר רובינשטיין",
       "title": null,
       "mk": "none",
       "photo": "u15",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "יואב אגמי",
       "title": null,
       "mk": "none",
       "photo": "u16",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "יעל כהן פארן",
       "title": null,
       "mk": "former",
       "photo": "u17",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Yael Cohen Paran",
+      "nameAr": "ياعيل جرمان"
     },
     {
       "name": "ירון ניב",
       "title": "פרופ'",
       "mk": "none",
       "photo": "u18",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yaron Niv",
+      "nameAr": null
     },
     {
       "name": "יריב אופנהיימר",
       "title": null,
       "mk": "none",
       "photo": "u19",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yariv Oppenheimer",
+      "nameAr": null
     },
     {
       "name": "לי הופמן אגיב",
       "title": null,
       "mk": "none",
       "photo": "u20",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "מאלכ בדר",
       "title": "עו\"ד",
       "mk": "none",
       "photo": "u21",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Malek Bader",
+      "nameAr": "مالك بدر"
     },
     {
       "name": "מהרטה ברוך רון",
       "title": null,
       "mk": "none",
       "photo": "u22",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Mehereta Baruch-Ron",
+      "nameAr": null
     },
     {
       "name": "מוסי רז",
       "title": null,
       "mk": "former",
       "photo": "u23",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Mossi Raz",
+      "nameAr": null
     },
     {
       "name": "מורן מישל",
       "title": null,
       "mk": "none",
       "photo": "u24",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Moran Michel",
+      "nameAr": null
     },
     {
       "name": "נאור נרקיס",
       "title": null,
       "mk": "none",
       "photo": "u25",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Naor Narkis",
+      "nameAr": null
     },
     {
       "name": "נדאל מסאלחה",
       "title": "עו\"ד",
       "mk": "none",
       "photo": "u26",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Nedal Massalha",
+      "nameAr": null
     },
     {
       "name": "עאיד בדיר",
       "title": null,
       "mk": "none",
       "photo": "u27",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Aaed Bader",
+      "nameAr": null
     },
     {
       "name": "ענבל וורטמן שהם",
       "title": null,
       "mk": "none",
       "photo": "u28",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "ענבר בזק",
       "title": null,
       "mk": "former",
       "photo": "u29",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Inbar Bezek",
+      "nameAr": null
     },
     {
       "name": "ערן ניסן",
       "title": null,
       "mk": "none",
       "photo": "u30",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "name": "קטי פיאסצקי",
       "title": null,
       "mk": "none",
       "photo": "u31",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Kati Piasecki",
+      "nameAr": null
     }
   ]
 }

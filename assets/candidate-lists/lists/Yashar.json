@@ -22,7 +22,9 @@
       "photoKey": "Gadi Eisenkot",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/gadi-eisenkot.webp"
-      }
+      },
+      "nameEn": "Gadi Eisenkot",
+      "nameAr": "غادي أيزنكوت"
     },
     {
       "rank": 2,
@@ -32,7 +34,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/yoram-cohen.webp"
-      }
+      },
+      "nameEn": "Yoram Cohen",
+      "nameAr": null
     },
     {
       "rank": 3,
@@ -42,14 +46,18 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
-      }
+      },
+      "nameEn": "Orit Farkash-HaCohen",
+      "nameAr": "أوريت فركاش اليهودي"
     },
     {
       "rank": 4,
       "name": "עדי אלטשולר",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Adi Altschuler",
+      "nameAr": null
     },
     {
       "rank": 5,
@@ -59,14 +67,18 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/matan-kahana-1.webp"
-      }
+      },
+      "nameEn": "Matan Kahana",
+      "nameAr": "ماتان كاهانا"
     },
     {
       "rank": 6,
       "name": "חילי טרופר",
       "title": null,
       "mk": "current",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Hili Tropper",
+      "nameAr": "هيلي تروبر"
     },
     {
       "rank": 7,
@@ -76,7 +88,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/shaul-meridor-1.webp"
-      }
+      },
+      "nameEn": "Shaul Meridor",
+      "nameAr": null
     },
     {
       "rank": 8,
@@ -86,7 +100,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/tair_ifargan.webp"
-      }
+      },
+      "nameEn": "Tair Ifergan",
+      "nameAr": null
     },
     {
       "rank": 9,
@@ -96,14 +112,18 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/אושרת-e1785318426848.png"
-      }
+      },
+      "nameEn": "Oshrat Gani Gonen",
+      "nameAr": null
     },
     {
       "rank": 10,
       "name": "שירה שפירא",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 11,
@@ -113,7 +133,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-harush-giti.webp"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 12,
@@ -123,7 +145,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/שטרן-סופי-e1787554647455.png"
-      }
+      },
+      "nameEn": "Elazar Stern",
+      "nameAr": "اليعازر شتيرن"
     },
     {
       "rank": 13,
@@ -133,7 +157,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/כמיל-רקע-שקוף-e1784736932714.png"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 14,
@@ -143,7 +169,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/dvora-sharipian-bachar.webp"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 15,
@@ -153,7 +181,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/alex-riff.webp"
-      }
+      },
+      "nameEn": "Alex Rif",
+      "nameAr": null
     },
     {
       "rank": 16,
@@ -163,7 +193,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-yehezkeli-1.webp"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 17,
@@ -173,7 +205,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/פולקמן-e1787562888384.png"
-      }
+      },
+      "nameEn": "Roy Folkman",
+      "nameAr": "روي فوكمان"
     },
     {
       "rank": 18,
@@ -183,7 +217,9 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/20260804_190314_0000-e1785915320431.png"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 19,
@@ -193,14 +229,18 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/טל.png"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 20,
       "name": "אליסף פרץ",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 21,
@@ -210,7 +250,9 @@
       "gender": "f",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/יפה.png"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 22,
@@ -220,133 +262,171 @@
       "gender": "m",
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/09/IMG_3684-1-e1788428648677.webp"
-      }
+      },
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 23,
       "name": "רון ברקאי",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Ron Barkaï",
+      "nameAr": null
     },
     {
       "rank": 24,
       "name": "שי פישר",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 25,
       "name": "ליאן פולק דוד",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 26,
       "name": "רועי כהן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 27,
       "name": "זיו רוזן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 28,
       "name": "ג'וסלין בש",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 29,
       "name": "אלון פוטרמן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Alon Futterman",
+      "nameAr": "ألون فوترمان"
     },
     {
       "rank": 30,
       "name": "טלי מולנר",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 31,
       "name": "גיל אבריאל",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 32,
       "name": "שירן בן דוד עוזרי",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 33,
       "name": "אלירן אליה",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Eliran Elya",
+      "nameAr": null
     },
     {
       "rank": 34,
       "name": "הלן גלבר",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 35,
       "name": "שלומי יחיאב",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Shlomi Yehiav",
+      "nameAr": null
     },
     {
       "rank": 36,
       "name": "הילה מאיר",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 37,
       "name": "רן בן עטיה",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 38,
       "name": "אליענה זקס",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 39,
       "name": "גידי זאגא",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 40,
       "name": "משה דוידוביץ",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Moshe Davidovich",
+      "nameAr": null
     }
   ]
 }

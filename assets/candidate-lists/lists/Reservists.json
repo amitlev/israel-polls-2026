@@ -1,0 +1,46 @@
+{
+  "party": "Reservists",
+  "partyName": "המילואימניקים והכלכלית",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה",
+    "publisher": "gov.il / ynet",
+    "published": "2026-09-07",
+    "url": "https://www.gov.il/he/pages/candidates-lists-26",
+    "licence": "Names are facts reported by the press",
+    "note": "A three-way merger — Hendel's המילואימניקים, Zaleika's הכלכלית and Einat Wilf's עוז — registered on 7 Sep under the letters די / צ / י. The NAME is confirmed by gov.il; the ORDER is not. No source publishes the merged list, and the pre-merger reporting put Wilf second and Yoav Adomi third, which the merger has plainly changed. Only these three are recorded, and even their order is inferred from Zaleika being a named co-leader.",
+    "verify": "the whole order is unconfirmed — replace it from gov.il once the approved lists are published"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "יועז הנדל",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "photoKey": "Yoaz Hendel",
+      "nameEn": "Yoaz Hendel",
+      "nameAr": "يوعاز هيندل"
+    },
+    {
+      "rank": 2,
+      "name": "ירון זליכה",
+      "title": "פרופ'",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yaron Zelicha",
+      "nameAr": null
+    },
+    {
+      "rank": 3,
+      "name": "עינת וילף",
+      "title": "ד\"ר",
+      "mk": "former",
+      "gender": "f",
+      "nameEn": "Einat Wilf",
+      "nameAr": "إينات ويلف"
+    }
+  ]
+}

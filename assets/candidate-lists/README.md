@@ -77,6 +77,9 @@ silently dropped from every poll. See the "New-party detection" note in the root
   below). `null` means *not yet determined*, which is not the same as `"none"`: a null must
   never be grouped in with genuinely new candidates.
 - **`gender`** is `"f"` or `"m"`, from the same script. `null` again means undetermined.
+- **`nameEn`** / **`nameAr`** are the person's name as it is actually written in those
+  languages, from Wikidata — not a transliteration. `null` where Wikidata has no entry,
+  which is most private individuals; those stay Hebrew on screen. See below.
 - **`title`** is the professional or military title and *only* that — `ד"ר`, `עו"ד`,
   `אל"מ במיל'`, `סרן במיל'`. Never ח"כ or חכ"ל; those are `mk`, and carrying them in both
   places would let the two disagree.
@@ -122,6 +125,39 @@ Four things it knows that are easy to get wrong:
 Where the roll disagrees with what the party's graphic printed, both are reported and
 neither wins automatically. That is how Yair Golan's entry got fixed: Meretz missed the
 threshold in 2022, so he is a *former* MK and the hand-entered "current" was wrong.
+
+## `nameEn` and `nameAr`
+
+`npm run enrich:names` fills both from Wikidata, which carries he/en/ar labels for public
+figures maintained by people who know how the name is really written. That is not the same
+thing as a transliteration, which is why no transliterator is used here: half the value is
+that "Fleur Hassan-Nahoum" is not what any scheme would produce from פלר חסן-נחום. The
+Knesset's own OData service is Hebrew-only and cannot help.
+
+Matching is narrow on purpose: an item is accepted only if its **Hebrew** label matches the
+name we hold and it is an instance of human (Q5). A near-match is refused, because "אלי כהן"
+would otherwise resolve to whichever Eli Cohen has the better-optimised item, and a wrong
+name on a face is worse than a Hebrew one.
+
+Two things it cannot do on its own:
+
+- **Hebrew spells names several ways.** The comparison flattens what is orthographic rather
+  than personal — geresh, hyphens, ווליד against ואליד — but that only helps when the search
+  returned the item at all. When Wikidata's Hebrew index does not reach a person there is no
+  label left to compare, and only an id helps. That is what the `WIKIDATA` table is for; all
+  three entries in it are Ra'am's Arab MKs, who are on Wikidata with full he/en/ar labels
+  under Hebrew spellings the Israeli press does not use.
+- **This matters most exactly where coverage is worst.** For an Arab candidate the Arabic
+  name is the real one, and leaving it out shows an Arabic reader a Hebrew transliteration
+  of their own name.
+
+Coverage is far from complete and the report prints the gap rather than hiding it: of 198
+candidates, 107 have an English name and 47 Arabic. The rest are private individuals whose
+name has never been written in either language anywhere, and they stay Hebrew — which is
+honest, and is what the source actually holds.
+
+The same pass records Wikidata's portrait (P18) for anyone who has one — 93 of them, listed
+in `.leaderheads/knesset/wikidata-portraits.txt`. Nothing consumes those yet.
 
 ## Site readers
 

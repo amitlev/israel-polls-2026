@@ -19,42 +19,54 @@
       "title": null,
       "mk": "current",
       "gender": "m",
-      "photoKey": "Itamar Ben-Gvir"
+      "photoKey": "Itamar Ben-Gvir",
+      "nameEn": "Itamar Ben-Gvir",
+      "nameAr": "إيتمار بن غفير"
     },
     {
       "rank": 2,
       "name": "טלי גוטליב",
       "title": null,
       "mk": "current",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Tali Gottleib",
+      "nameAr": "تالي غوتليف"
     },
     {
       "rank": 3,
       "name": "יצחק וסרלאוף",
       "title": null,
       "mk": "current",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Isaac Wasserlauf",
+      "nameAr": "إسحاق فاسرلاوف"
     },
     {
       "rank": 4,
       "name": "עמיחי אליהו",
       "title": null,
       "mk": "current",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Amichai Eliyahu",
+      "nameAr": "عميحاي إلياهو"
     },
     {
       "rank": 5,
       "name": "לימור סון הר מלך",
       "title": null,
       "mk": "current",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Limor Son Har-Melech",
+      "nameAr": "ليمور سون هار ميلخ"
     },
     {
       "rank": 6,
       "name": "יצחק קרויזר",
       "title": null,
       "mk": "current",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yitzhak Kroizer",
+      "nameAr": null
     },
     {
       "rank": 7,
@@ -62,14 +74,18 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameInPress": "חנמאל דרופמן"
+      "nameInPress": "חנמאל דרופמן",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 8,
       "name": "צחי אליהו",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 9,
@@ -77,84 +93,108 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameInPress": "יוסי גולדברגר"
+      "nameInPress": "יוסי גולדברגר",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 10,
       "name": "איתיאל ניימן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 11,
       "name": "דוד בבלי",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 12,
       "name": "ישי פליישר",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yishai Fleisher",
+      "nameAr": null
     },
     {
       "rank": 13,
       "name": "שירן מירזאי",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 14,
       "name": "שימי גולן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 15,
       "name": "יניב בדלוב",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 16,
       "name": "מסלה אייצ'לותם",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 17,
       "name": "גדי מזוז",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 18,
       "name": "מרדכי פריזיס",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Mordehai Frizis",
+      "nameAr": null
     },
     {
       "rank": 19,
       "name": "אהרון עמר",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 20,
       "name": "אור אליה יומטוביאן",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     }
   ]
 }

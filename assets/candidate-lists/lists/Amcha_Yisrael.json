@@ -20,126 +20,162 @@
       "title": "תא\"ל במיל'",
       "mk": "none",
       "gender": "m",
-      "photoKey": "Ofer Winter"
+      "photoKey": "Ofer Winter",
+      "nameEn": "Ofer Winter",
+      "nameAr": null
     },
     {
       "rank": 2,
       "name": "יוסף חדאד",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": "Yoseph Haddad",
+      "nameAr": "يوسف حداد"
     },
     {
       "rank": 3,
       "name": "נטעלי שם טוב",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Netali Shem Tov",
+      "nameAr": null
     },
     {
       "rank": 4,
       "name": "ערן בן-ארי",
       "title": "עו\"ד",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 5,
       "name": "פלר חסן-נחום",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": "Fleur Hassan-Nahoum",
+      "nameAr": null
     },
     {
       "rank": 6,
       "name": "ללי דרעי",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 7,
       "name": "רונן בודנרו",
       "title": "רס\"ן במיל'",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 8,
       "name": "דוידי בן ציון",
       "title": "רס\"ן במיל'",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 9,
       "name": "אביב עזרא",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 10,
       "name": "סיגל קראוניק-עטיה",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 11,
       "name": "אלי ג'ינו",
       "title": "אל\"מ במיל'",
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 12,
       "name": "אריק רובין",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 13,
       "name": "עלם איברהים",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 14,
       "name": "משה הר-ציון",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 15,
       "name": "לילך חיים-אידלברג",
       "title": null,
       "mk": "none",
-      "gender": "f"
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 16,
       "name": "משה טולדנו",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 17,
       "name": "רז מלכה",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     },
     {
       "rank": 18,
       "name": "דור יצחק",
       "title": null,
       "mk": "none",
-      "gender": "m"
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
     }
   ]
 }

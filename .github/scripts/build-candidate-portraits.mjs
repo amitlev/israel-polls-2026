@@ -111,6 +111,14 @@ const PARTIES = {
   /* Names only. No list graphic and no party site with photographs was found. */
   Amcha_Yisrael: {},
 
+  /* Names only for now. Only the top six are published anywhere, which is past the party's
+     polling, so every seat it is projected to win still gets a named person. */
+  Ra_am: {},
+
+  /* Names only, and barely: the merged list's order is not published at all. See the note
+     in lists/Reservists.json. */
+  Reservists: {},
+
   /* 1131x1600, 5x4. Like Together's, this graphic's name plate is dark, so the grid came
      from the orange rule under each card — one bar per card, the most uniform thing on the
      page, where the white portrait cards fragment on dark suits and hair. Columns at
@@ -495,7 +503,11 @@ if (!preview) {
        emphatic that its alphabetical order must never be read as a list order. */
     people[name] = (list.candidates || []).filter(c => c.rank <= MAX_SEATS)
       .sort((a, b) => a.rank - b.rank)
-      .map(c => ({ r: c.rank, n: c.name, g: c.gender ?? null, mk: c.mk ?? null }));
+      /* ne/na are omitted rather than nulled where a candidate has no published English or
+         Arabic name, which is about half of them — a present-but-null key would cost more
+         bytes in the page than the value is worth. */
+      .map(c => ({ r: c.rank, n: c.name, g: c.gender ?? null, mk: c.mk ?? null,
+        ...(c.nameEn ? { ne: c.nameEn } : {}), ...(c.nameAr ? { na: c.nameAr } : {}) }));
   }
   const before = fs.statSync(FILES[0]).size;
   splice([['CANDIDATE_SPRITES_DATA', sprites], ['CANDIDATES_DATA', people]]);

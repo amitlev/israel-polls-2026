@@ -65,7 +65,7 @@ const NAME_GENDER = {
   גידי: 'm', דוידי: 'm', יוסף: 'm', יורם: 'm', כמיל: 'm', ניר: 'm', עופר: 'm', רון: 'm',
   רונן: 'm', רועי: 'm', רן: 'm', שאול: 'm', שלומי: 'm', אהרון: 'm', איתיאל: 'm',
   גדי: 'm', חנמאל: 'm', יוסי: 'm', יניב: 'm', ישי: 'm', מסלה: 'm', מרדכי: 'm',
-  צחי: 'm', שימי: 'm',
+  צחי: 'm', שימי: 'm', ואליד: 'm',
   אולסיה: 'f', אורלי: 'f', אלוירה: 'f', אליס: 'f', אסתי: 'f',
   ברוריה: 'f', הדס: 'f', טליה: 'f', יעל: 'f', לילי: 'f', מאיה: 'f', מהרטה: 'f',
   מיכאלה: 'f', מיכל: 'f', נאווה: 'f', סומיה: 'f', ענבל: 'f', קטי: 'f', קרן: 'f',
@@ -94,11 +94,10 @@ const GENDER = {
   'The_Democrats 12': 'f',      // מורן זר קצנשטיין
   'The_Democrats 19': 'f',      // רתם סיון
   'The_Democrats u11': 'm',     // גיל ביילין
-  'The_Democrats u12': 'f',     // דימה שפירא
+  'The_Democrats u12': 'm',     // דימה שפירא — Dima here is a man, checked against the portrait
   'The_Democrats u20': 'f',     // לי הופמן אגיב
   'The_Democrats u24': 'f',     // מורן מישל
   'The_Democrats u03': 'm',     // אוליביה עמנואל דה לם — Olivier, not Olivia
-  'The_Democrats u12': 'm',     // דימה שפירא
   'Yashar 4': 'f',              // עדי אלטשולר
   'Yashar 15': 'f',             // אלקס ריף — Alex Rif
   'Yashar 19': 'f',             // טל אוחנה חכמון
@@ -126,6 +125,10 @@ const RESOLVED = {
   'Together 20': 30783,       // יסמין סאקס פרידמן, in the roll as יסמין פרידמן
   'Together 24': 30777,       // משה "קינלי" טור-פז = משה טור פז
   'Together 29': 30871,       // שלי טל מירון, split as first "שלי טל" + last "מירון"
+  /* The roll writes ווליד, the press writes ואליד. Collapsing וו to ו leaves וליד against
+     ואליד — the difference is an א standing in for a vowel, and stripping those generally
+     would start matching strangers. A sitting Ra'am MK, so worth pinning by hand. */
+  'Ra_am 3': 30752,           // ואליד טאהא = ווליד טאהא
 };
 
 /* ── the Knesset roll ── */
@@ -174,10 +177,15 @@ async function roll() {
  * both to bare tokens, then require the *given* name to match exactly and the surname to
  * overlap in one direction or the other. Anything looser starts matching strangers. */
 
+/* Hebrew spells the same name several ways and the roll picked one of them. Flatten the
+   differences that are orthographic rather than personal: the roll holds ווליד טאהא where
+   the press writes ואליד טאהא, and ואליד אלהואשלה where the press writes ואליד אל-הואשלה.
+   Both are sitting Ra'am MKs, and both were read as having never served. */
 const norm = s => String(s || '')
-  .replace(/[׳״"'`״׳]/g, '')
+  .replace(/[׳״"'`]/g, '')
   .replace(/\([^)]*\)/g, ' ')
   .replace(/[-–—]/g, ' ')
+  .replace(/וו/g, 'ו').replace(/יי/g, 'י')
   .replace(/\s+/g, ' ')
   .trim();
 
@@ -191,7 +199,9 @@ function match(name, people) {
   for (const p of people) {
     const pf = tokens(p.first), pl = tokens(p.last);
     if (!pf.length || pf[0] !== c[0]) continue;
-    if (rest.join(' ') === pl.join(' ')) { exact.push(p); continue; }
+    /* Compare the surname with spaces collapsed too: "אל הואשלה" and "אלהואשלה" are one
+       name written two ways, not two people. */
+    if (rest.join(' ') === pl.join(' ') || (rest.length && pl.length && rest.join('') === pl.join(''))) { exact.push(p); continue; }
     if (!rest.length || !pl.length) continue;
     const covers = pl.every(t => rest.includes(t)) || rest.every(t => pl.includes(t));
     if (covers) loose.push(p);
@@ -204,6 +214,12 @@ function match(name, people) {
 const { people } = await roll();
 
 const GRAPHIC_SAID = { current: 'ח"כ', former: 'חכ"ל' };
+/* The table is written in each name's natural spelling; look it up through the same
+   normaliser the matcher uses, so a variant like נאווה/נאוה resolves to one entry rather
+   than falling through and reporting a gap. */
+const NAME_GENDER_N = {};
+for (const k in NAME_GENDER) NAME_GENDER_N[norm(k)] = NAME_GENDER[k];
+
 const report = { changed: [], disagree: [], ambiguous: [], noGender: [], served: [] };
 
 for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
@@ -217,8 +233,11 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
     const key = `${slug} ${c.rank ?? c.photo}`;
     let { hits, loose } = match(c.name, people);
     if (key in RESOLVED) {
+      /* Select from the whole roll, not from what the matcher found. Filtering its hits
+         would let the table reject a wrong match but never assert a missed one, and the
+         misses are the cases that need a human most — ואליד טאהא returned nothing at all. */
       const want = RESOLVED[key];
-      hits = want == null ? [] : hits.filter(h => h.id === want);
+      hits = want == null ? [] : people.filter(h => h.id === want);
       loose = false;
     }
 
@@ -243,7 +262,7 @@ for (const file of fs.readdirSync(LISTS).filter(f => f.endsWith('.json'))) {
       report.disagree.push(`${who} — graphic said ${GRAPHIC_SAID[before] || before}, roll says ${mk}`);
 
     if (GENDER[key] != null) gender = GENDER[key];
-    if (gender == null) gender = NAME_GENDER[tokens(c.name)[0]] ?? null;
+    if (gender == null) gender = NAME_GENDER_N[tokens(c.name)[0]] ?? null;
     if (gender == null) report.noGender.push(`${who} — given name "${tokens(c.name)[0]}"`);
 
     if (mk === 'current' || mk === 'former') report.served.push(`${mk === 'current' ? 'ח"כ ' : 'לשעבר'} ${who}`);
