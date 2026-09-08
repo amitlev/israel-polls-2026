@@ -71,12 +71,15 @@ const NAME_GENDER = {
   רונן: 'm', רועי: 'm', רן: 'm', שאול: 'm', שלומי: 'm', אהרון: 'm', איתיאל: 'm',
   גדי: 'm', חנמאל: 'm', יוסי: 'm', יניב: 'm', ישי: 'm', מסלה: 'm', מרדכי: 'm',
   צחי: 'm', שימי: 'm', ואליד: 'm',
+  אלישע: 'm', ארז: 'm', שלמה: 'm', איציק: 'm', שוקי: 'm', נתנאל: 'm', בני: 'm',
+  צביקה: 'm', איתמר: 'm', יצחק: 'm', ארקדי: 'm', שמואל: 'm', דרור: 'm',
   אולסיה: 'f', אורלי: 'f', אלוירה: 'f', אליס: 'f', אסתי: 'f',
   ברוריה: 'f', הדס: 'f', טליה: 'f', יעל: 'f', לילי: 'f', מאיה: 'f', מהרטה: 'f',
   מיכאלה: 'f', מיכל: 'f', נאווה: 'f', סומיה: 'f', ענבל: 'f', קטי: 'f', קרן: 'f',
   תמי: 'f', אושרת: 'f', אליענה: 'f', גוסלין: 'f', דבורה: 'f', הילה: 'f', הלן: 'f',
   טלי: 'f', יפה: 'f', ליאן: 'f', לילך: 'f', ללי: 'f', נטעלי: 'f', סיגל: 'f', ענבר: 'f',
   פלר: 'f', שירה: 'f', שירן: 'f', תאיר: 'f',
+  עליזה: 'f', רעות: 'f', סימה: 'f', שיראל: 'f', איריס: 'f',
 };
 
 /* Unisex given names, decided per person and checked against the portrait. These are
@@ -118,6 +121,10 @@ const GENDER = {
   'Amcha_Yisrael 17': 'm',      // רז מלכה
   'Amcha_Yisrael 18': 'm',      // דור יצחק
   'Otzma_Yehudit 20': 'm',      // אור אליה יומטוביאן
+  'Likud 9': 'f',               // טליק גואילי — the press calls her אמו של רני גואילי
+  'Likud 36': 'm',              // אפי נוה
+  /* כחול לבן said its first ten would be half women, at slots 2, 3, 5, 8 and 10. Slot 5. */
+  'National_Unity 5': 'f',      // רותם אבידר צאליק
 };
 
 /* Matches a human has ruled on, keyed by "<Party_id> <rank>". A PersonID accepts that
@@ -138,6 +145,12 @@ const RESOLVED = {
      ואליד — the difference is an א standing in for a vowel, and stripping those generally
      would start matching strangers. A sitting Ra'am MK, so worth pinning by hand. */
   'Ra_am 3': 30752,           // ואליד טאהא = ווליד טאהא
+  /* Two אלי כהן in the roll, both male and both former MKs, so the fields come out the same
+     either way — but the ambiguity should be answered rather than left flagged. #755 served
+     in the 1990s; #30083 is the five-digit id of someone who entered in 2015, which is when
+     the Likud minister first took a seat. */
+  'Likud 2': 30083,
+  'National_Unity 2': 23635,  // פנינה תמנו שטה, in the roll as פנינה תמנו
 };
 
 /* ── the Knesset roll ── */

@@ -1,0 +1,265 @@
+{
+  "party": "Likud",
+  "partyName": "הליכוד",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת הליכוד לכנסת ה-26 — המשוריינים ותחתית הרשימה",
+    "publisher": "סרוגים / מעריב",
+    "published": "2026-09-08",
+    "url": "https://www.srugim.co.il/newsflash/137964",
+    "licence": "Names are facts reported by the press",
+    "note": "INCOMPLETE, and deliberately so. Two things are published as rank-to-name statements and both are here: the seven slots Netanyahu reserved (9, 11, 15, 16, 26, 29, 35), from סרוגים's report of the announcement, and the bottom of the list from 27 down to 40, from מעריב. Everything between rank 3 and rank 25 is missing: the outlets that printed it did so as an image, gov.il is behind a block, and reconstructing it by inserting the reserved slots into the primaries order is inference, not reporting — an earlier סרוגים piece did exactly that and put ישראל כץ at 4, גדעון סער at 5 and חיים כץ at 18, none of which survived the actual announcement. A hole is honest; a guess at the largest party's list is not.",
+    "verify": "ranks 3-8, 10, 12-14 and 17-25 are missing entirely — fill them from the approved lists or a source that prints them as text"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "בנימין נתניהו",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Benjamin Netanyahu",
+      "nameAr": "بنيامين نتنياهو"
+    },
+    {
+      "rank": 2,
+      "name": "אלי כהן",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Eli Cohen",
+      "nameAr": "إيلي كوهين"
+    },
+    {
+      "rank": 9,
+      "name": "טליק גואילי",
+      "nameInPress": "טליק גווילי",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Talik Gvili",
+      "nameAr": "طاليك غفيلي",
+      "verify": "מעריב, ערוץ 7, כאן and כיפה all write גואילי — she is the mother of רני גואילי, the Yasam fighter killed on 7 October; סרוגים's newsflash spelled it גווילי",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 11,
+      "name": "יעקב ברדוגו",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yaakov Bardugo",
+      "nameAr": "يعقوب بردوغو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 15,
+      "name": "אלישע מדן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Elisha Madan",
+      "nameAr": "إليشع مدان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 16,
+      "name": "דוד פטר",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "David Peter",
+      "nameAr": "ديفيد بيتر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 26,
+      "name": "אלי גולדשמידט",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Eli Goldschmidt",
+      "nameAr": "إيلي غولشميدت"
+    },
+    {
+      "rank": 27,
+      "name": "ארז תדמור",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Erez Tadmor",
+      "nameAr": "إيرز تدمور",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 28,
+      "name": "שלמה לרנר",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Shlomo Lerner",
+      "nameAr": "شلومو ليرنر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 29,
+      "name": "איציק בונצל",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Itzik Buntzel",
+      "nameAr": "إيتسيك بونتسل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 30,
+      "name": "משה פרץ",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Moshe Peretz",
+      "nameAr": "موشيه بيريتز"
+    },
+    {
+      "rank": 31,
+      "name": "שוקי אוחנה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Shuki Ohana",
+      "nameAr": "شوكي أوحانا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 32,
+      "name": "זאב אלקין",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ze'ev Elkin",
+      "nameAr": "زئيف إلكين"
+    },
+    {
+      "rank": 33,
+      "name": "עמית הלוי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Amit Halevy",
+      "nameAr": "عميت هليفي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 34,
+      "name": "קרן אטיאס בובליל",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Keren Atias Boublil",
+      "nameAr": "كيرين أتياس بوبليل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 35,
+      "name": "אמיר אביבי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Amir Avivi",
+      "nameAr": "أمير أفيفي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 36,
+      "name": "אפי נוה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Efi Nave",
+      "nameAr": "إيفي نافيه",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 37,
+      "name": "שרון סעדה",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": "Sharon Saada",
+      "nameAr": "شارون سعدة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 38,
+      "name": "אביחי בוארון",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Avichai Boaron",
+      "nameAr": "أفيخاي بورون"
+    },
+    {
+      "rank": 39,
+      "name": "נתנאל אוחיון",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Netanel Ohayon",
+      "nameAr": "نتنئيل أوحيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 40,
+      "name": "מאי גולן",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "May Golan",
+      "nameAr": "ماي غولان"
+    }
+  ]
+}

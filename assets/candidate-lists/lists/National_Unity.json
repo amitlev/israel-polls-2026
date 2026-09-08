@@ -1,0 +1,97 @@
+{
+  "party": "National Unity",
+  "partyName": "כחול לבן",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת כחול לבן לכנסת ה-26",
+    "publisher": "כיפה",
+    "published": "2026-09-08",
+    "url": "https://www.kipa.co.il/%d7%97%d7%93%d7%a9%d7%95%d7%aa/1231292-0/",
+    "licence": "Names are facts reported by the press",
+    "note": "Only the top five are published as an ordered list. אלון שוסטר and מופיד מרעי are reported as being on the list — דבר has them 'at the top of it' — but no source consulted gives their ranks, so they are held unranked rather than given an invented position. The party said the first ten would be half women, at slots 2, 3, 5, 8 and 10.",
+    "verify": "ranks 6+ unpublished; re-check the whole order against the approved lists"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "בני גנץ",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Benny Gantz",
+      "nameAr": "بيني غانتس"
+    },
+    {
+      "rank": 2,
+      "name": "פנינה תמנו שטה",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Pnina Tamano",
+      "nameAr": "بنينا تامانو"
+    },
+    {
+      "rank": 3,
+      "name": "עליזה בלוך",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Aliza Bloch",
+      "nameAr": "أليزا بلوخ"
+    },
+    {
+      "rank": 4,
+      "name": "רועי קונקול",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Roi Konkol",
+      "nameAr": "روعي كونكول",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 5,
+      "name": "רותם אבידר צאליק",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Rotem Avidar Tzalik",
+      "nameAr": "روتم أفيدار تساليك",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ],
+  "unranked": [
+    {
+      "name": "אלון שוסטר",
+      "photo": "u01",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Alon Schuster",
+      "nameAr": "ألون شوستر",
+      "verify": "reported as on the list by דבר and כיפה; rank not published"
+    },
+    {
+      "name": "מופיד מרעי",
+      "photo": "u02",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Mufid Mari",
+      "nameAr": "مفيد مرعي",
+      "verify": "reported as on the list by דבר; rank not published",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ]
+}

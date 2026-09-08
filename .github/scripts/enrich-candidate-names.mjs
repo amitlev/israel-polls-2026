@@ -115,6 +115,15 @@ const WIKIDATA = {
      broadcaster — so the ambiguity guard refuses both. The portrait on the item is the same
      man as the one the party's site published. */
   'The_Democrats 7': 'Q133888758',
+  /* Names shared by several people on Wikidata, where the description settles which one.
+     אלי כהן is the extreme case: five living people share it exactly, and two more who have
+     died were refused first — one of them the spy executed in Damascus in 1965. */
+  'Likud 2': 'Q19634024',            // אלי כהן — "פוליטיקאי ישראלי, שר האנרגיה"
+  'Likud 16': 'Q139384404',          // דוד פטר — "עורך דין ופרשן משפטי ישראלי", not the Czech rabbi
+  'Likud 27': 'Q30005051',           // ארז תדמור — "פעיל פוליטי, פובליציסט ושדרן", not the film director
+  'Shas 7': 'Q7054034',              // משה אבוטבול — "חבר כנסת וסגן שר", not the footballer
+  'National_Unity 2': 'Q3663047',    // פנינה תמנו שטה — the item is labelled פנינה תמנו
+  'Shas 9': 'Q96754353',             // יוסף טייב — the item is labelled יוסי טייב
   'Yashar 2': null,        // יורם כהן — six items share the name; none of them is this one
   'Together 10': null,     // יונתן שלו — the only item is a doctoral-thesis record from 1996
 };
