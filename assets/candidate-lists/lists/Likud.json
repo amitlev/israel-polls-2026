@@ -5,13 +5,13 @@
   "source": {
     "kind": "press",
     "file": null,
-    "title": "רשימת הליכוד לכנסת ה-26 — המשוריינים ותחתית הרשימה",
-    "publisher": "סרוגים / מעריב",
+    "title": "רשימת הליכוד לכנסת ה-26, כפי שהוגשה לוועדת הבחירות המרכזית",
+    "publisher": "ערוץ 14",
     "published": "2026-09-08",
-    "url": "https://www.srugim.co.il/newsflash/137964",
+    "url": "https://www.c14.co.il/article/1695876",
     "licence": "Names are facts reported by the press",
-    "note": "INCOMPLETE, and deliberately so. Two things are published as rank-to-name statements and both are here: the seven slots Netanyahu reserved (9, 11, 15, 16, 26, 29, 35), from סרוגים's report of the announcement, and the bottom of the list from 27 down to 40, from מעריב. Everything between rank 3 and rank 25 is missing: the outlets that printed it did so as an image, gov.il is behind a block, and reconstructing it by inserting the reserved slots into the primaries order is inference, not reporting — an earlier סרוגים piece did exactly that and put ישראל כץ at 4, גדעון סער at 5 and חיים כץ at 18, none of which survived the actual announcement. A hole is honest; a guess at the largest party's list is not.",
-    "verify": "ranks 3-8, 10, 12-14 and 17-25 are missing entirely — fill them from the approved lists or a source that prints them as text"
+    "note": "All 120 names, printed as text on the evening the list was submitted. It confirms the seven reserved slots reported separately by סרוגים (9, 11, 15, 16, 26, 29) and the bottom of the list reported by מעריב — with two corrections: אביחי בוארון is 35, not 38, and אמיר אביבי, whom סרוגים placed at 35, is not on the submitted list at all. English and Arabic names are filled to rank 40, which is the deepest the seat grid can reach; below that they carry whatever Wikidata already knew and are otherwise Hebrew only.",
+    "verify": "re-check against the approved lists when gov.il publishes them"
   },
   "candidates": [
     {
@@ -33,19 +33,87 @@
       "nameAr": "إيلي كوهين"
     },
     {
+      "rank": 3,
+      "name": "אמיר אוחנה",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Amir Ohana",
+      "nameAr": "أمير أوحانا"
+    },
+    {
+      "rank": 4,
+      "name": "יריב לוין",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Yariv Levin",
+      "nameAr": "ياريف ليفين"
+    },
+    {
+      "rank": 5,
+      "name": "מירי רגב",
+      "title": null,
+      "mk": "former",
+      "gender": "f",
+      "nameEn": "Miri Regev",
+      "nameAr": "ميري ريغيف"
+    },
+    {
+      "rank": 6,
+      "name": "ישראל כ\"ץ",
+      "title": null,
+      "mk": null,
+      "gender": "m",
+      "nameEn": "Israel Katz",
+      "nameAr": "إسرائيل كاتس",
+      "verify": "name matches 2 people in the Knesset roll; mk and gender left undetermined"
+    },
+    {
+      "rank": 7,
+      "name": "גדעון סער",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Gideon Sa'ar",
+      "nameAr": "جدعون ساعر"
+    },
+    {
+      "rank": 8,
+      "name": "אופיר כץ",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ofir Katz",
+      "nameAr": "أوفير كاتس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
       "rank": 9,
       "name": "טליק גואילי",
-      "nameInPress": "טליק גווילי",
       "title": null,
       "mk": "none",
       "gender": "f",
       "nameEn": "Talik Gvili",
       "nameAr": "طاليك غفيلي",
       "verify": "מעריב, ערוץ 7, כאן and כיפה all write גואילי — she is the mother of רני גואילי, the Yasam fighter killed on 7 October; סרוגים's newsflash spelled it גווילי",
+      "nameInPress": "טליק גווילי",
       "pinned": [
         "nameEn",
         "nameAr"
       ]
+    },
+    {
+      "rank": 10,
+      "name": "יואב קיש",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Yoav Kisch",
+      "nameAr": "يوآف كيش"
     },
     {
       "rank": 11,
@@ -59,6 +127,33 @@
         "nameEn",
         "nameAr"
       ]
+    },
+    {
+      "rank": 12,
+      "name": "מיקי זוהר",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Mickey Zohar",
+      "nameAr": "ميكي زوهار"
+    },
+    {
+      "rank": 13,
+      "name": "אלמוג כהן",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Almog Cohen",
+      "nameAr": "ألموغ كوهين"
+    },
+    {
+      "rank": 14,
+      "name": "עמיחי שיקלי",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Amichai Chikli",
+      "nameAr": "عميحاي شيكلي"
     },
     {
       "rank": 15,
@@ -85,6 +180,95 @@
         "nameEn",
         "nameAr"
       ]
+    },
+    {
+      "rank": 17,
+      "name": "משה סעדה",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Moshe Saada",
+      "nameAr": "موشيه سعدة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 18,
+      "name": "חיים כץ",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Chaim Katz",
+      "nameAr": "حاييم كاتس"
+    },
+    {
+      "rank": 19,
+      "name": "דוד אמסלם",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "David Amsalem",
+      "nameAr": "دافيد امسلم"
+    },
+    {
+      "rank": 20,
+      "name": "אתי עטיה",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Etty Atia",
+      "nameAr": "إتي عطية"
+    },
+    {
+      "rank": 21,
+      "name": "בועז ביסמוט",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Boaz Bismuth",
+      "nameAr": "بوعاز بيسموت",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 22,
+      "name": "דוד ביטן",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "David Bitan",
+      "nameAr": "ديفيد بيتان"
+    },
+    {
+      "rank": 23,
+      "name": "שלמה קרעי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Shlomo Karhi",
+      "nameAr": "شلومو كرعي"
+    },
+    {
+      "rank": 24,
+      "name": "ניר ברקת",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Nir Barkat",
+      "nameAr": "نير بركات"
+    },
+    {
+      "rank": 25,
+      "name": "גילה גמליאל",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Gila Gamliel",
+      "nameAr": "جيلا غامليل"
     },
     {
       "rank": 26,
@@ -136,12 +320,16 @@
     },
     {
       "rank": 30,
-      "name": "משה פרץ",
+      "name": "משה בנימין פרץ",
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Moshe Peretz",
-      "nameAr": "موشيه بيريتز"
+      "nameEn": "Moshe Binyamin Peretz",
+      "nameAr": "موشيه بنيامين بيرتس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 31,
@@ -193,25 +381,21 @@
     },
     {
       "rank": 35,
-      "name": "אמיר אביבי",
+      "name": "אביחי בוארון",
       "title": null,
-      "mk": "none",
+      "mk": "current",
       "gender": "m",
-      "nameEn": "Amir Avivi",
-      "nameAr": "أمير أفيفي",
-      "pinned": [
-        "nameEn",
-        "nameAr"
-      ]
+      "nameEn": "Avichai Boaron",
+      "nameAr": "أفيخاي بورون"
     },
     {
       "rank": 36,
-      "name": "אפי נוה",
+      "name": "אפרים נוה",
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Efi Nave",
-      "nameAr": "إيفي نافيه",
+      "nameEn": "Efraim Naveh",
+      "nameAr": "إفرايم نافيه",
       "pinned": [
         "nameEn",
         "nameAr"
@@ -232,12 +416,16 @@
     },
     {
       "rank": 38,
-      "name": "אביחי בוארון",
+      "name": "חנוך מילביצקי",
       "title": null,
-      "mk": "current",
+      "mk": "none",
       "gender": "m",
-      "nameEn": "Avichai Boaron",
-      "nameAr": "أفيخاي بورون"
+      "nameEn": "Hanoch Milwidsky",
+      "nameAr": "حنوخ ميلفيتسكي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 39,
@@ -260,6 +448,727 @@
       "gender": "f",
       "nameEn": "May Golan",
       "nameAr": "ماي غولان"
+    },
+    {
+      "rank": 41,
+      "name": "מולא מולא",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 42,
+      "name": "צביאל רובין",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 43,
+      "name": "גברה וורקו",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 44,
+      "name": "קטי שטרית",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Cathy Sheetrit",
+      "nameAr": "كاثي شيتريت"
+    },
+    {
+      "rank": 45,
+      "name": "אלכסנדר פרידמן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 46,
+      "name": "עידית סילמן",
+      "title": null,
+      "mk": "former",
+      "gender": "f",
+      "nameEn": "Idit Silman",
+      "nameAr": "ایدیت سیلمان"
+    },
+    {
+      "rank": 47,
+      "name": "אריאל קלנר",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ariel Kallner",
+      "nameAr": "أرييل كالنر"
+    },
+    {
+      "rank": 48,
+      "name": "אבי דיכטר",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Avi Dichter",
+      "nameAr": "آفي ديختر"
+    },
+    {
+      "rank": 49,
+      "name": "ששון גואטה",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Sasson Guetta",
+      "nameAr": null
+    },
+    {
+      "rank": 50,
+      "name": "שלום דנינו",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Shalom Danino",
+      "nameAr": null
+    },
+    {
+      "rank": 51,
+      "name": "שבתאי קטש",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Shabtay Katash",
+      "nameAr": null
+    },
+    {
+      "rank": 52,
+      "name": "אלישיב רבין חיימוב",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 53,
+      "name": "יוסף פיטוסי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 54,
+      "name": "פארס עבד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 55,
+      "name": "שי גלילי",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 56,
+      "name": "מטי יוגב",
+      "title": null,
+      "mk": "former",
+      "gender": "f",
+      "nameEn": "Matti Yogev",
+      "nameAr": "ماتي يوغيف"
+    },
+    {
+      "rank": 57,
+      "name": "אייל אלי",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 58,
+      "name": "שי קלך",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 59,
+      "name": "עוזי דיין",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Uzi Dayan",
+      "nameAr": "أوزي دايان"
+    },
+    {
+      "rank": 60,
+      "name": "אבשלום טל",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 61,
+      "name": "אלון חדד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Alon Hadad",
+      "nameAr": null
+    },
+    {
+      "rank": 62,
+      "name": "דרור קאפח",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 63,
+      "name": "סמיר זידאן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 64,
+      "name": "אברהם דז'ורייב",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 65,
+      "name": "אושר שקלים",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Osher Shekalim",
+      "nameAr": "أوشر شيكاليم"
+    },
+    {
+      "rank": 66,
+      "name": "גבי אלוש",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 67,
+      "name": "ויטלי חייקין",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 68,
+      "name": "אלמז זרו",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 69,
+      "name": "יורם טמשוט",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 70,
+      "name": "יוחנן מזמר טוב",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 71,
+      "name": "משה חיים גורל",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 72,
+      "name": "יוחאי שטרית",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 73,
+      "name": "אדי כהן",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": "Edy Cohen",
+      "nameAr": "إيدي كوهين"
+    },
+    {
+      "rank": 74,
+      "name": "זאב שמש",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 75,
+      "name": "אליהו שתיוי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 76,
+      "name": "עפיף עבד",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Afef Abed",
+      "nameAr": "عفيف عبد"
+    },
+    {
+      "rank": 77,
+      "name": "מאי הדר",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 78,
+      "name": "יעקב בר גיל",
+      "title": null,
+      "mk": null,
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null,
+      "verify": "name matches 2 people in the Knesset roll; mk and gender left undetermined"
+    },
+    {
+      "rank": 79,
+      "name": "דור חרלפ",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 80,
+      "name": "אביחי שאשא כהן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 81,
+      "name": "עדי ברוך",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 82,
+      "name": "דין מילוא",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 83,
+      "name": "יואל בן-שושן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 84,
+      "name": "ציון לנקרי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 85,
+      "name": "דודו מור",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 86,
+      "name": "אריאל בוכניק",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 87,
+      "name": "אמציה מיכאליס",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 88,
+      "name": "אופיר סבאן",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 89,
+      "name": "יפת צדקה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 90,
+      "name": "עודד סושרד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 91,
+      "name": "גוליאט לסקר מרציאנו",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 92,
+      "name": "איריס שטגמן",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 93,
+      "name": "צפורה פינברג",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 94,
+      "name": "יוסף-איל בן פנחס",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 95,
+      "name": "דוד אברהם",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 96,
+      "name": "כוכבה מתתיהו",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 97,
+      "name": "רצון שרעבי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 98,
+      "name": "רחל דה מרקדו",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 99,
+      "name": "מדינה אלוני ממו",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 100,
+      "name": "מיכאל קליינר",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Michael Kleiner",
+      "nameAr": "ميخائيل كلاينر"
+    },
+    {
+      "rank": 101,
+      "name": "מאיר שמעון אוחנה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 102,
+      "name": "צפריר סלמון",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 103,
+      "name": "אילה לנדא",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 104,
+      "name": "יונתן גמליאל מלמד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 105,
+      "name": "אורנה יפרח",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 106,
+      "name": "אליהו שלוח",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 107,
+      "name": "יוסף קיסטר",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Joseph Kister",
+      "nameAr": null
+    },
+    {
+      "rank": 108,
+      "name": "יצחק דניאלי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 109,
+      "name": "ברוך נתח",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 110,
+      "name": "בת שבע החרמוני",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 111,
+      "name": "יצחק מאיר שישיצקי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 112,
+      "name": "מיכאל רייף",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 113,
+      "name": "יעל שמרגד",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 114,
+      "name": "חדוה שפיגל",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 115,
+      "name": "נעמי בלומנטל",
+      "title": null,
+      "mk": "former",
+      "gender": "f",
+      "nameEn": "Naomi Blumenthal",
+      "nameAr": "ناعومي بلومنتال"
+    },
+    {
+      "rank": 116,
+      "name": "אסתר טימור",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 117,
+      "name": "ענבל פריטנה גל",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 118,
+      "name": "בנימין ביטון",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": null,
+      "nameAr": null
+    },
+    {
+      "rank": 119,
+      "name": "צביקה ברוט",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Tzvika Brot",
+      "nameAr": null
+    },
+    {
+      "rank": 120,
+      "name": "חיים ביבס",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Haim Bibas",
+      "nameAr": "حاييم بيبس"
     }
   ]
 }

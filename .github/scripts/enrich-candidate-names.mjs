@@ -124,6 +124,9 @@ const WIKIDATA = {
   'Shas 7': 'Q7054034',              // משה אבוטבול — "חבר כנסת וסגן שר", not the footballer
   'National_Unity 2': 'Q3663047',    // פנינה תמנו שטה — the item is labelled פנינה תמנו
   'Shas 9': 'Q96754353',             // יוסף טייב — the item is labelled יוסי טייב
+  'Likud 6': 'Q487304',              // ישראל כ"ץ — "שר הביטחון", not the sociology professor
+  'Likud 13': 'Q113389177',          // אלמוג כהן — "פוליטיקאי ישראלי", not the footballer
+  'Likud 18': 'Q2583214',            // חיים כץ — "פוליטיקאי ישראלי", not the rabbi
   'Yashar 2': null,        // יורם כהן — six items share the name; none of them is this one
   'Together 10': null,     // יונתן שלו — the only item is a doctoral-thesis record from 1996
 };
