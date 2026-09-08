@@ -3160,7 +3160,12 @@ tryRefresh();
   const ROSTER  = window.CANDIDATES_DATA || {};
   const slugOf  = id => id.replace(/[^A-Za-z0-9]/g, '_');
 
-  const T = 34, GAP = 4, PITCH = T + GAP, PAD = 8, HEAD = 26, GUTTER = 22, RULE = 8;
+  /* Columns and rows do not share a pitch. Horizontally a tile needs only the 4px gap;
+     vertically it also has to clear the party rule drawn under the run and the party name
+     printed under that, which is 3px of rule plus a line of 8.5px type. At the old shared
+     pitch of 38 the name landed on top of the next row of faces. */
+  const T = 34, GAP = 4, PITCH = T + GAP, VGAP = 17, VPITCH = T + VGAP;
+  const PAD = 8, HEAD = 30, GUTTER = 22;
   const W = 900;
 
   /* Group orders are fixed, and the gender one is alphabetical in Hebrew rather than
@@ -3238,7 +3243,7 @@ tryRefresh();
 
       items.forEach((s, j) => {
         const col = j % c, row = Math.floor(j / c);
-        pos[s.key] = { x: ltr ? left + col * PITCH : rightEdge - T - col * PITCH, y: HEAD + row * PITCH };
+        pos[s.key] = { x: ltr ? left + col * PITCH : rightEdge - T - col * PITCH, y: HEAD + row * VPITCH };
       });
 
       /* A coloured rule under each run of one party, per row — what keeps the internal
@@ -3251,14 +3256,14 @@ tryRefresh();
         while (i < line.length) {
           let j = i; while (j + 1 < line.length && line[j + 1].id === line[i].id) j++;
           const a = pos[line[i].key], b = pos[line[j].key];
-          rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: HEAD + row * PITCH + T + 2,
+          rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: HEAD + row * VPITCH + T + 4,
                        color: line[i].party.color, name: line[i].party.name, span: j - i + 1 });
           i = j + 1;
         }
       }
       rightEdge = left - GUTTER;
     });
-    return { pos, heads, rules, height: HEAD + maxRows * PITCH + RULE + PAD };
+    return { pos, heads, rules, height: HEAD + maxRows * VPITCH + PAD };
   }
 
   /* ── nodes ── */
@@ -3313,7 +3318,7 @@ tryRefresh();
     const chrome = svg.querySelector('#kChrome');
     chrome.innerHTML =
       L.heads.map(h => `<text x="${h.x}" y="${h.y}" text-anchor="${h.anchor}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
-        `<tspan dx="6" fill="${th.axis}" font-size="11" font-weight="700">${h.n}</tspan></text>`).join('') +
+        `<tspan fill="${th.axis}" font-size="11" font-weight="700">\u00a0\u00a0${h.n}</tspan></text>`).join('') +
       L.rules.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="3" rx="1.5" fill="${r.color}"/>` +
         (r.span >= 3 ? `<text x="${r.x + r.w / 2}" y="${r.y + 12}" text-anchor="middle" fill="${th.axis}" font-size="8.5" font-weight="700">${esc(r.name)}</text>` : '')).join('');
 
