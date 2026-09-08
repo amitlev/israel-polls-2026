@@ -22,7 +22,11 @@
       "gender": "m",
       "photoKey": "Ofer Winter",
       "nameEn": "Ofer Winter",
-      "nameAr": null
+      "nameAr": "عوفر وينتر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 2,
@@ -39,8 +43,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": "Netali Shem Tov",
-      "nameAr": null
+      "nameEn": "Netali Shem-Tov",
+      "nameAr": "نيطاع لي شيم طوف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 4,
@@ -48,8 +56,12 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Eran Ben-Ari",
+      "nameAr": "عيران بن أري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 5,
@@ -58,7 +70,11 @@
       "mk": "none",
       "gender": "f",
       "nameEn": "Fleur Hassan-Nahoum",
-      "nameAr": null
+      "nameAr": "فلير حسن ناحوم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 6,
@@ -66,8 +82,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Lali Derai",
+      "nameAr": "لالي درعي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 7,
@@ -75,8 +95,12 @@
       "title": "רס\"ן במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Ronen Bodenro",
+      "nameAr": "رونين بودنرو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 8,
@@ -84,8 +108,12 @@
       "title": "רס\"ן במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Davidi Ben Zion",
+      "nameAr": "ديفيدي بن تسيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 9,
@@ -93,8 +121,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Aviv Ezra",
+      "nameAr": "أفيف عزرا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 10,
@@ -102,8 +134,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Sigal Kraunik-Atia",
+      "nameAr": "سيغال كراونيك عطية",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 11,
@@ -111,8 +147,12 @@
       "title": "אל\"מ במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Eli Gino",
+      "nameAr": "إيلي جينو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -120,8 +160,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Arik Rubin",
+      "nameAr": "أريك روبين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 13,
@@ -129,8 +173,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Alam Ibrahim",
+      "nameAr": "علم إبراهيم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 14,
@@ -138,8 +186,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Moshe Har-Zion",
+      "nameAr": "موشيه هار تسيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -147,8 +199,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Lilach Haim-Idelberg",
+      "nameAr": "ليلاخ حاييم إيدلبرغ",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -156,8 +212,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Moshe Toledano",
+      "nameAr": "موشيه توليدانو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 17,
@@ -165,8 +225,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Raz Malka",
+      "nameAr": "راز مالكا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 18,
@@ -174,8 +238,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Dor Yitzhak",
+      "nameAr": "دور يتسحاق",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

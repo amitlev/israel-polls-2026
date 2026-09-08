@@ -66,7 +66,11 @@
       "mk": "current",
       "gender": "m",
       "nameEn": "Yitzhak Kroizer",
-      "nameAr": null
+      "nameAr": "يتسحاق كرويزر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 7,
@@ -75,8 +79,12 @@
       "mk": "none",
       "gender": "m",
       "nameInPress": "חנמאל דרופמן",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Chanamel Dorfman",
+      "nameAr": "حنمال دورفمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 8,
@@ -84,8 +92,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Tzachi Eliyahu",
+      "nameAr": "تساحي إلياهو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 9,
@@ -94,8 +106,12 @@
       "mk": "none",
       "gender": "m",
       "nameInPress": "יוסי גולדברגר",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yossi Goldberg",
+      "nameAr": "يوسي غولدبرغ",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 10,
@@ -103,8 +119,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Itiel Neeman",
+      "nameAr": "إيتيئيل نئيمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 11,
@@ -112,8 +132,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "David Bavli",
+      "nameAr": "ديفيد بافلي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -122,7 +146,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Yishai Fleisher",
-      "nameAr": null
+      "nameAr": "يشاي فلايشر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 13,
@@ -130,8 +158,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shiran Mirzai",
+      "nameAr": "شيران ميرزائي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 14,
@@ -139,8 +171,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shimi Golan",
+      "nameAr": "شيمي غولان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -148,8 +184,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yaniv Badalov",
+      "nameAr": "يانيف بادالوف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -157,8 +197,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Masala Aichalotam",
+      "nameAr": "مسالا أيتشالوتام",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 17,
@@ -166,8 +210,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Gadi Mazuz",
+      "nameAr": "غادي مزوز",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 18,
@@ -175,8 +223,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Mordechai Frizis",
+      "nameAr": "مردخاي فريزيس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 19,
@@ -184,8 +236,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Aharon Amar",
+      "nameAr": "أهارون عمار",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 20,
@@ -193,8 +249,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Or Eliya Yomtovian",
+      "nameAr": "أور إيليا يومطوبيان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

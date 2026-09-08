@@ -187,10 +187,24 @@ is not. Wikidata is edited by anyone: Gaby Lasky's Arabic label is a slur, Yael 
 is a different politician's name, and Orit Farkash-HaCohen's renders הכהן as "the Jew". Those
 three Arabic labels are dropped by hand.
 
-Coverage is far from complete and the report prints the gap rather than hiding it: of 198
-candidates, 109 have an English name and 48 Arabic. The rest are private
-individuals whose name has never been written in either language anywhere, and they stay
-Hebrew — which is honest, and is what the source actually holds.
+Wikidata alone reached 109 of the 198 in English and 48 in Arabic. The rest are private
+individuals whose name has never been published in either language, and no amount of
+searching was going to find them — so the remaining 149 were filled in by hand and imported
+(below). All 198 now carry both, and 151 of them are pinned.
+
+`npm run import:names -- <file.csv>` is the round trip: `name-gaps.csv` exports whoever is
+missing a name, the file comes back filled in, and the import matches on party and rank —
+never on the name, which is the field being edited. Everything imported is pinned, because
+these are a person's answers and `enrich:names` would otherwise overwrite them from Wikidata,
+which is frequently the worse source: three hand-filled spellings disagreed with Wikidata's
+label and agreed with the English Wikipedia article title — Yaron Zelekha, Matti Sarfati
+Harkavi, Keren Terner Eyal.
+
+The Arabic is checked for mixed script before it is written. A Hebrew letter inside an Arabic
+word is invisible on screen and breaks search, sorting and text-to-speech, and it is exactly
+the typo a Hebrew keyboard produces — the first imported file's "أمير ستروغو" ended in a
+Hebrew vav where an Arabic waw belongs. Only unambiguous confusables are corrected, each one
+reported; anything else is refused rather than guessed at.
 
 The same pass records Wikidata's portrait (P18) for anyone who has one — 99 of them,
 listed in `.leaderheads/knesset/wikidata-portraits.txt`. Nothing consumes those yet.

@@ -39,8 +39,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": "Keren Terner",
-      "nameAr": null
+      "nameEn": "Keren Turner Eyal",
+      "nameAr": "كيرين تيرنر إيال",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 4,
@@ -57,8 +61,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": "Liran Avisar Ben Horin",
-      "nameAr": null
+      "nameEn": "Liran Avisar Ben-Horin",
+      "nameAr": "ليران أفيشير بن حورين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 6,
@@ -67,7 +75,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Noam Tibon",
-      "nameAr": null
+      "nameAr": "نوعام تيبون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 7,
@@ -76,8 +88,12 @@
       "mk": "none",
       "nameOnGraphic": "מיכל הירש נגרי",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Michal Nagari",
+      "nameAr": "ميخال نغري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 8,
@@ -103,8 +119,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yonatan Shalev",
+      "nameAr": "يوناتان شاليف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 11,
@@ -112,8 +132,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Bruria Naim Arman",
+      "nameAr": "بروريا نعيم أرمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -130,8 +154,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Amir Strogo",
+      "nameAr": "أمير ستروغو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 14,
@@ -140,7 +168,11 @@
       "mk": "current",
       "gender": "m",
       "nameEn": "Naor Shiri",
-      "nameAr": null
+      "nameAr": "نئور شيري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -148,8 +180,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Nisan Zeevi",
-      "nameAr": null
+      "nameEn": "Nissan Zeevi",
+      "nameAr": "نيسان زئيفي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -166,8 +202,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Orly Harel",
+      "nameAr": "أورلي هاريل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 18,
@@ -184,8 +224,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shachar Varon",
+      "nameAr": "شاحار فارون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 20,
@@ -202,8 +246,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Esti Ayalon Kovo",
+      "nameAr": "إيستي أيلون كوبو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 22,
@@ -211,8 +259,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Neta Atias",
+      "nameAr": "نيطع أتياس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 23,
@@ -221,8 +273,12 @@
       "mk": "none",
       "nameOnGraphic": "ג'רמי סולטן",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Jeremy Saltan",
+      "nameAr": "جيريمي سلتان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 24,
@@ -239,8 +295,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Zvi Plotnitzky",
+      "nameAr": "تسفي بلوتنيتسكي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 26,
@@ -249,8 +309,12 @@
       "mk": "none",
       "nameOnGraphic": "אוליסיה קנטור",
       "gender": "f",
-      "nameEn": "Olessia Kantor",
-      "nameAr": null
+      "nameEn": "Olesya Kantor",
+      "nameAr": "أوليسيا كانتور",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 27,
@@ -267,8 +331,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Mati Gill",
+      "nameAr": "ماتي جيل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 29,
@@ -288,8 +356,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Tomer Wiener",
+      "nameAr": "تومر وينر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 31,
@@ -297,8 +369,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Roni Fantanesh Malkai",
+      "nameAr": "روني فانتانيش مالكاي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 32,
@@ -307,8 +383,12 @@
       "mk": "none",
       "verify": "on the graphic only — the party site has no card for rank 32",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Tami Mazel Shachar",
+      "nameAr": "تامي مازيل شاحار",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 33,
@@ -316,8 +396,12 @@
       "title": null,
       "mk": "current",
       "gender": "f",
-      "nameEn": "Mati Tzarfati Harkabi",
-      "nameAr": null
+      "nameEn": "Mati Sarfati Harkavi",
+      "nameAr": "ماتي تسرفاتي هركافي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 34,
@@ -326,8 +410,12 @@
       "mk": "none",
       "nameOnGraphic": "יעל שטרן",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yael Lin Stern",
+      "nameAr": "ياعيل لين شتيرن",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 35,
@@ -335,8 +423,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Amit Barda",
+      "nameAr": "عميت بردا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

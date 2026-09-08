@@ -30,7 +30,11 @@
       "mk": "current",
       "gender": "f",
       "nameEn": "Naama Lazimi",
-      "nameAr": null
+      "nameAr": "نعمة لزيمي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 3,
@@ -39,7 +43,11 @@
       "mk": "current",
       "gender": "m",
       "nameEn": "Gilad Kariv",
-      "nameAr": null
+      "nameAr": "جلعاد كاريف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 4,
@@ -48,7 +56,11 @@
       "mk": "current",
       "gender": "f",
       "nameEn": "Efrat Rayten",
-      "nameAr": null
+      "nameAr": "إفرات رايتن",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 5,
@@ -57,10 +69,11 @@
       "mk": "none",
       "verify": "the site prints \"יאיא פינק\" and so does Hebrew Wikipedia (Q122260479) — a nickname, not the typo this note first read it as. Held under the formal יאיר, with Yair Fink pinned over Wikidata's \"Yaya Fink\"",
       "gender": "m",
-      "nameEn": "Yair Fink",
-      "nameAr": null,
+      "nameEn": "Yair (Yaya) Fink",
+      "nameAr": "يايير فينِك",
       "pinned": [
-        "nameEn"
+        "nameEn",
+        "nameAr"
       ]
     },
     {
@@ -82,7 +95,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Omri Ronen",
-      "nameAr": null
+      "nameAr": "عمري رونين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 8,
@@ -100,7 +117,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Moshe Radman Abutbul",
-      "nameAr": null
+      "nameAr": "موشيه ردمان أبوتبول",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 10,
@@ -118,7 +139,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Nimrod Sheffer",
-      "nameAr": null
+      "nameAr": "نمرود شيفر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -127,7 +152,11 @@
       "mk": "none",
       "gender": "f",
       "nameEn": "Moran Zer Katzenstein",
-      "nameAr": null
+      "nameAr": "موران زير كاتسنشتاين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 13,
@@ -145,7 +174,11 @@
       "mk": "former",
       "gender": "f",
       "nameEn": "Emilie Moatti",
-      "nameAr": null
+      "nameAr": "إيميلي مواتي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -154,7 +187,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Tomer Avital",
-      "nameAr": null
+      "nameAr": "تومر أفيتال",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -162,8 +199,12 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "f",
-      "nameEn": "Nava Rozolyo",
-      "nameAr": null
+      "nameEn": "Nava Rozolio",
+      "nameAr": "نافا روزوليو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 17,
@@ -172,7 +213,11 @@
       "mk": "former",
       "gender": "m",
       "nameEn": "Ram Shefa",
-      "nameAr": null
+      "nameAr": "رام شيفع",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 18,
@@ -189,8 +234,12 @@
       "title": "ד\"ר",
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Rotem Sivan",
+      "nameAr": "روتم سيفان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 20,
@@ -199,7 +248,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Eran Etzion",
-      "nameAr": null
+      "nameAr": "عيران عتسيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ],
   "unranked": [
@@ -209,8 +262,12 @@
       "mk": "none",
       "photo": "u01",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Avishai Lichtenstein",
+      "nameAr": "أفيشاي ليختنشتاين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "אביתר באר",
@@ -218,8 +275,12 @@
       "mk": "none",
       "photo": "u02",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Evyatar Be'er",
+      "nameAr": "أفيتار بئير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "אוליביה עמנואל דה לם",
@@ -227,8 +288,12 @@
       "mk": "none",
       "photo": "u03",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Olivia Emmanuel De Lamm",
+      "nameAr": "أوليفيا عمانوئيل دي لام",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "אחסאן חלאילה",
@@ -236,8 +301,12 @@
       "mk": "none",
       "photo": "u04",
       "gender": "m",
-      "nameEn": "Ehsan Khlaily",
-      "nameAr": null
+      "nameEn": "Ihsan Khalaila",
+      "nameAr": "إحسان خلايلة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "איהאב שליאן",
@@ -263,8 +332,12 @@
       "mk": "none",
       "photo": "u07",
       "gender": "f",
-      "nameEn": "Elis Goldman",
-      "nameAr": null
+      "nameEn": "Alice Goldman",
+      "nameAr": "أليس غولدمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "אמיר ח'ניפס",
@@ -272,8 +345,12 @@
       "mk": "none",
       "photo": "u08",
       "gender": "m",
-      "nameEn": "Amir Khnifess",
-      "nameAr": null
+      "nameEn": "Amir Khnifes",
+      "nameAr": "أمير خنيفس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "בנימין דניאל מיניץ",
@@ -281,8 +358,12 @@
       "mk": "none",
       "photo": "u09",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Binyamin Daniel Minitz",
+      "nameAr": "بنيامين دانيال مينيتس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "גאלב סלאמנה",
@@ -290,8 +371,12 @@
       "mk": "none",
       "photo": "u10",
       "gender": "m",
-      "nameEn": "Ghaleb Salamna",
-      "nameAr": null
+      "nameEn": "Ghaleb Salamana",
+      "nameAr": "غالب سلامنة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "גיל ביילין",
@@ -300,7 +385,11 @@
       "photo": "u11",
       "gender": "m",
       "nameEn": "Gil Beilin",
-      "nameAr": null
+      "nameAr": "جيل بيلين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "דימה שפירא",
@@ -309,7 +398,11 @@
       "photo": "u12",
       "gender": "m",
       "nameEn": "Dima Shapira",
-      "nameAr": null
+      "nameAr": "ديما شابيرا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "דני אלגרט",
@@ -317,8 +410,12 @@
       "mk": "none",
       "photo": "u13",
       "gender": "m",
-      "nameEn": "Dani Elgarat",
-      "nameAr": null
+      "nameEn": "Dani Elgart",
+      "nameAr": "داني إلغارت",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "הדס רגולסקי",
@@ -327,7 +424,11 @@
       "photo": "u14",
       "gender": "f",
       "nameEn": "Hadas Ragolsky",
-      "nameAr": null
+      "nameAr": "هداس رغولسكي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "יאיר רובינשטיין",
@@ -335,8 +436,12 @@
       "mk": "none",
       "photo": "u15",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yair Rubinstein",
+      "nameAr": "يايير روبنشتاين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "יואב אגמי",
@@ -344,8 +449,12 @@
       "mk": "none",
       "photo": "u16",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yoav Agami",
+      "nameAr": "يوآف أغامي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "יעל כהן פארן",
@@ -354,7 +463,11 @@
       "photo": "u17",
       "gender": "f",
       "nameEn": "Yael Cohen Paran",
-      "nameAr": null
+      "nameAr": "ياعيل كوهين فاران",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "ירון ניב",
@@ -363,7 +476,11 @@
       "photo": "u18",
       "gender": "m",
       "nameEn": "Yaron Niv",
-      "nameAr": null
+      "nameAr": "يرون نيب",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "יריב אופנהיימר",
@@ -372,7 +489,11 @@
       "photo": "u19",
       "gender": "m",
       "nameEn": "Yariv Oppenheimer",
-      "nameAr": null
+      "nameAr": "ياريف أوبنهايمر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "לי הופמן אגיב",
@@ -380,8 +501,12 @@
       "mk": "none",
       "photo": "u20",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Lee Hoffman Agiv",
+      "nameAr": "لي هوفمان أغيف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "מאלכ בדר",
@@ -399,7 +524,11 @@
       "photo": "u22",
       "gender": "f",
       "nameEn": "Mehereta Baruch-Ron",
-      "nameAr": null
+      "nameAr": "مهريتا باروخ رون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "מוסי רז",
@@ -408,7 +537,11 @@
       "photo": "u23",
       "gender": "m",
       "nameEn": "Mossi Raz",
-      "nameAr": null
+      "nameAr": "موسي راز",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "מורן מישל",
@@ -417,7 +550,11 @@
       "photo": "u24",
       "gender": "f",
       "nameEn": "Moran Michel",
-      "nameAr": null
+      "nameAr": "موران ميشيل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "נאור נרקיס",
@@ -426,7 +563,11 @@
       "photo": "u25",
       "gender": "m",
       "nameEn": "Naor Narkis",
-      "nameAr": null
+      "nameAr": "نئور نركيس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "נדאל מסאלחה",
@@ -434,8 +575,12 @@
       "mk": "none",
       "photo": "u26",
       "gender": "m",
-      "nameEn": "Nedal Massalha",
-      "nameAr": null
+      "nameEn": "Nidal Masalha",
+      "nameAr": "نضال مصالحة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "עאיד בדיר",
@@ -443,8 +588,12 @@
       "mk": "none",
       "photo": "u27",
       "gender": "m",
-      "nameEn": "Aaed Bader",
-      "nameAr": null
+      "nameEn": "Aed Badir",
+      "nameAr": "عائد بدير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "ענבל וורטמן שהם",
@@ -452,8 +601,12 @@
       "mk": "none",
       "photo": "u28",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Inbal Wortman Shoham",
+      "nameAr": "عنبال فورتمان شوهام",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "ענבר בזק",
@@ -462,7 +615,11 @@
       "photo": "u29",
       "gender": "f",
       "nameEn": "Inbar Bezek",
-      "nameAr": null
+      "nameAr": "عنبار بيزك",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "ערן ניסן",
@@ -470,8 +627,12 @@
       "mk": "none",
       "photo": "u30",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Eran Nisan",
+      "nameAr": "عيران نيسان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "name": "קטי פיאסצקי",
@@ -479,8 +640,12 @@
       "mk": "none",
       "photo": "u31",
       "gender": "f",
-      "nameEn": "Kati Piasecki",
-      "nameAr": null
+      "nameEn": "Katy Piasecki",
+      "nameAr": "كاتي بياسيتسكي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

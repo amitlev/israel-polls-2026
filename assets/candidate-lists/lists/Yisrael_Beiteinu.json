@@ -29,7 +29,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Rafi Ben Shitrit",
-      "nameAr": null
+      "nameAr": "رافي بن شطريت",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 3,
@@ -38,7 +42,11 @@
       "mk": "none",
       "gender": "f",
       "nameEn": "Talya Lankri",
-      "nameAr": null
+      "nameAr": "طاليا لنكري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 4,
@@ -64,8 +72,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Sharon Sharabi",
+      "nameAr": "شارون شرعبي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 7,
@@ -91,8 +103,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Elvira Kolichman",
+      "nameAr": "إلفيرا كوليخمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 10,
@@ -110,7 +126,11 @@
       "mk": "none",
       "gender": "f",
       "nameEn": "Lili Ben Ami",
-      "nameAr": null
+      "nameAr": "ليلي بن عمي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -118,8 +138,12 @@
       "title": "ד\"ר",
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yael Benbenishti",
+      "nameAr": "ياعيل بنبنيشتي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 13,
@@ -127,8 +151,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "David Azoulay",
+      "nameAr": "ديفيد أزولاي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 14,
@@ -137,7 +165,11 @@
       "mk": "former",
       "gender": "f",
       "nameEn": "Limor Magen-Telem",
-      "nameAr": null
+      "nameAr": "ليمور ماغين تيليم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -145,8 +177,12 @@
       "title": "סרן במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Israel Ben Shitrit",
+      "nameAr": "إسرائيل بن شطريت",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -155,7 +191,11 @@
       "mk": "former",
       "gender": "f",
       "nameEn": "Sharon Roffe Ofir",
-      "nameAr": null
+      "nameAr": "شارون روفيه أوفير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 17,
@@ -163,8 +203,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Mor Dekel",
+      "nameAr": "مور ديكيل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 18,
@@ -172,8 +216,12 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Michaela Levin-Shamir",
+      "nameAr": "ميكائيلا ليفين شامير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 19,
@@ -181,8 +229,12 @@
       "title": "אל\"מ במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Olivier Rafowicz",
+      "nameAr": "أوليفييه رافوفيتش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 20,
@@ -190,8 +242,12 @@
       "title": "רס\"ן במיל'",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yaakov (Yanki) Mozes",
+      "nameAr": "يعقوب (يانكي) موزيس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 21,
@@ -199,8 +255,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Ami Kor",
+      "nameAr": "عمي كور",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 22,
@@ -208,8 +268,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Maya Flumbaum",
+      "nameAr": "مايا فلومبويم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 23,
@@ -217,8 +281,12 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Adi Mordechayev",
+      "nameAr": "عادي مردخايف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 24,
@@ -226,8 +294,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Michal Oron Azani",
+      "nameAr": "ميخال أورون عزاني",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 25,
@@ -235,8 +307,12 @@
       "title": "עו\"ד",
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Stav Boyango-Matza",
+      "nameAr": "ستاف بويانجو متسا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

@@ -30,8 +30,12 @@
       "title": "פרופ'",
       "mk": "none",
       "gender": "m",
-      "nameEn": "Yaron Zelicha",
-      "nameAr": null
+      "nameEn": "Yaron Zelekha",
+      "nameAr": "يارون زليخا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 3,

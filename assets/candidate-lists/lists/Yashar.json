@@ -35,8 +35,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/yoram-cohen.webp"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yoram Cohen",
+      "nameAr": "يورام كوهين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 3,
@@ -47,8 +51,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
       },
-      "nameEn": "Orit Farkash-HaCohen",
-      "nameAr": null
+      "nameEn": "Orit Farkash-Hacohen",
+      "nameAr": "أوريت فركاش هكوهين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 4,
@@ -57,7 +65,11 @@
       "mk": "none",
       "gender": "f",
       "nameEn": "Adi Altschuler",
-      "nameAr": null
+      "nameAr": "عادي ألتشولر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 5,
@@ -90,7 +102,11 @@
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/shaul-meridor-1.webp"
       },
       "nameEn": "Shaul Meridor",
-      "nameAr": null
+      "nameAr": "شاؤول مريدور",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 8,
@@ -102,7 +118,11 @@
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/tair_ifargan.webp"
       },
       "nameEn": "Tair Ifergan",
-      "nameAr": null
+      "nameAr": "تائير إيفرجان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 9,
@@ -114,7 +134,11 @@
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/אושרת-e1785318426848.png"
       },
       "nameEn": "Oshrat Gani Gonen",
-      "nameAr": null
+      "nameAr": "أوشرات غاني غونين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 10,
@@ -122,8 +146,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shira Shapira",
+      "nameAr": "شيرا شابيرا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 11,
@@ -134,8 +162,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-harush-giti.webp"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Inbar Harush Giti",
+      "nameAr": "عنبار هاروش غيتي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 12,
@@ -170,8 +202,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/dvora-sharipian-bachar.webp"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Dvora Sharifian Bakhar",
+      "nameAr": "دفورا شريفيان بخار",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 15,
@@ -183,7 +219,11 @@
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/alex-riff.webp"
       },
       "nameEn": "Alex Rif",
-      "nameAr": null
+      "nameAr": "أليكس ريف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 16,
@@ -194,8 +234,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-yehezkeli-1.webp"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Inbar Yehezkeli",
+      "nameAr": "عنبار يحزقيلي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 17,
@@ -218,8 +262,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/20260804_190314_0000-e1785915320431.png"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Israel Zari",
+      "nameAr": "إسرائيل زاري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 19,
@@ -239,8 +287,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Elisaf Peretz",
+      "nameAr": "ألياساف بيرتس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 21,
@@ -251,8 +303,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/יפה.png"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Yaffa Tebeje",
+      "nameAr": "يافا تبجيه",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 22,
@@ -263,8 +319,12 @@
       "photo": {
         "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/09/IMG_3684-1-e1788428648677.webp"
       },
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Nir Hajabi",
+      "nameAr": "نير حجبي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 23,
@@ -272,8 +332,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Ron Barkaï",
-      "nameAr": null
+      "nameEn": "Ron Barkai",
+      "nameAr": "رون بركاي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 24,
@@ -281,8 +345,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shay Fisher",
+      "nameAr": "شاي فيشر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 25,
@@ -290,8 +358,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Lian Pollack David",
+      "nameAr": "ليان بولاك ديفيد",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 26,
@@ -299,8 +371,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Roei Cohen",
+      "nameAr": "روعي كوهين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 27,
@@ -308,8 +384,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Ziv Rozen",
+      "nameAr": "زيف روزين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 28,
@@ -317,8 +397,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Jocelyn Bash",
+      "nameAr": "جوسلين باش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 29,
@@ -335,8 +419,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Tali Molner",
+      "nameAr": "تالي مولنير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 31,
@@ -344,8 +432,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Gil Avriel",
+      "nameAr": "جيل أفريئيل",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 32,
@@ -353,8 +445,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Shiran Ben David Ozeri",
+      "nameAr": "شيران بن ديفيد عوزيري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 33,
@@ -362,8 +458,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": "Eliran Elya",
-      "nameAr": null
+      "nameEn": "Eliran Eliya",
+      "nameAr": "إليران إيليا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 34,
@@ -371,8 +471,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Helen Gelber",
+      "nameAr": "هيلين جيلبر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 35,
@@ -381,7 +485,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Shlomi Yehiav",
-      "nameAr": null
+      "nameAr": "شلومي يحيآف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 36,
@@ -389,8 +497,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Hila Meir",
+      "nameAr": "هيلا مئير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 37,
@@ -398,8 +510,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Ran Ben Atia",
+      "nameAr": "ران بن عطية",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 38,
@@ -407,8 +523,12 @@
       "title": null,
       "mk": "none",
       "gender": "f",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Eliana Sachs",
+      "nameAr": "إليعانا زاكس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 39,
@@ -416,8 +536,12 @@
       "title": null,
       "mk": "none",
       "gender": "m",
-      "nameEn": null,
-      "nameAr": null
+      "nameEn": "Gidi Zaga",
+      "nameAr": "غيدي زاغا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     },
     {
       "rank": 40,
@@ -426,7 +550,11 @@
       "mk": "none",
       "gender": "m",
       "nameEn": "Moshe Davidovich",
-      "nameAr": null
+      "nameAr": "موشيه دافيدوفيتش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }
