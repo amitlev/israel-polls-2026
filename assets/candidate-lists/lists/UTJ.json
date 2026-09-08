@@ -1,0 +1,133 @@
+{
+  "party": "UTJ",
+  "partyName": "יהדות התורה",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת יהדות התורה לכנסת ה-26",
+    "publisher": "חדשות 12 / הארץ",
+    "published": "2026-09-08",
+    "url": "https://www.mako.co.il/news-israel-elections/2026/liveblog-5bc9483b18b70a1026.htm",
+    "licence": "Names are facts reported by the press",
+    "note": "N12's list-closing liveblog printed ranks 1-8 and הארץ the same ten in the same order, which is the two-independent-sources standard. The order also matches the Agudat Yisrael / Degel HaTorah alternation reported separately — Degel takes 1, 3, 5, 7, 9 and its published order was אשר, פינדרוס, רוזנטל, וייספיש, זלץ, which is exactly the odd slots here. Moshe Gafni and Uri Maklev are not on the list: Rabbi Dov Landau announced on 6 September that neither would serve in the next Knesset, though Gafni stays party chairman. Israel Eichler was replaced by Elyakim Stark on 7 September.",
+    "verify": "ranks 11+ unpublished; re-check the whole order against the approved lists"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "יעקב אשר",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Jacob Asher",
+      "nameAr": "يعقوب اشير"
+    },
+    {
+      "rank": 2,
+      "name": "יצחק גולדקנופף",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Isaac Goldknopf",
+      "nameAr": "إسحاق جولدكنوبف"
+    },
+    {
+      "rank": 3,
+      "name": "יצחק פינדרוס",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Isaac Pindrus",
+      "nameAr": "إسحاق بيندروس"
+    },
+    {
+      "rank": 4,
+      "name": "מאיר פרוש",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Meir Porush",
+      "nameAr": "مئير بوروش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 5,
+      "name": "משה רוזנטל",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Moshe Rosenthal",
+      "nameAr": "موشيه روزنتال",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "אליקים שטארק",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Elyakim Stark",
+      "nameAr": "إلياكيم شتارك",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "יהודה וייספיש",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yehuda Weisfish",
+      "nameAr": "يهودا فايسفيش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 8,
+      "name": "יעקב טסלר",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Jacob Tessler",
+      "nameAr": "جاكوب تيسلر"
+    },
+    {
+      "rank": 9,
+      "name": "דוד זלץ",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "David Zaltz",
+      "nameAr": "ديفيد زالتس",
+      "nameInPress": "דודי זלץ",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "דוד אוחנה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "David Ohana",
+      "nameAr": "ديفيد أوحانا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ]
+}

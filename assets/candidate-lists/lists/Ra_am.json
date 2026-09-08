@@ -6,12 +6,12 @@
     "kind": "press",
     "file": null,
     "title": "רשימת רע\"ם לכנסת ה-26, כפי שהוגשה",
-    "publisher": "דבר",
+    "publisher": "דבר / חדשות 12",
     "published": "2026-09-07",
     "url": "https://www.davar1.co.il/696325/",
     "licence": "Names are facts reported by the press",
-    "note": "Only the top six are published. gov.il confirms the list was submitted under the letter עם as \"רע\\\"ם - הרשימה הערבית המאוחדת\" but publishes no ordered candidates for any party yet. Six is past the party's current polling (about five seats), so every seat it is projected to win has a named person; anything below six is simply not public.",
-    "verify": "ranks 7+ unpublished; re-check the whole order against the approved lists"
+    "note": "All ten, from N12's list-closing liveblog. The top six had come from דבר and are unchanged by it — the liveblog spells three of the Arab names slightly differently (וליד for ואליד, חטיב יאסין for חטיב-יאסין), and those three are pinned to their Wikidata items here, so the spelling held is the one the Israeli press uses.",
+    "verify": "re-check the whole order against the approved lists"
   },
   "candidates": [
     {
@@ -68,6 +68,58 @@
       "gender": "m",
       "nameEn": "Yasser Hujeirat",
       "nameAr": "ياسر حجيرات"
+    },
+    {
+      "rank": 7,
+      "name": "אבראהים אלטורי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Ibrahim al-Turi",
+      "nameAr": "إبراهيم الطوري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 8,
+      "name": "עבד אלכרים מסרי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Abd al-Karim Masri",
+      "nameAr": "عبد الكريم مصري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 9,
+      "name": "עבד אלכרים עזאם",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Abd al-Karim Azzam",
+      "nameAr": "عبد الكريم عزام",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "אבראהים אבו לבן",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Ibrahim Abu Laban",
+      "nameAr": "إبراهيم أبو لبن",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
     }
   ]
 }

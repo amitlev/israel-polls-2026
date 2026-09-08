@@ -131,6 +131,8 @@ const PARTIES = {
   Shas: {},
   Religious_Zionism: {},
   National_Unity: {},
+  UTJ: {},
+  Joint_List: {},
 
   /* 1131x1600, 5x4. Like Together's, this graphic's name plate is dark, so the grid came
      from the orange rule under each card — one bar per card, the most uniform thing on the

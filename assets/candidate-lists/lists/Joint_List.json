@@ -1,0 +1,107 @@
+{
+  "party": "Joint List",
+  "partyName": "הרשימה המשותפת",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "צמרת הרשימה המשותפת לכנסת ה-26",
+    "publisher": "ynet",
+    "published": "2026-09-08",
+    "url": "https://www.ynet.co.il/news/elections2026/article/s1bc2ql00mg",
+    "licence": "Names are facts reported by the press",
+    "note": "Nine names, which is as deep as anyone has published. חד\"ש, תע\"ל and בל\"ד agreed on 19 August to run together again, with חד\"ש taking five of the top ten, בל\"ד three and תע\"ל two; the party beside each name here is that allocation. The top three are reported identically by ynet, ויקיפדיה and the party press; 4-9 come from ynet alone.",
+    "verify": "ranks 10+ unpublished. ynet also reports that some slots between 4 and 11 carry rotation agreements between the three parties and were not declared final — so even the published order here may move. Re-check the whole list against the approved lists."
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "יוסף ג'בארין",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Yousef Jabareen",
+      "nameAr": "يوسف جبارين"
+    },
+    {
+      "rank": 2,
+      "name": "אחמד טיבי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ahmad Tibi",
+      "nameAr": "أحمد الطيبي"
+    },
+    {
+      "rank": 3,
+      "name": "סאמי אבו שחאדה",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Sami Abu Shehadeh",
+      "nameAr": "سامي أبو شحادة"
+    },
+    {
+      "rank": 4,
+      "name": "ג'עפר פרח",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Jafar Farah",
+      "nameAr": "جعفر فرح"
+    },
+    {
+      "rank": 5,
+      "name": "בכר עוואודה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Bakr Awawdeh",
+      "nameAr": "بكر عواودة",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "עופר כסיף",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ofer Cassif",
+      "nameAr": "عوفر كسيف"
+    },
+    {
+      "rank": 7,
+      "name": "יוסף עטאונה",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Youssef Atauna",
+      "nameAr": "يوسف العطاونة"
+    },
+    {
+      "rank": 8,
+      "name": "מהא כרכבי-סבאח",
+      "title": "ד\"ר",
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Maha Karkabi-Sabbah",
+      "nameAr": "مها كركبي صباح",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 9,
+      "name": "אוסאמה סעדי",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Osama Saadi",
+      "nameAr": "أسامة السعدي"
+    }
+  ]
+}
