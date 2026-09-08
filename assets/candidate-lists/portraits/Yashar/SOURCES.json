@@ -1,0 +1,98 @@
+{
+ "party": "Yashar",
+ "generated": "2026-09-08",
+ "site": null,
+ "graphic": null,
+ "portraits": [
+  {
+   "key": "01",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/gadi-eisenkot.webp"
+  },
+  {
+   "key": "02",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/yoram-cohen.webp"
+  },
+  {
+   "key": "03",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/orit-farkash-1.webp"
+  },
+  {
+   "key": "05",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/05/matan-kahana-1.webp"
+  },
+  {
+   "key": "07",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/shaul-meridor-1.webp"
+  },
+  {
+   "key": "08",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/tair_ifargan.webp"
+  },
+  {
+   "key": "09",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/אושרת-e1785318426848.png"
+  },
+  {
+   "key": "11",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-harush-giti.webp"
+  },
+  {
+   "key": "12",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/שטרן-סופי-e1787554647455.png"
+  },
+  {
+   "key": "13",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/כמיל-רקע-שקוף-e1784736932714.png"
+  },
+  {
+   "key": "14",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/07/dvora-sharipian-bachar.webp"
+  },
+  {
+   "key": "15",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/06/alex-riff.webp"
+  },
+  {
+   "key": "16",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/04/inbar-yehezkeli-1.webp"
+  },
+  {
+   "key": "17",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/פולקמן-e1787562888384.png"
+  },
+  {
+   "key": "18",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/20260804_190314_0000-e1785915320431.png"
+  },
+  {
+   "key": "19",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/טל.png"
+  },
+  {
+   "key": "21",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/08/יפה.png"
+  },
+  {
+   "key": "22",
+   "from": "site",
+   "url": "https://yasharwitheisenkot.com/wp-content/uploads/2026/09/IMG_3684-1-e1788428648677.webp"
+  }
+ ]
+}

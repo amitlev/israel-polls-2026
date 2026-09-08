@@ -7,7 +7,12 @@
     "update:polls": "node .github/scripts/update-polls.mjs",
     "update:govil": "node .github/scripts/update-govil-polls.mjs",
     "build:heads": "node .github/scripts/build-leader-heads.mjs",
-    "build:logos": "node .github/scripts/build-party-logos.mjs"
+    "build:logos": "node .github/scripts/build-party-logos.mjs",
+    "build:candidates": "node .github/scripts/build-candidate-portraits.mjs",
+    "enrich:candidates": "node .github/scripts/enrich-candidates.mjs",
+    "enrich:names": "node .github/scripts/enrich-candidate-names.mjs",
+    "edit:candidates": "node .github/scripts/candidate-editor/server.mjs",
+    "import:names": "node .github/scripts/import-candidate-names.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^0.1.80",

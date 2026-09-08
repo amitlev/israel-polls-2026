@@ -1,0 +1,262 @@
+{
+  "party": "Religious Zionism",
+  "partyName": "הציונות הדתית-זהות",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת הציונות הדתית לכנסת ה-26, אחרי האיחוד עם זהות",
+    "publisher": "כיפה",
+    "published": "2026-09-08",
+    "url": "https://kipa.co.il/%D7%97%D7%93%D7%A9%D7%95%D7%AA/1231293-0",
+    "licence": "Names are facts reported by the press",
+    "note": "Twenty names. Under the technical-bloc agreement signed on 1 September 2026, Moshe Feiglin's זהות takes slots 2, 8, 10 and 11 — פייגלין, זאגא, פציניאש and מוטר. סרוגים corroborates ranks 1-9 and 12; it went to press before זהות named its representatives for 10 and 11, and reports those two slots as unfilled.",
+    "verify": "re-check against the approved lists when gov.il publishes them"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "בצלאל סמוטריץ'",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Bezalel Smotrich",
+      "nameAr": "بتسلئيل سموتريش"
+    },
+    {
+      "rank": 2,
+      "name": "משה פייגלין",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Moshe Feiglin",
+      "nameAr": "موشيه فايغلين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 3,
+      "name": "אורית סטרוק",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Orit Strock",
+      "nameAr": "أوريت ستروك"
+    },
+    {
+      "rank": 4,
+      "name": "שמחה רוטמן",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Simcha Rothman",
+      "nameAr": "سمحا روتمان",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 5,
+      "name": "צביקה מור",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Tzvika Mor",
+      "nameAr": "تسفيكا مور",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "איתמר איתם",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Itamar Eitam",
+      "nameAr": "إيتمار إيتام",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "צבי סוכות",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Zvi Succot",
+      "nameAr": "تسفي سوكوت"
+    },
+    {
+      "rank": 8,
+      "name": "יצחק זאגא",
+      "title": "הרב",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yitzhak Zaga",
+      "nameAr": "يتسحاق زاغا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 9,
+      "name": "רעות בן חיים",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Reut Ben Haim",
+      "nameAr": "رعوت بن حاييم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "עומר פציניאש",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": "Omer Patzinash",
+      "nameAr": "عومير باتسيناش",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 11,
+      "name": "ארקדי מוטר",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Arkadi Muter",
+      "nameAr": "أركادي موتير",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "אוהד טל",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Ohad Tal",
+      "nameAr": "أوهاد طال",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "רועי קירשברג",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Roi Kirshberg",
+      "nameAr": "روعي كيرشبيرغ",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 14,
+      "name": "עומר רחמים",
+      "title": null,
+      "mk": "none",
+      "gender": null,
+      "nameEn": "Omer Rahamim",
+      "nameAr": "عومير رحميم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 15,
+      "name": "סימה חסון",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Sima Hasson",
+      "nameAr": "سيما حسون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 16,
+      "name": "מיכל וולדיגר",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Michelle Waldiger",
+      "nameAr": "ميشال فالديجر"
+    },
+    {
+      "rank": 17,
+      "name": "שיראל נהיר ללום",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Shirel Nahir Lalum",
+      "nameAr": "شيرال نهير لالوم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 18,
+      "name": "שמואל ששון",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Shmuel Sasson",
+      "nameAr": "شموئيل ششون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 19,
+      "name": "איריס ברנשטיין",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Iris Bernstein",
+      "nameAr": "إيريس برنشتاين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 20,
+      "name": "צביקה וישינגרד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Tzvika Vishingrad",
+      "nameAr": "تسفيكا فيشينغراد",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ]
+}

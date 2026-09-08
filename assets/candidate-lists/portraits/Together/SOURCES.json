@@ -1,0 +1,218 @@
+{
+ "party": "Together",
+ "generated": "2026-09-08",
+ "site": "https://be-yahad.org.il/team/",
+ "graphic": "Together.png",
+ "portraits": [
+  {
+   "key": "01",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/1-נפתלי-בנט.jpg",
+   "ncc": 0.859
+  },
+  {
+   "key": "02",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/2-יאיר-לפיד.jpg",
+   "ncc": 0.928
+  },
+  {
+   "key": "03",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/3-קרן-טרנר.jpg",
+   "ncc": 0.822
+  },
+  {
+   "key": "04",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/4-מירב-בן-ארי.jpg",
+   "ncc": 0.953
+  },
+  {
+   "key": "05",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/04/5-לירן-אבישר-בן-חורין.jpg",
+   "ncc": 0.928
+  },
+  {
+   "key": "06",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/6-נעם-תיבון.jpg",
+   "ncc": 0.928
+  },
+  {
+   "key": "07",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/7-מיכל-נגרי.jpg",
+   "ncc": 0.933
+  },
+  {
+   "key": "08",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/8-איתן-גינזבורג-1.png",
+   "ncc": 0.909
+  },
+  {
+   "key": "09",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/9-מירב-כהן.jpg",
+   "ncc": 0.864
+  },
+  {
+   "key": "10",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/10-יונתן-שלו.jpg",
+   "ncc": 0.928
+  },
+  {
+   "key": "11",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/11-ברוריה-נעים-ארמן.jpg",
+   "ncc": 0.9
+  },
+  {
+   "key": "12",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/12-רם-בן-ברק.jpg",
+   "ncc": 0.954
+  },
+  {
+   "key": "13",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/13-אמיר-סטרוגו.jpg",
+   "ncc": 0.915
+  },
+  {
+   "key": "14",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/14-נאור-שירי.jpg",
+   "ncc": 0.888
+  },
+  {
+   "key": "15",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/15-ניסן-זאבי.jpg",
+   "ncc": 0.87
+  },
+  {
+   "key": "16",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/16-ולדימיר-בליאק.jpg",
+   "ncc": 0.921
+  },
+  {
+   "key": "17",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/17-אורלי-הראל.jpg",
+   "ncc": 0.909
+  },
+  {
+   "key": "18",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/18-יוראי-להב-הרצנו.jpg",
+   "ncc": 0.967
+  },
+  {
+   "key": "19",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/19-שחר-ורון.jpg",
+   "ncc": 0.91
+  },
+  {
+   "key": "20",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/07/20-יסמין-סאקס-פרידמן.jpg",
+   "ncc": 0.961
+  },
+  {
+   "key": "21",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/21-אסתי-איילון-קובו.jpg",
+   "ncc": 0.884
+  },
+  {
+   "key": "22",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/22-נטע-אטיאס.jpg",
+   "ncc": 0.925
+  },
+  {
+   "key": "23",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/23-ג׳רמי-סלטן.jpg",
+   "ncc": 0.913
+  },
+  {
+   "key": "24",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/07/24-משה-קינלי-טור-פז.jpg",
+   "ncc": 0.88
+  },
+  {
+   "key": "25",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/25-צבי-פלוטניצקי.jpg",
+   "ncc": 0.877
+  },
+  {
+   "key": "26",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/26-אולסיה-קנטור.jpg",
+   "ncc": 0.856
+  },
+  {
+   "key": "27",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/27-סימון-דוידסון.jpg",
+   "ncc": 0.922
+  },
+  {
+   "key": "28",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/28-מתי-גיל.jpg",
+   "ncc": 0.914
+  },
+  {
+   "key": "29",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/29-שלי-טל-מירון.jpg",
+   "ncc": 0.934
+  },
+  {
+   "key": "30",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/08/30-תומר-וינר.jpg",
+   "ncc": 0.893
+  },
+  {
+   "key": "31",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/31-רוני-פנטנש-מלכאי-1.jpg",
+   "ncc": 0.943
+  },
+  {
+   "key": "32",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/32-תמי-מזאל-2.png",
+   "ncc": 0.876
+  },
+  {
+   "key": "33",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/33-מטי-צרפתי-הרכבי.png",
+   "ncc": 0.954
+  },
+  {
+   "key": "34",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/34-יעל-שטרן.png",
+   "ncc": 0.913
+  },
+  {
+   "key": "35",
+   "from": "site",
+   "url": "https://be-yahad.org.il/wp-content/uploads/2026/09/35-עמית-ברדה.png",
+   "ncc": 0.914
+  }
+ ]
+}

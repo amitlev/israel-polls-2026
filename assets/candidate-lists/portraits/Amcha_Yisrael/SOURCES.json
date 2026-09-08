@@ -1,0 +1,12 @@
+{
+ "party": "Amcha_Yisrael",
+ "generated": "2026-09-08",
+ "site": null,
+ "graphic": null,
+ "portraits": [
+  {
+   "key": "01",
+   "from": "override"
+  }
+ ]
+}

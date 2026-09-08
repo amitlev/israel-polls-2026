@@ -1,0 +1,159 @@
+{
+  "party": "Shas",
+  "partyName": "ש\"ס",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת ש\"ס לכנסת ה-26, כפי שאושרה במועצת חכמי התורה",
+    "publisher": "כיכר השבת",
+    "published": "2026-09-08",
+    "url": "https://www.kikar.co.il/haredim/shas-list-knesset-26-approved-new-members",
+    "licence": "Names are facts reported by the press",
+    "note": "Thirteen names, the whole list as published. ynet and הארץ report the same order for all thirteen, which is the two-independent-sources standard this workspace uses. Every sitting Shas MK stays; דרור עמוס and יוסף אלנתנוב are the two new names.",
+    "verify": "re-check against the approved lists when gov.il publishes them"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "אריה דרעי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Aryeh Dery",
+      "nameAr": "أرييه درعي"
+    },
+    {
+      "rank": 2,
+      "name": "ינון אזולאי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Yinon Azulai",
+      "nameAr": "ينون أزولاي"
+    },
+    {
+      "rank": 3,
+      "name": "מיכאל מלכיאלי",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Michael Malchieli",
+      "nameAr": "مايكل مالكيالي"
+    },
+    {
+      "rank": 4,
+      "name": "יואב בן צור",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Yoav Ben-Tzur",
+      "nameAr": "يوآف بن تسور"
+    },
+    {
+      "rank": 5,
+      "name": "חיים ביטון",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Chaim Biton",
+      "nameAr": "حاييم بيطون"
+    },
+    {
+      "rank": 6,
+      "name": "דרור עמוס",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Dror Amos",
+      "nameAr": "درور عاموس",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "משה אבוטבול",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Moshe Abutbul",
+      "nameAr": "موشيه أبوتبول"
+    },
+    {
+      "rank": 8,
+      "name": "אוריאל בוסו",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Uriel Busso",
+      "nameAr": "أورييل بوسو"
+    },
+    {
+      "rank": 9,
+      "name": "יוסף טייב",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Joseph Taieb",
+      "nameAr": "يوسف طيب",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "יונתן משריקי",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yonatan Mashriki",
+      "nameAr": "يوناتان مشريقي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 11,
+      "name": "יוסף אלנתנוב",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yosef Elnatanov",
+      "nameAr": "يوسف إلناتانوف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "ארז מלול",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Erez Malul",
+      "nameAr": "إيرز ملول",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "סימון מושיאשוילי",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Simon Moshiashvili",
+      "nameAr": "سيمون موشياشفيلي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ]
+}

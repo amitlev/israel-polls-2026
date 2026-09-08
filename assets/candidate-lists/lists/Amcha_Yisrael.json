@@ -1,0 +1,249 @@
+{
+  "party": "Amcha Yisrael",
+  "partyName": "עמך ישראל",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת עמך ישראל לכנסת ה-26, כפי שהוגשה",
+    "publisher": "כיפה",
+    "published": "2026-09-07",
+    "url": "https://kipa.co.il/חדשות/1231186-0",
+    "licence": "Names are facts reported by the press",
+    "note": "ORDER NOT CONFIRMED. Only one report carries a numbered submitted list (kipa 1231186); the launch-event write-ups on c14 and emess name the same people in two further, mutually inconsistent orders, because those are narrative rather than ranked. The names are solid, the ranks are not — re-check once the Central Elections Committee publishes the approved lists. No party site with photographs was found.",
+    "verify": "ranks beyond 1 and 2 need confirming against the approved list"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "עופר וינטר",
+      "title": "תא\"ל במיל'",
+      "mk": "none",
+      "gender": "m",
+      "photoKey": "Ofer Winter",
+      "nameEn": "Ofer Winter",
+      "nameAr": "عوفر وينتر",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 2,
+      "name": "יוסף חדאד",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Yoseph Haddad",
+      "nameAr": "يوسف حداد"
+    },
+    {
+      "rank": 3,
+      "name": "נטעלי שם טוב",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Netali Shem-Tov",
+      "nameAr": "نيتالي شيم طوف",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 4,
+      "name": "ערן בן-ארי",
+      "title": "עו\"ד",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Eran Ben-Ari",
+      "nameAr": "عيران بن أري",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 5,
+      "name": "פלר חסן-נחום",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Fleur Hassan-Nahoum",
+      "nameAr": "فلير حسن ناحوم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "ללי דרעי",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Lali Derai",
+      "nameAr": "لالي درعي",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "רונן בודנרו",
+      "title": "רס\"ן במיל'",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Ronen Bodenro",
+      "nameAr": "رونين بودنرو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 8,
+      "name": "דוידי בן ציון",
+      "title": "רס\"ן במיל'",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Davidi Ben Zion",
+      "nameAr": "ديفيدي بن تسيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 9,
+      "name": "אביב עזרא",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Aviv Ezra",
+      "nameAr": "أفيف عزرا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "סיגל קראוניק-עטיה",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Sigal Kraunik-Atia",
+      "nameAr": "سيغال كراونيك عطية",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 11,
+      "name": "אלי ג'ינו",
+      "title": "אל\"מ במיל'",
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Eli Gino",
+      "nameAr": "إيلي جينو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "אריק רובין",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Arik Rubin",
+      "nameAr": "أريك روبين",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "עלם איברהים",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Alam Ibrahim",
+      "nameAr": "علم إبراهيم",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 14,
+      "name": "משה הר-ציון",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Moshe Har-Zion",
+      "nameAr": "موشيه هار تسيون",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 15,
+      "name": "לילך חיים-אידלברג",
+      "title": null,
+      "mk": "none",
+      "gender": "f",
+      "nameEn": "Lilach Haim-Idelberg",
+      "nameAr": "ليلاخ حاييم إيدلبرغ",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 16,
+      "name": "משה טולדנו",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Moshe Toledano",
+      "nameAr": "موشيه توليدانو",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 17,
+      "name": "רז מלכה",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Raz Malka",
+      "nameAr": "راز مالكا",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    },
+    {
+      "rank": 18,
+      "name": "דור יצחק",
+      "title": null,
+      "mk": "none",
+      "gender": "m",
+      "nameEn": "Dor Yitzhak",
+      "nameAr": "دور يتسحاق",
+      "pinned": [
+        "nameEn",
+        "nameAr"
+      ]
+    }
+  ]
+}

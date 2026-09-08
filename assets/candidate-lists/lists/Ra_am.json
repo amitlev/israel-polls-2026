@@ -1,0 +1,73 @@
+{
+  "party": "Ra'am",
+  "partyName": "רע\"ם",
+  "knesset": 26,
+  "source": {
+    "kind": "press",
+    "file": null,
+    "title": "רשימת רע\"ם לכנסת ה-26, כפי שהוגשה",
+    "publisher": "דבר",
+    "published": "2026-09-07",
+    "url": "https://www.davar1.co.il/696325/",
+    "licence": "Names are facts reported by the press",
+    "note": "Only the top six are published. gov.il confirms the list was submitted under the letter עם as \"רע\\\"ם - הרשימה הערבית המאוחדת\" but publishes no ordered candidates for any party yet. Six is past the party's current polling (about five seats), so every seat it is projected to win has a named person; anything below six is simply not public.",
+    "verify": "ranks 7+ unpublished; re-check the whole order against the approved lists"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "name": "מנסור עבאס",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "photoKey": "Mansour Abbas",
+      "nameEn": "Mansour Abbas",
+      "nameAr": "منصور عباس"
+    },
+    {
+      "rank": 2,
+      "name": "יואב סגלוביץ'",
+      "title": null,
+      "mk": "former",
+      "gender": "m",
+      "nameEn": "Yoav Segalovich",
+      "nameAr": "يوآف سيغالوفيتش"
+    },
+    {
+      "rank": 3,
+      "name": "ואליד טאהא",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Walid Taha",
+      "nameAr": "وليد طه"
+    },
+    {
+      "rank": 4,
+      "name": "ואליד אל-הואשלה",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Walid al-Huashla",
+      "nameAr": "وليد الهواشلة"
+    },
+    {
+      "rank": 5,
+      "name": "אימאן חטיב-יאסין",
+      "title": null,
+      "mk": "current",
+      "gender": "f",
+      "nameEn": "Iman Khatib-Yassin",
+      "nameAr": "إيمان خطيب ياسين"
+    },
+    {
+      "rank": 6,
+      "name": "יאסר חוג'יראת",
+      "title": null,
+      "mk": "current",
+      "gender": "m",
+      "nameEn": "Yasser Hujeirat",
+      "nameAr": "ياسر حجيرات"
+    }
+  ]
+}
