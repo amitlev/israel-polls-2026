@@ -40,6 +40,10 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { FILES, regenAll } from './lib/restore-chunks.mjs';
 
 const ASSETS = 'assets/candidate-lists';
+/* A portrait dropped in here wins over anything the graphic or the site would produce, and
+   survives the rebuild — the same contract assets/leader-heads/cutouts/ has. Without it the
+   editor would be pointless: every bake deletes the party's portraits and regenerates them. */
+const OVERRIDES = `${ASSETS}/overrides`;
 const WORK = '.leaderheads/candidates';
 const OUT = 192;            // CAP on the baked square, matching the leader heads — never an upscale
 const QUALITY = 92;         // JPEG, 0-100 (NOT 0-1 — @napi-rs/canvas takes the percentage).
@@ -391,6 +395,13 @@ for (const [name, party] of Object.entries(PARTIES)) {
   const cuts = [], provenance = [];
 
   const bake = async (key, rec, cardIndex) => {
+    const pinned = path.join(OVERRIDES, name, `${key}.jpg`);
+    if (fs.existsSync(pinned)) {
+      const img = await loadImage(pinned);
+      cuts.push({ key, from: 'override', canvas: square(`${name} ${key}`, img, [0, 0, img.width, img.height]) });
+      provenance.push({ key, from: 'override' });
+      return;
+    }
     const file = rec ? await download(name, key, rec.url) : null;
     if (file) {
       const photo = await loadImage(file);
@@ -427,17 +438,31 @@ for (const [name, party] of Object.entries(PARTIES)) {
 
   const dir = path.join(ASSETS, 'portraits', name);
   fs.mkdirSync(dir, { recursive: true });
-  for (const f of fs.readdirSync(dir)) if (/\.jpe?g$/i.test(f)) fs.unlinkSync(path.join(dir, f));
+
+  /* Write what this run produced, and LEAVE anything it did not. The sources here are live
+     third-party pages: The Democrats stopped server-rendering the grid that held 31 of their
+     candidates, and a clean-then-regenerate deleted 31 committed portraits on the next run
+     because a page changed how it renders. A portrait that has already been reviewed and
+     committed should not disappear because a site was redesigned — it is reported instead,
+     and removing one is then a deliberate `git rm`. */
+  const made = new Set(cuts.map(c => c.key));
+  const orphans = fs.readdirSync(dir)
+    .map(f => /^(.+)\.jpe?g$/i.exec(f)).filter(Boolean).map(m => m[1])
+    .filter(k => !made.has(k));
   for (const cut of cuts)
     fs.writeFileSync(path.join(dir, `${cut.key}.jpg`), cut.canvas.toBuffer('image/jpeg', QUALITY));
+  if (orphans.length)
+    console.warn(`⚠ ${name}: ${orphans.length} committed portraits have no source in this run and were left alone: ${orphans.join(', ')}`);
 
   const fromSite = provenance.filter(p => p.from === 'site').length;
+  const fromOverride = provenance.filter(p => p.from === 'override').length;
   const soft = cuts.filter(c => c.canvas.width < OUT).map(c => c.key);
   fs.writeFileSync(path.join(dir, 'SOURCES.json'), JSON.stringify({
     party: name, generated: new Date().toISOString().slice(0, 10),
     site: party.site?.page ?? null, graphic: party.graphic ?? null, portraits: provenance,
   }, null, 1));
-  console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ${cuts.length - fromSite} from the graphic` +
+  console.log(`${name}: ${cuts.length} portraits → ${dir}/  (${fromSite} from the site, ${cuts.length - fromSite - fromOverride} from the graphic` +
+    (fromOverride ? `, ${fromOverride} hand-picked` : '') +
     (soft.length ? `; ${soft.length} under ${OUT}px and soft: ${soft.join(', ')}` : '') + ')');
 }
 

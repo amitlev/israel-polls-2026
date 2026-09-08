@@ -10,7 +10,8 @@
     "build:logos": "node .github/scripts/build-party-logos.mjs",
     "build:candidates": "node .github/scripts/build-candidate-portraits.mjs",
     "enrich:candidates": "node .github/scripts/enrich-candidates.mjs",
-    "enrich:names": "node .github/scripts/enrich-candidate-names.mjs"
+    "enrich:names": "node .github/scripts/enrich-candidate-names.mjs",
+    "edit:candidates": "node .github/scripts/candidate-editor/server.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^0.1.80",

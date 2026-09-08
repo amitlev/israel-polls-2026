@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>עורך המועמדים</title>
+<style>
+  :root { color-scheme: light dark;
+    --bg:#f4f6fa; --card:#fff; --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --line:#e2e8f0; --accent:#2563eb; --ok:#16a34a; --warn:#b45309; --f:#db2777; --m:#2563eb; }
+  @media (prefers-color-scheme: dark) { :root {
+    --bg:#0b1220; --card:#111a2b; --ink:#e8ecf3; --muted:#94a3b8; --faint:#64748b;
+    --line:#1e293b; --accent:#60a5fa; --f:#f472b6; --m:#60a5fa; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:14px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif; }
+  header { position:sticky; top:0; z-index:5; background:var(--card);
+    border-bottom:1px solid var(--line); padding:10px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:800; }
+  .sp { margin-inline-start:auto; }
+  select, input, button { font:inherit; color:inherit; }
+  select, input[type=text], input[type=url] { background:var(--bg); border:1px solid var(--line);
+    border-radius:8px; padding:6px 9px; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:8px;
+    padding:7px 13px; font-weight:700; cursor:pointer; }
+  button.ghost { background:transparent; color:var(--muted); border:1px solid var(--line); }
+  button:disabled { opacity:.5; cursor:default; }
+  #status { font-size:12px; font-weight:700; color:var(--muted); min-width:150px; }
+  .note { max-width:1400px; margin:14px auto 0; padding:0 18px; font-size:12px; color:var(--muted); }
+  main { max-width:1400px; margin:0 auto; padding:14px 18px 60px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; }
+  .c { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px;
+    display:grid; grid-template-columns:76px 1fr; gap:11px; align-items:start; }
+  .c.dirty { outline:2px solid var(--accent); }
+  .ph { width:76px; height:76px; border-radius:10px; object-fit:cover; background:var(--bg);
+    border:1px solid var(--line); cursor:pointer; display:block; }
+  .ph.none { display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:11px; text-align:center; }
+  .rk { font-size:11px; font-weight:800; color:var(--faint); margin-top:5px; text-align:center; }
+  .rk .ov { color:var(--ok); }
+  .f { display:grid; gap:5px; }
+  .f input { width:100%; }
+  .f input[dir=ltr] { direction:ltr; text-align:left; }
+  .row { display:flex; gap:6px; align-items:center; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { background:var(--bg); color:var(--muted); border:0; padding:4px 9px;
+    font-size:11.5px; font-weight:700; border-radius:0; }
+  .seg button + button { border-inline-start:1px solid var(--line); }
+  .seg button.on { color:#fff; }
+  .seg button.on[data-v=f] { background:var(--f); } .seg button.on[data-v=m] { background:var(--m); }
+  .seg button.on[data-v=current],.seg button.on[data-v=former],.seg button.on[data-v=none],
+  .seg button.on[data-v=""] { background:var(--accent); }
+  .vf { font-size:11px; color:var(--warn); }
+  /* photo dialog */
+  dialog { border:0; border-radius:14px; padding:0; background:var(--card); color:var(--ink);
+    max-width:min(560px,92vw); box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  dialog::backdrop { background:rgba(2,6,23,.55); }
+  .d { padding:16px; display:grid; gap:11px; }
+  .stage { position:relative; width:100%; aspect-ratio:1; background:#0b1220;
+    border-radius:10px; overflow:hidden; display:grid; place-items:center; }
+  .stage img { max-width:100%; max-height:100%; display:block; -webkit-user-drag:none; user-select:none; }
+  .cropbox { position:absolute; border:2px solid #fff; box-shadow:0 0 0 9999px rgba(0,0,0,.5);
+    cursor:move; border-radius:6px; }
+  .hint { font-size:11.5px; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>עורך המועמדים</h1>
+  <select id="party"></select>
+  <input type="text" id="q" placeholder="חיפוש שם…" style="width:180px">
+  <label class="hint"><input type="checkbox" id="onlyGaps"> רק חסרים</label>
+  <span class="sp"></span>
+  <span id="status"></span>
+  <button id="build" class="ghost">בנה מחדש</button>
+</header>
+<div class="note" id="note"></div>
+<main id="grid"></main>
+
+<dialog id="dlg"><div class="d">
+  <b id="dlgName"></b>
+  <div class="row">
+    <input type="file" id="file" accept="image/*">
+    <input type="url" id="url" placeholder="או הדבק כתובת תמונה" style="flex:1">
+    <button id="load" class="ghost">טען</button>
+  </div>
+  <div id="suggestRow" class="row" style="display:none">
+    <button id="useSuggest" class="ghost">השתמש בתמונה מוויקינתונים</button>
+  </div>
+  <div class="stage" id="stage"><div class="hint" id="stageHint">בחר קובץ או הדבק כתובת</div></div>
+  <div class="row"><span class="hint">גודל</span><input type="range" id="zoom" min="10" max="100" value="100" style="flex:1"></div>
+  <div class="hint">גרור את הריבוע כדי למקם. נשמר ל-overrides/ ושורד בנייה מחדש.</div>
+  <div class="row">
+    <button id="save">שמור תמונה</button>
+    <button id="clear" class="ghost">הסר עקיפה</button>
+    <span class="sp"></span>
+    <button id="close" class="ghost">סגור</button>
+  </div>
+</div></dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+let DATA = [], cur = null, img = null, box = null;
+
+const setStatus = (t, c) => { const e = $('#status'); e.textContent = t; e.style.color = c || 'var(--muted)'; };
+
+async function load() {
+  DATA = await (await fetch('/api/data')).json();
+  const sel = $('#party');
+  sel.innerHTML = '<option value="">כל המפלגות</option>' +
+    DATA.map(d => `<option value="${d.party}">${d.partyName} (${d.rows.length})</option>`).join('');
+  render();
+}
+
+function rows() {
+  const p = $('#party').value, q = $('#q').value.trim(), gaps = $('#onlyGaps').checked;
+  const out = [];
+  for (const d of DATA) {
+    if (p && d.party !== p) continue;
+    for (const r of d.rows) {
+      if (q && !(r.name + (r.nameEn || '') + (r.nameAr || '')).includes(q)) continue;
+      if (gaps && r.nameEn && r.nameAr && r.gender && r.mk && r.hasPhoto) continue;
+      out.push({ ...r, party: d.party, partyName: d.partyName });
+    }
+  }
+  return out;
+}
+
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const seg = (name, val, opts) => `<span class="seg" data-field="${name}">` +
+  opts.map(([v, l]) => `<button data-v="${v}" class="${(val ?? '') === v ? 'on' : ''}">${l}</button>`).join('') + '</span>';
+
+function render() {
+  const list = rows();
+  const p = $('#party').value;
+  const d = DATA.find(x => x.party === p);
+  $('#note').textContent = d ? d.note : `${list.length} מועמדים`;
+  $('#grid').innerHTML = list.map(r => `
+    <div class="c" data-party="${r.party}" data-key="${r.key}">
+      <div>
+        ${r.hasPhoto || r.override
+          ? `<img class="ph" src="/${r.override ? 'override' : 'portrait'}/${r.party}/${r.key}.jpg?t=${Date.now()}" alt="">`
+          : `<div class="ph none">אין תמונה</div>`}
+        <div class="rk">${r.key}${r.override ? ' <span class="ov">●</span>' : ''}</div>
+      </div>
+      <div class="f">
+        <input type="text" data-field="name" value="${esc(r.name)}" placeholder="שם בעברית">
+        <input type="text" dir="ltr" data-field="nameEn" value="${esc(r.nameEn)}" placeholder="English name">
+        <input type="text" data-field="nameAr" value="${esc(r.nameAr)}" placeholder="الاسم بالعربية">
+        <div class="row">
+          ${seg('gender', r.gender, [['f', 'אישה'], ['m', 'גבר'], ['', '?']])}
+          ${seg('mk', r.mk, [['current', 'מכהן'], ['former', 'לשעבר'], ['none', 'חדש'], ['', '?']])}
+        </div>
+        ${r.verify ? `<div class="vf">⚑ ${esc(r.verify)}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function save(card, fields) {
+  card.classList.add('dirty');
+  setStatus('שומר…');
+  const r = await fetch('/api/candidate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ party: card.dataset.party, key: card.dataset.key, fields }) });
+  const j = await r.json();
+  card.classList.remove('dirty');
+  if (j.error) return setStatus('שגיאה: ' + j.error, 'var(--warn)');
+  setStatus('נשמר ✓', 'var(--ok)');
+  const d = DATA.find(x => x.party === card.dataset.party);
+  const row = d.rows.find(x => x.key === card.dataset.key);
+  Object.assign(row, j.candidate);
+}
+
+$('#grid').addEventListener('change', e => {
+  const inp = e.target.closest('input[data-field]'); if (!inp) return;
+  save(inp.closest('.c'), { [inp.dataset.field]: inp.value.trim() });
+});
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('.seg button');
+  if (b) {
+    const s = b.closest('.seg');
+    s.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    return save(b.closest('.c'), { [s.dataset.field]: b.dataset.v });
+  }
+  const ph = e.target.closest('.ph');
+  if (ph) openPhoto(ph.closest('.c'));
+});
+['party', 'q', 'onlyGaps'].forEach(id => $('#' + id).addEventListener('input', render));
+
+/* ── photo dialog ── */
+function openPhoto(card) {
+  cur = { party: card.dataset.party, key: card.dataset.key, card };
+  const d = DATA.find(x => x.party === cur.party);
+  const row = d.rows.find(x => x.key === cur.key);
+  $('#dlgName').textContent = `${row.name} — ${d.partyName} ${cur.key}`;
+  $('#stage').innerHTML = '<div class="hint" id="stageHint">בחר קובץ או הדבק כתובת</div>';
+  $('#url').value = ''; $('#file').value = ''; img = null; box = null;
+  $('#suggestRow').style.display = row.suggest ? '' : 'none';
+  $('#useSuggest').onclick = () => { $('#url').value = row.suggest; loadUrl(); };
+  $('#dlg').showModal();
+}
+
+function place(src) {
+  const stage = $('#stage');
+  stage.innerHTML = '';
+  const el = new Image();
+  el.onload = () => {
+    img = el;
+    const r = el.getBoundingClientRect(), s = Math.min(r.width, r.height);
+    box = { x: (r.width - s) / 2, y: (r.height - s) / 2, s };
+    drawBox();
+  };
+  el.src = src;
+  stage.appendChild(el);
+  const bx = document.createElement('div');
+  bx.className = 'cropbox'; bx.id = 'cropbox';
+  stage.appendChild(bx);
+  let drag = null;
+  bx.onpointerdown = e => { drag = { x: e.clientX, y: e.clientY, bx: box.x, by: box.y }; bx.setPointerCapture(e.pointerId); };
+  bx.onpointermove = e => {
+    if (!drag || !img) return;
+    const r = img.getBoundingClientRect();
+    box.x = Math.max(0, Math.min(r.width - box.s, drag.bx + e.clientX - drag.x));
+    box.y = Math.max(0, Math.min(r.height - box.s, drag.by + e.clientY - drag.y));
+    drawBox();
+  };
+  bx.onpointerup = () => { drag = null; };
+}
+
+function drawBox() {
+  if (!img || !box) return;
+  const bx = $('#cropbox'), ir = img.getBoundingClientRect(), sr = $('#stage').getBoundingClientRect();
+  bx.style.left = (ir.left - sr.left + box.x) + 'px';
+  bx.style.top = (ir.top - sr.top + box.y) + 'px';
+  bx.style.width = bx.style.height = box.s + 'px';
+}
+
+$('#zoom').oninput = () => {
+  if (!img) return;
+  const r = img.getBoundingClientRect(), max = Math.min(r.width, r.height);
+  box.s = Math.max(24, max * (+$('#zoom').value / 100));
+  box.x = Math.max(0, Math.min(r.width - box.s, box.x));
+  box.y = Math.max(0, Math.min(r.height - box.s, box.y));
+  drawBox();
+};
+
+const loadUrl = () => { const u = $('#url').value.trim(); if (u) place('/api/fetch?url=' + encodeURIComponent(u)); };
+$('#load').onclick = loadUrl;
+$('#file').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const fr = new FileReader(); fr.onload = () => place(fr.result); fr.readAsDataURL(f);
+};
+
+$('#save').onclick = async () => {
+  if (!img || !box) return setStatus('אין תמונה טעונה', 'var(--warn)');
+  /* The crop box is in on-screen pixels; the server crops the original, so scale up. */
+  const r = img.getBoundingClientRect(), k = img.naturalWidth / r.width;
+  const crop = { x: box.x * k, y: box.y * k, s: box.s * k };
+  setStatus('שומר תמונה…');
+  const payload = { party: cur.party, key: cur.key, crop };
+  if (img.src.startsWith('data:')) payload.data = img.src;
+  else payload.url = $('#url').value.trim();
+  const j = await (await fetch('/api/photo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })).json();
+  if (j.error) return setStatus('שגיאה: ' + j.error, 'var(--warn)');
+  setStatus(`נשמר ${j.side}px ✓`, 'var(--ok)');
+  $('#dlg').close();
+  await load();
+};
+
+$('#clear').onclick = async () => {
+  await fetch(`/api/photo?party=${cur.party}&key=${cur.key}`, { method: 'DELETE' });
+  $('#dlg').close(); setStatus('העקיפה הוסרה ✓', 'var(--ok)'); await load();
+};
+$('#close').onclick = () => $('#dlg').close();
+
+$('#build').onclick = async () => {
+  $('#build').disabled = true; setStatus('בונה…');
+  const j = await (await fetch('/api/build', { method: 'POST' })).json();
+  $('#build').disabled = false;
+  setStatus(j.code === 0 ? 'הבנייה הסתיימה ✓' : 'הבנייה נכשלה', j.code === 0 ? 'var(--ok)' : 'var(--warn)');
+  if (j.code !== 0) console.log(j.log);
+  await load();
+};
+
+load();
+</script>
+</body>
+</html>

@@ -5,6 +5,8 @@ The dashboard tracks parties; this folder tracks the people on each party's list
 
 ```
 lists/<Party_id>.json              the list                          (committed)
+overrides/<Party_id>/<key>.jpg     a hand-picked photo, beats the    (committed)
+                                   graphic and the site
 sources/<Party_id>.<ext>           the party-published list graphic, (committed)
                                    where the party published one
 portraits/<Party_id>/NN.jpg        one portrait per rank             (committed)
@@ -158,6 +160,30 @@ honest, and is what the source actually holds.
 
 The same pass records Wikidata's portrait (P18) for anyone who has one — 93 of them, listed
 in `.leaderheads/knesset/wikidata-portraits.txt`. Nothing consumes those yet.
+
+## The editor
+
+`npm run edit:candidates`, then <http://127.0.0.1:8760>. Every field on every candidate —
+the three names, gender, ותק, the photo — with a party filter, a search box, and a "רק
+חסרים" toggle for the gaps. It binds to localhost only: it writes to the working tree and
+can start a build, so it has no business being reachable from anywhere else.
+
+It edits **these files**, not a database of its own: fields go back into `lists/*.json` and
+a photo into `overrides/`, so every change shows up in `git diff` and is reviewed like any
+other commit. Field order and everything the editor does not touch are preserved, so a diff
+shows the one line that changed.
+
+A photo can come from a file, a pasted URL, or — where the candidate is a public figure —
+Wikidata's own portrait, offered as a button. Drag the square to frame it. It is written to
+`overrides/<Party_id>/<key>.jpg`, which **beats the graphic and the site and survives a
+rebuild**; that is the same contract `assets/leader-heads/cutouts/` has, and without it the
+next bake would simply overwrite the choice.
+
+**The bake never deletes a portrait it did not make.** It used to clean the party's folder
+and regenerate, which is fine until a live third-party page changes: The Democrats stopped
+server-rendering the grid holding 31 of their candidates, and one run silently destroyed 31
+committed portraits. Anything with no source in a given run is now reported and left alone,
+and removing one is a deliberate `git rm`.
 
 ## Site readers
 
