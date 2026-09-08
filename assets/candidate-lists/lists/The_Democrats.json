@@ -70,7 +70,10 @@
       "mk": "former",
       "gender": "f",
       "nameEn": "Gaby Lasky",
-      "nameAr": null
+      "nameAr": "غابي لاسكي",
+      "pinned": [
+        "nameAr"
+      ]
     },
     {
       "rank": 7,
