@@ -38,6 +38,12 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
 ## Data & methodology
 
 - Single source of truth: Wikipedia, "Opinion polling for the 2026 Israeli legislative election"
+- **The dataset starts on 1 September 2026** (`POLLS_FROM`). The lists closed on the 8th and the
+  ballot changed shape getting there: RZP merged with Zehut, the Reservists with the New Economic
+  Party, Unity withdrew, Hadash–Ta'al stopped appearing as its own column, and three lists that did
+  not exist in the spring now poll in double figures. An August poll is not a staler reading of
+  today's question, it is an answer to a different one. The floor is enforced in `update-polls.mjs`
+  *and* on the page's own refresh path, so a scheduled run cannot quietly re-add what was cut.
 - Parties below the 3.25% threshold count as 0 seats in that poll
 - Averages/medians computed only over polls that reported a figure for that party
 - Bloc totals ("others" = complement to 120) follow the user's own coalition/opposition assignments
@@ -62,7 +68,34 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
   - It **apportions by largest remainder** to exactly 120. Rounding each party independently, as the table's ממוצע column does, does not sum to 120 and cannot.
   - It collapses `ARAB_JOINT_GROUP` to a **single framing** rather than splitting the unit back across its members the way the forecast does. The forecast splits because it is summing bloc totals; here the seats are people, and splitting seated seven Joint List members beside one Hadash–Ta'al member — the same voters twice, two faces for one seat.
   - Coverage is the honest limit: only the parties with a list in `assets/candidate-lists/` fill their seats with real people. Everything else gets a neutral avatar and lands in an explicit "לא ידוע" group in the ותק and gender cuts, rather than being quietly folded into "new" or into a gender.
+- **A party header that spans two columns is the failure mode to watch.** This has now bitten three
+  times, and the third one silently discarded *every poll from 1 September onwards* — the dataset sat
+  at 31 August while Wikipedia carried twelve newer polls, and the scraper cheerfully reported "no new
+  polls" each run. Two technical blocs had appeared as `colspan="2"` headers, `RZP-Zehut` and
+  `Reserv.-NEP`, and only the "Joint List" case had ever handled a colspan. One unconsumed column
+  shifts every column after it, the row's seats stop summing to anything sane, and the sanity check
+  then drops the row — quietly, because a dropped row looks exactly like a row that was never there.
+  Three fixes, all in `update-polls.mjs` and both HTML copies:
+  - **Colspan is honoured for every party header, not just the Joint List.** The extra columns are
+    pushed as `'+<party>'` keys meaning *add this column to that party*, so a bloc reported as one
+    merged cell and a bloc reported as two separate cells both land on the same list.
+  - **`Zehut` and `NEP` map to `'+Religious Zionism'` and `'+Reservists'`.** They run on those ballot
+    slips, and the column has to be consumed even when it is empty.
+  - **A header cell is split on its first depth-0 pipe, not its last.** `! style=… | [[The
+    Reservists|Reserv.]]-[[New Economic Party|NEP]]` was being read as `NEP]]`, because the last pipe
+    on the line is inside the second wikilink. That is also what made `Gov.{{efn|…}}` come back as a
+    paragraph of footnote and show up as a bogus "unrecognized column".
+- **A sub-threshold percentage is a zero, not a missing answer.** `(1.3%)`, `(<1%)` and `(~2%)` all mean
+  the pollster asked about the party and it did not clear the threshold. Only the first form was
+  recognized; `(<1%)` was read as "not reported", and since the party table averages a party over the
+  polls that reported it, that quietly *lifted* the mean of a party polling below 1% instead of
+  dragging it down.
 - **New-party detection.** Wikipedia's table occasionally adds a party column (e.g. Unity, Amcha Yisrael) that `headerKey()` doesn't recognize yet — until it's added to `ALL_KEYS`/`headerKey()`/`PARTIES` (in both `update-polls.mjs` and `docs/index.html`), that party's seats are silently dropped from every poll rather than shown, and worse, when Wikipedia's "Joint List" column isn't colspan-merged, an unrelated bug can shift every later column's data (this happened for real — see the Aug 2026 Yashar/Democrats corruption fixed in this repo's history). To catch this automatically going forward, `update-polls.mjs` now flags any header cell it can't recognize in the currently-active table; the twice-daily workflow surfaces that as a GitHub issue (opened once, commented on for repeat detections) instead of a log line nobody reads. The same check also runs client-side (as a `console.warn`) when the dashboard refreshes from Wikipedia in the browser.
+- **Removing a party from the display is not the same as removing it from the parser.** `Unity`
+  (withdrew 4 Sep 2026) and `Hadash-Ta'al` are gone from `PARTIES`, so neither is shown; both stay in
+  `ALL_KEYS`/`headerKey()`, because the older tables still carry their columns and an unrecognized
+  column shifts every column after it — see above. Balad needs no flag: it has no figure in any poll
+  since 1 September, and a party with no data in range simply does not render.
 - A party's `active` flag in `PARTIES` controls whether it's shown at all (used for parties superseded by a later merger, e.g. `Yesh Atid`/`Bennett 2026` after the `Together` merger) — when Wikipedia's table stops populating one tracked key in favor of a differently-named one for the same real-world party (as happened with `Yesodot Yisrael` → `Reservists`/"Zionist Home"), flip the flags to match which key current polls actually populate, rather than assuming the newer-added key is always the active one.
 
 ## Languages (he · ar · en)

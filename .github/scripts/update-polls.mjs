@@ -12,6 +12,15 @@ const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
 const DRY = !!process.env.DRY_RUN;
 const BACKFILL_DAYS = Number(process.env.BACKFILL_DAYS || 45);   // how far back to re-check Wikipedia for polls added after the fact
 
+/* The dataset starts on 1 September 2026. The lists closed on the 8th and the ballot changed
+   shape on the way there: RZP merged with Zehut, the Reservists with the New Economic Party,
+   Unity withdrew, Hadash-Ta'al stopped appearing as its own column, and three lists that did
+   not exist in the spring now poll in double figures. A poll from August is not a lower-quality
+   reading of today's question — it is an answer to a different one, and averaging the two is
+   what produces a trend line nobody can act on. Enforced at every entry point, so a scheduled
+   run cannot quietly re-add what was cut. */
+const POLLS_FROM = '2026-09-01';
+
 
 /* ── parser (ported from docs/index.html) ── */
 const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists","Unity","Amcha Yisrael"];
@@ -52,7 +61,15 @@ function headerKey(txt){ const t=txt.toLowerCase();
   if(/bennett/.test(t)) return 'Bennett 2026';
   if(/yashar/.test(t)) return 'Yashar';
   if(/yesodot/.test(t)) return 'Yesodot Yisrael';
-  if(/reservists|zionist home/.test(t)) return 'Reservists';
+  if(/reserv|zionist home/.test(t)) return 'Reservists';
+  /* Two technical blocs each still have a column per member in the older tables and a single
+     merged column in the newest one. A "+" key means "add this column to that party": Zehut
+     runs on the RZP slip, NEP on the Reservists slip, so their seats belong to those lists —
+     and, just as importantly, the column has to be consumed rather than skipped, or every
+     column after it shifts. Checked after the base names, since the merged headers read
+     "RZP-Zehut" and "Reserv.-NEP" and must resolve to the base. */
+  if(/\bzehut\b/.test(t)) return '+Religious Zionism';
+  if(/new economic|\bnep\b/.test(t)) return '+Reservists';
   if(/amcha yisrael|winter party/.test(t)) return 'Amcha Yisrael';
   if(/\bunity\b/.test(t)) return 'Unity';
   return null; }
@@ -66,6 +83,18 @@ function cellContent(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
     if(two==='}}'||two===']]'){depth--;i++;continue;}
     if(depth===0 && s[i]==='|') sep=i; }
   if(sep>=0) s=s.slice(sep+1); return s.trim(); }
+/* A header cell is "! attributes | content", and the attribute half never contains a link.
+   Splitting on the LAST pipe therefore breaks on a header whose content is itself a piped
+   link — "[[The Reservists|Reserv.]]-[[New Economic Party|NEP]]" came back as "NEP]]", which
+   headerKey could not place, and the whole column went unrecognized. Split on the first pipe
+   that is outside [[ ]] and {{ }} instead: that is the attribute separator. */
+function headerContent(line){ const s=line.replace(/^\s*!/,''); let depth=0;
+  for(let i=0;i<s.length-1;i++){ const two=s[i]+s[i+1];
+    if(two==='{{'||two==='[['){depth++;i++;continue;}
+    if(two==='}}'||two===']]'){depth--;i++;continue;}
+    if(depth===0 && s[i]==='|') return s.slice(i+1).trim(); }
+  return s.trim(); }
+function headerSpan(line){ const m=line.match(/colspan\s*=\s*"?(\d+)"?/i); return m?parseInt(m[1],10):1; }
 function cellSpan(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
   for(let i=0;i<s.length-1;i++){ const two=s[i]+s[i+1];
     if(two==='{{'||two==='[['){depth++;i++;continue;}
@@ -75,8 +104,12 @@ function cellSpan(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
 function convSeat(raw){ let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'').replace(/\{\{efn[^}]*\}\}/gi,'').replace(/'''/g,'').trim();
   if(/\{\{\s*n\/?a\s*\}\}/i.test(v)) return null;
   if(/^[–—-]$/.test(v)) return null;
-  if(/\{\{small\|\s*\(?[\d.]+%\)?\s*\}\}/i.test(v)) return 0;
-  if(/^\(?[\d.]+%\)?$/.test(v)) return 0;
+  /* A party the poll DID report but placed below the threshold, written as a vote share:
+     "(1.3%)", "(<1%)", "(~2%)". That is a zero, not a missing answer — and the difference
+     matters, because the party table averages a party only over the polls that reported it,
+     so reading "<1%" as "not asked" quietly lifts its mean instead of dragging it down. */
+  if(/\{\{small\|\s*\(?\s*[<>≤≥~]?\s*[\d.]+\s*%\)?\s*\}\}/i.test(v)) return 0;
+  if(/^\(?\s*[<>≤≥~]?\s*[\d.]+\s*%\)?$/.test(v)) return 0;
   const m=v.match(/^(\d{1,2})\b/); if(m) return parseInt(m[1],10); return null; }
 function convSampleSize(raw){
   let v=raw.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'').replace(/\{\{efn[^}]*\}\}/gi,'').replace(/'''/g,'').trim();
@@ -106,8 +139,7 @@ function parseWikiText(wikitext){
     for(const ch of chunks){ if(/\{\{\s*Opdrts/i.test(ch)) continue;
       const hcells=ch.split('\n').filter(l=>/^\s*!/.test(l)); if(hcells.length<8) continue;
       const order=[]; const unrecognizedHere=[];
-      for(const hc of hcells){ let txt=hc.replace(/^\s*!/,''); const bar=txt.lastIndexOf('|');
-        const content=bar>=0?txt.slice(bar+1):txt; const plain=wikiPlain(content); const key=headerKey(plain);
+      for(const hc of hcells){ const plain=wikiPlain(headerContent(hc)); const key=headerKey(plain);
         if(key==='JOINT2'){ const csm=hc.match(/colspan\s*=\s*"?(\d+)"?/i); const cs=csm?parseInt(csm[1],10):1;
           // colspan tells us how many real data columns this header cell actually spans:
           // no colspan (a single "Joint List" column, e.g. a merged-list scenario reported as one number) -> 1 key;
@@ -118,7 +150,16 @@ function parseWikiText(wikitext){
           if(cs>=3){ order.push("Ra'am"); order.push("Hadash-Ta'al"); order.push('Balad'); }
           else if(cs===2){ order.push("Hadash-Ta'al"); order.push('Balad'); }
           else { order.push('Joint List'); }
-        } else if(key){ order.push(key); }
+        } else if(key){
+          /* A party header spanning more than one column is a technical bloc that used to be
+             two separate columns and is now one ballot slip: RZP-Zehut, Reservists-NEP. The
+             data row may carry one merged cell or, if a pollster still splits them, two — so
+             the extra columns are marked to be ADDED to the first rather than dropped. Getting
+             this wrong is not a missing party: it shifts every column after it, which is what
+             silently discarded every poll from 1 September onwards. */
+          order.push(key);
+          for(let k=1;k<headerSpan(hc);k++) order.push('+'+key);
+        }
         else if(plain && !NON_PARTY_HEADER.test(plain)){
           // A piped wikilink's own "|" (e.g. "[[Unity (Israel)|Unity]]") can be the last "|" on the
           // line, so the crude header-cell split above sometimes leaves a stray "]]"/"}}" — cosmetic
@@ -146,7 +187,9 @@ function parseWikiText(wikitext){
       const seatCells=[]; cellLines.slice(4).forEach(l=>{ const sp=cellSpan(l); seatCells.push(cellContent(l)); for(let k=1;k<sp;k++) seatCells.push(''); }); // expand colspan cells (e.g. combined Joint List) so columns align with the header
       if(seatCells.length<cols.length) continue;
       const rec={ date:iso, pollster:firm, outlet:alias.outlet||FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
-      cols.forEach((c,i)=>{ rec[c]=convSeat(seatCells[i]); });
+      cols.forEach((c,i)=>{ const v=convSeat(seatCells[i]);
+        if(c[0]==='+'){ const k=c.slice(1); if(v!==null) rec[k]=(rec[k]||0)+v; }
+        else rec[c]=v; });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
       const tail=seatCells.slice(cols.length).map(convSeat);
       const gv=tail.find(t=>t!==null && Math.abs(t-govsum)<=1);
@@ -181,7 +224,7 @@ if (unrecognizedParties.size) {
 const srcHtml = fs.readFileSync(FILES[0], 'utf8');
 const arrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
 if (!arrText) throw new Error('BASE_POLLS_DATA array not found in ' + FILES[0]);
-const existing = JSON.parse(arrText);
+const existing = JSON.parse(arrText).filter(p => p.date >= POLLS_FROM);
 
 // Rows stored under a name Wikipedia has since renamed away from get canonicalised
 // in place, so they keep matching the incoming rows (and the name-keyed lookups in
@@ -205,7 +248,7 @@ const today = new Date().toISOString().slice(0, 10);
 // set, so re-check a whole window back instead of only past the high-water mark.
 const cutoff = new Date(Date.now() - BACKFILL_DAYS * 86400000).toISOString().slice(0, 10);
 const fresh = parsed
-  .filter(p => p.date >= cutoff && p.date <= today && !seen.has(p.date + '|' + p.pollster))
+  .filter(p => p.date >= POLLS_FROM && p.date >= cutoff && p.date <= today && !seen.has(p.date + '|' + p.pollster))
   .sort((a, b) => a.date < b.date ? -1 : 1);
 
 if (!fresh.length && !renamed) { console.log(`No new polls (baked up to ${maxDate}, looking back to ${cutoff}).`); process.exit(0); }
