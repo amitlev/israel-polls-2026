@@ -1554,14 +1554,58 @@ function seatVector(filtered) {
   }
   if (!sum) return {};
 
+  /* Apportion INSIDE each bloc, to the bloc totals every other widget shows. Apportioning
+     the 120 in one pass is a defensible number and was the wrong one to put on this page:
+     it gave the opposition 60 where the tug-of-war directly above said 59, and two widgets
+     side by side disagreeing about the same quantity is a bug whatever the arithmetic says.
+     The bloc totals come from blocTotals(); the split within a bloc still comes from the
+     parties' own means, so a party's share of its bloc is unchanged. */
+  const targets = blocTotals(filtered);
+  const assign = loadBlocAssign();
   const seats = {};
-  let used = 0;
-  kept.forEach(k => { k.exact = k.v * 120 / sum; seats[k.id] = Math.floor(k.exact); used += seats[k.id]; });
-  kept.sort((a, b) => (b.exact % 1) - (a.exact % 1));
-  for (let i = 0; used < 120; i++, used++) seats[kept[i % kept.length].id]++;
+  if (!targets) return {};
+  const bucket = { coal: [], opp: [], other: [] };
+  kept.forEach(k => (bucket[assign[k.id]] || bucket.other).push(k));
+
+  const apportion = (list, target) => {
+    const tot = list.reduce((a, k) => a + k.v, 0);
+    if (!list.length || !tot || target <= 0) return 0;
+    let used = 0;
+    list.forEach(k => { k.exact = k.v * target / tot; seats[k.id] = Math.floor(k.exact); used += seats[k.id]; });
+    const order = [...list].sort((a, b) => (b.exact % 1) - (a.exact % 1));
+    for (let i = 0; used < target; i++, used++) seats[order[i % order.length].id]++;
+    return target;
+  };
+  let placed = 0;
+  placed += apportion(bucket.coal, targets.gov);
+  placed += apportion(bucket.opp, targets.opp);
+  placed += apportion(bucket.other, targets.other);
+
+  /* A bloc can be credited seats by the poll average and have no party left above the
+     threshold to seat them — sub-threshold votes still count towards a bloc sum. Those
+     seats have nowhere to go inside their own bloc, so they are spread across everyone
+     rather than silently leaving the Knesset short of 120. */
+  if (placed < 120 && kept.length) {
+    const tot = kept.reduce((a, k) => a + k.v, 0);
+    const order = [...kept].sort((a, b) => b.v - a.v);
+    for (let i = 0; placed < 120; i++, placed++) seats[order[i % order.length].id] = (seats[order[i % order.length].id] || 0) + 1;
+  }
   for (const id in seats) if (!seats[id]) delete seats[id];
   return seats;
 }
+/* The bloc split, in one place. It was computed identically in three widgets and a fourth
+   way in the seat grid, which is how the grid came to show the opposition on 60 while the
+   tug-of-war directly above it showed 59. Everything that puts a number on a bloc calls
+   this. */
+function blocTotals(filtered) {
+  const bl = filtered.map(pollBlocs).filter(Boolean);
+  if (!bl.length) return null;
+  const gov = Math.round(mean(bl.map(b => b.gov)));
+  let opp = Math.round(mean(bl.map(b => b.opp)));
+  if (gov + opp > 120) opp = 120 - gov;
+  return { gov, opp, other: Math.max(0, 120 - gov - opp), n: bl.length };
+}
+
 function pollBlocs(p) {
   const assign = loadBlocAssign(); const allIds = PARTIES.map(x => x.id);
   const known = allIds.filter(n => p[n] !== null && p[n] !== undefined).length;
@@ -1586,11 +1630,8 @@ function chartTheme(){
 }
 function renderBlocDonut(filtered) {
   const svg = document.getElementById('blocChart'), note = document.getElementById('blocNote');
-  const eligible = filtered.map(pollBlocs).filter(Boolean);
-  if (!eligible.length) { svg.innerHTML = ''; note.textContent = 'אין מספיק נתונים בטווח שנבחר.'; return; }
-  let g = Math.round(mean(eligible.map(e => e.gov))), o = Math.round(mean(eligible.map(e => e.opp)));
-  if (g + o > 120) o = 120 - g;
-  const b = { gov: g, opp: o, other: Math.max(0, 120 - g - o), n: eligible.length };
+  const b = blocTotals(filtered);
+  if (!b) { svg.innerHTML = ''; note.textContent = 'אין מספיק נתונים בטווח שנבחר.'; return; }
   const CT = chartTheme(), RED=CT.coal, BLUE=CT.opp, GRAY=CT.gray;
   const cx=210, cy=200, rOut=150, rIn=96;
   const fOpp = Math.max(0, Math.min(1, b.opp/120)), fOther = Math.max(0, Math.min(1 - fOpp, b.other/120));
@@ -2014,10 +2055,10 @@ function renderAll() { const f = getFiltered(); lastFiltered = f; renderTable(f)
 /* ─── Editorial hero band ─── */
 function renderHero(filtered) {
   const hero = document.getElementById('hero'); if (!hero) return;
-  const bl = filtered.map(pollBlocs).filter(Boolean);
-  if (!bl.length) { hero.style.display = 'none'; return; }
+  const bt = blocTotals(filtered);
+  if (!bt) { hero.style.display = 'none'; return; }
   hero.style.display = '';
-  const gov = Math.round(mean(bl.map(b => b.gov))), opp = Math.round(mean(bl.map(b => b.opp)));
+  const { gov, opp } = bt;
   const diff = Math.abs(opp - gov);
   const lead = opp > gov ? 'האופוזיציה' : (gov > opp ? 'הקואליציה' : 'הגושים');
   const top = Math.max(gov, opp);
@@ -2194,15 +2235,13 @@ function tugBystander(r, pal) {
 function renderTugWar(filtered) {
   const sec = document.getElementById('tugSection'), svg = document.getElementById('tugSvg');
   if (!sec || !svg) return;
-  const bl = filtered.map(pollBlocs).filter(Boolean);
-  if (!bl.length) { sec.style.display = 'none'; return; }
+  const bt = blocTotals(filtered);
+  if (!bt) { sec.style.display = 'none'; return; }
   sec.style.display = '';
   tugInitDefs();
   TC = Object.assign({}, tugIsNarrow(svg) ? TUG_NARROW : TUG_WIDE);
 
-  /* Same rounding as renderHero / renderBlocDonut, so the three never disagree. */
-  const gov = Math.round(mean(bl.map(b => b.gov))), opp = Math.round(mean(bl.map(b => b.opp)));
-  const other = Math.max(0, 120 - gov - opp);
+  const { gov, opp, other } = bt;
   const assign = loadBlocAssign();
   const rows = PARTIES.filter(p => p.active !== false).map(p => {
     const v = filtered.map(x => x[p.id]).filter(x => x != null);
@@ -3207,7 +3246,12 @@ tryRefresh();
       const items = bucket[k], c = cols[gi];
       const width = c * PITCH - GAP;
       const left = rightEdge - width;
-      heads.push({ label: label[k], n: items.length, y: PAD + 12, x: ltr ? left : rightEdge, anchor: ltr ? 'start' : 'end' });
+      /* x is the column's reading-START edge, and the heading now carries an explicit
+         direction, so the anchor is 'start' in both directions. It used to be 'end' in
+         Hebrew, which was right only while the text inherited the SVG's left-to-right
+         direction; once the direction was set the anchor flipped with it and the headings
+         ran off the outside of their columns. */
+      heads.push({ label: label[k], n: items.length, y: PAD + 12, x: ltr ? left : rightEdge, anchor: 'start' });
 
       items.forEach((s, j) => {
         const col = j % c, row = Math.floor(j / c);
@@ -3384,7 +3428,7 @@ tryRefresh();
 /* ===== Per-widget methodology (ⓘ hover) ===== */
 (function(){
   const METHOD = {
-    'כך תיראה הכנסת': 'ממוצע המנדטים לכל מפלגה בטווח הנבחר, מחולק ל‑120 מושבים בשיטת השארית הגדולה — ולכן הסכום הוא תמיד 120 בדיוק, בשונה מעמודת הממוצע בטבלה שבה כל מפלגה מעוגלת בנפרד. הממוצע מחושב על כל הסקרים בטווח (מפלגה שסקר לא ציין נספרת בו כ‑0), מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0, ומסגרות הריצה הערביות נבחנות כיחידה אחת כדי שלא יופיעו פעמיים. כל מושב מאויש במועמד לפי מקומו ברשימה שהמפלגה פרסמה; מושב שאין לו מועמד ידוע מקבל דמות ניטרלית.',
+    'כך תיראה הכנסת': 'גודל כל גוש זהה למוצג במשיכת החבל ובחלוקה לגושים — אותו חישוב, בדיוק. בתוך כל גוש מחולקים המושבים בין מפלגותיו בשיטת השארית הגדולה, לפי ממוצע המנדטים של כל מפלגה בטווח הנבחר, ולכן הסכום הוא תמיד 120 בדיוק — בשונה מעמודת הממוצע בטבלה שבה כל מפלגה מעוגלת בנפרד. הממוצע מחושב על כל הסקרים בטווח (מפלגה שסקר לא ציין נספרת בו כ‑0), מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0, ומסגרות הריצה הערביות נבחנות כיחידה אחת כדי שלא יופיעו פעמיים. כל מושב מאויש במועמד לפי מקומו ברשימה שהמפלגה פרסמה; מושב שאין לו מועמד ידוע מקבל דמות ניטרלית.',
     'שאל את הנתונים': 'התשובות מחושבות מקומית בדפדפן מתוך כל הסקרים — ללא בינה מלאכותית, ללא התחברות וללא עלות. בחרו שאלה או לחצו על הצעה מהירה.',
     'לפי מפלגה': {
       off: 'ממוצע וחציון המנדטים לכל מפלגה, מחושבים רק על הסקרים שדיווחו נתון עבורה בטווח הנבחר. מפלגות מתחת לאחוז החסימה (3.25%) נספרות כ‑0. בכפתורים ניתן לשייך כל מפלגה לגוש. "הרשימה המשותפת" היא חד"ש–תע"ל + בל"ד בריצה משותפת — כל סקר בודק מסגרת אחת בלבד, ולכן אין לחבר את שלוש השורות.',
