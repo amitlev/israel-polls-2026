@@ -37,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { FILES, regenAll } from './lib/restore-chunks.mjs';
+const FILES = ['docs/media-data.js'];
 
 const ASSETS = 'assets/candidate-lists';
 /* A portrait dropped in here wins over anything the graphic or the site would produce, and
@@ -56,9 +56,9 @@ const UA = { 'User-Agent': 'israel-polls-2026-dashboard/1.0 (https://github.com/
    anything larger is bytes with nothing in them. They go in as ONE sprite per party rather
    than 30 data URIs: WebP compresses a sheet better than 30 separate images, and it is one
    base64 string in the HTML instead of thirty.
-   Bytes here are not paid once. Every poll update rewrites all 20 .restore chunks in full,
-   twice a day, so anything added to the page is re-committed some 730 times a year. That
-   is the whole reason for 64px and for sprites — do not raise either casually. */
+   These bytes are the visitor's download, and media-data.js is one file the browser
+   caches across visits — but it is still ~680KB fetched before the seat grid can draw.
+   That is the reason for 64px and for sprites — do not raise either casually. */
 const SPRITE = 64, SPRITE_COLS = 8, SPRITE_Q = 80;
 const MAX_SEATS = 40;   // no party has ever polled near this; ranks past it can win no seat
 
@@ -182,10 +182,10 @@ function cardCanvas(img, g, n) {
 
 /* Photo filenames that start with the candidate's rank: "12-רם-בן-ברק-1536x1024.jpg".
    The size suffix is stripped to reach the original upload. */
-function parseFilenameRank(html) {
+function parseFilenameRank(js) {
   const re = /https?:\/\/[^"'\s,)\\]+?\/wp-content\/uploads\/\d{4}\/\d{2}\/[^"'\s,)\\]+?\.(?:jpg|jpeg|png)/gi;
   const ranked = new Map();
-  for (const raw of html.match(re) || []) {
+  for (const raw of js.match(re) || []) {
     const u = dec(raw);
     const m = u.match(/\/(\d+)-(.+?)(?:-\d+x\d+)?\.(jpg|jpeg|png)$/i);
     if (!m) continue;
@@ -201,8 +201,8 @@ function parseFilenameRank(html) {
    widgets holding [title?, first name, last name]. The page renders the same candidates
    twice in two layouts, so items are folded together on data-post-id and a rank found in
    either copy wins. */
-function parseJetListing(html, site) {
-  const chunks = html.split(/class="[^"]*jet-listing-grid__item/).slice(1);
+function parseJetListing(js, site) {
+  const chunks = js.split(/class="[^"]*jet-listing-grid__item/).slice(1);
   const byId = new Map();
   const widget = (ch, kind) => [...ch.matchAll(new RegExp(`data-widget_type="${kind}\\.default"[^>]*>([\\s\\S]*?)(?=<div class="elementor-element|<\\/div>\\s*<\\/div>\\s*<\\/div>)`, 'g'))]
     .map(m => flat(m[1])).filter(Boolean);
@@ -234,8 +234,8 @@ function parseJetListing(html, site) {
 }
 
 async function readSite(name, site) {
-  const html = await (await fetch(site.page, { headers: UA })).text();
-  const out = site.parse === 'jet-listing' ? parseJetListing(html, site) : parseFilenameRank(html);
+  const js = await (await fetch(site.page, { headers: UA })).text();
+  const out = site.parse === 'jet-listing' ? parseJetListing(js, site) : parseFilenameRank(js);
   fs.mkdirSync(WORK, { recursive: true });
   fs.writeFileSync(`${WORK}/${name}_manifest.json`, JSON.stringify({
     page: site.page, read: new Date().toISOString().slice(0, 10),
@@ -526,21 +526,20 @@ async function spriteFor(name) {
    and the append branch closes and reopens <script> so each blob keeps its own block. */
 function splice(pairs) {
   for (const f of FILES) {
-    let html = fs.readFileSync(f, 'utf8');
+    let js = fs.readFileSync(f, 'utf8');
     let anchor = /(window\.PARTY_LOGOS_DATA = \{.*?\};\n)/s;
     for (const [global, blob] of pairs) {
       const line = `window.${global} = ${JSON.stringify(blob)};`;
       const existing = new RegExp(`window\\.${global} = \\{.*?\\};`, 's');
-      if (existing.test(html)) html = html.replace(existing, () => line);
+      if (existing.test(js)) js = js.replace(existing, () => line);
       else {
-        if (!anchor.test(html)) throw new Error(`could not find where to splice ${global} in ${f}`);
-        html = html.replace(anchor, (_, m) => `${m}</script>\n<script>\n${line}\n`);
+        if (!anchor.test(js)) throw new Error(`could not find where to splice ${global} in ${f}`);
+        js = js.replace(anchor, (_, m) => `${m}${line}\n`);
       }
       anchor = new RegExp(`(window\\.${global} = \\{.*?\\};\\n)`, 's');
     }
-    fs.writeFileSync(f, html);
+    fs.writeFileSync(f, js);
   }
-  regenAll();
 }
 
 if (!preview) {
@@ -566,6 +565,6 @@ if (!preview) {
   const kb = n => (n / 1024).toFixed(0) + 'KB';
   const spriteBytes = Object.values(sprites).reduce((a, s) => a + s.s.length, 0);
   console.log(`\nspliced ${Object.keys(sprites).length} sprites (${kb(spriteBytes)}) and ` +
-    `${Object.values(people).reduce((a, p) => a + p.length, 0)} candidates into both HTML files; ` +
+    `${Object.values(people).reduce((a, p) => a + p.length, 0)} candidates into docs/media-data.js; ` +
     `${kb(before)} \u2192 ${kb(fs.statSync(FILES[0]).size)}`);
 }

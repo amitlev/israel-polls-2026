@@ -1,11 +1,13 @@
 # Israel 2026 election polls dashboard (לוח סקרי הבחירות 2026)
 
-A live, self-contained dashboard for tracking Israeli 2026 Knesset election polls inside Claude Desktop (Cowork) — in Hebrew, Arabic or English.
+A live dashboard tracking Israeli 2026 Knesset election polls — in Hebrew, Arabic or English.
+
+**→ [israel-polls-2026.vercel.app](https://israel-polls-2026.vercel.app/)**
 
 **Features**
 
 - **A ballot slip counting down to the vote** — days to 27 Oct 2026 on a white paper slip, and a live countdown to the polls closing at 22:00. The day count is resolved in Asia/Jerusalem so a reader abroad still sees Israel's answer, and poll close is a fixed instant: Israeli daylight time ends on the last Sunday of October, the 25th, so 22:00 that day is UTC+2 rather than +3
-- Per-party seat averages and medians with party-leader photos, over 141+ polls (Jan-Jul 2026)
+- Per-party seat averages and medians with party-leader photos, over every poll since the lists closed (see the dataset floor below)
 - TV-style coalition/opposition half-donut with a 61-seat majority marker
 - **A 120-seat Knesset made of faces** — the seat average cashed out into 120 actual candidates, drawn from the parties' published lists, and re-cuttable by bloc, by ותק (sitting MK / former MK / new) or by gender. Each group is a vertical column as wide a share of the panel as its share of the 120, so the widths are themselves the answer; the coalition column sits on the right in every language, the same convention the tug-of-war and the donut already follow. Switching the cut moves every face across the screen to its new place rather than redrawing
 - Trend charts for parties and blocs, with independent date-range sliders
@@ -18,22 +20,22 @@ A live, self-contained dashboard for tracking Israeli 2026 Knesset election poll
 - **Shared links and embeds carry your filters** — date range, outlets, trend parties, bloc assignment and both average modes travel in the URL, so an embed keeps showing exactly what you picked without the host page needing any filter controls of its own
 - A second "מעבר לכותרות" (beyond the horse race) view tracking PM-preference matchups, trust ratings, and policy-opinion questions from the same gov.il filings over time — content Wikipedia's table doesn't carry at all
 
-**הערה בעברית:** הלוח בעברית (RTL) כברירת מחדל, עם מעבר לערבית ולאנגלית במתג שבראש העמוד. ההתקנה דורשת Claude Desktop במצב Cowork.
+**הערה בעברית:** הלוח בעברית (RTL) כברירת מחדל, עם מעבר לערבית ולאנגלית במתג שבראש העמוד.
 
 **ملاحظة بالعربية:** اللوحة متاحة بالعربية عبر مبدّل اللغة في أعلى الصفحة (أو `?lang=ar`).
 
-## Install
+## Running it
 
-In Claude Desktop (Cowork) or Claude Code, add this repo as a plugin marketplace and install:
+The dashboard is a static site: `docs/` is served as-is, no build step.
 
+```bash
+python3 -m http.server 8731 --directory docs
 ```
-/plugin marketplace add amitlev/israel-polls-2026
-/plugin install israel-polls-2026@israel-polls-2026
-```
 
-Then ask Claude: **"Install the Israel polls dashboard"** (or in Hebrew: "התקן את לוח הסקרים").
-
-Alternatively, point your Claude at this repo and ask it to install the dashboard from `plugins/israel-polls-2026`, or download the `.plugin` file from the repo and open it in Cowork.
+`docs/index.html` is the page. Its data lives in two generated files beside it —
+`docs/polls-data.js` (poll records, rewritten by the update workflows) and
+`docs/media-data.js` (baked leader photos, party logos and candidate sprites,
+rewritten only by the `build:*` scripts). Neither is edited by hand.
 
 ## Data & methodology
 
@@ -75,7 +77,7 @@ Alternatively, point your Claude at this repo and ask it to install the dashboar
   `Reserv.-NEP`, and only the "Joint List" case had ever handled a colspan. One unconsumed column
   shifts every column after it, the row's seats stop summing to anything sane, and the sanity check
   then drops the row — quietly, because a dropped row looks exactly like a row that was never there.
-  Three fixes, all in `update-polls.mjs` and both HTML copies:
+  Three fixes, all in `update-polls.mjs` and the page:
   - **Colspan is honoured for every party header, not just the Joint List.** The extra columns are
     pushed as `'+<party>'` keys meaning *add this column to that party*, so a bloc reported as one
     merged cell and a bloc reported as two separate cells both land on the same list.
@@ -136,13 +138,13 @@ Both link kinds carry the filters in force when they were made — `from`/`to`, 
 
 State is applied **in memory only**. A link someone else made must not overwrite the reader's own saved filters, so nothing touches `localStorage` on the way in. The two mode toggles are flipped by clicking their own buttons, so their labels and re-render come along for free.
 
-Share URLs always point at the public site rather than `location.href`, because this page also runs from `file://` inside Cowork and from the plugin's bundled copy, where the current URL means nothing to anyone else.
+Share URLs always point at the public site rather than `location.href`: inside an embed the current URL is the host page's, which means nothing to anyone else.
 
 In embed mode the rest of the page is hidden rather than removed — the render code looks elements up by id and redraws on theme changes and refreshes, so anything torn out would break the widget still on screen. Until the target panel has been moved into `.embed-root` the body is only `visibility:hidden`, so the first render still measures real boxes. The party-trend panel's own picker is hidden too: an embed shows the embedder's selection, not a control for changing it.
 
 The bloc-assignment buttons in the party table stay live, though. They are the widget's own interaction rather than a filter, they hide nothing, and a reload returns to whatever the embed URL asked for.
 
-Two limits worth knowing: an embed loads the whole ~690KB single-file dashboard, since that is what a self-contained page can offer; and link previews are a static `summary` card with no `og:image`, because generating a per-widget preview image would need a server-side renderer this static site does not have.
+Two limits worth knowing: an embed loads the whole dashboard — ~260KB of page plus a ~680KB `media-data.js` of baked images, which the browser caches across visits; and link previews are a static `summary` card with no `og:image`, because generating a per-widget preview image would need a server-side renderer this static site does not have.
 
 ## License
 

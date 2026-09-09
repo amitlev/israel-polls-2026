@@ -69,8 +69,6 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html \
-                  plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html \
-                  .restore/
+          git add docs/polls-data.js
           git commit -m "data: enrich polls from gov.il disclosures [skip ci]"
           git push

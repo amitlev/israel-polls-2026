@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /*
  * Fetch the Wikipedia polling page, parse any polls newer than the baked
- * MAX_BAKED_DATE, splice them into window.BASE_POLLS_DATA in both HTML files,
- * and regenerate the .restore chunks. Prints what it did; writes nothing when
+ * MAX_BAKED_DATE, and splice them into window.BASE_POLLS_DATA in
+ * docs/polls-data.js. Prints what it did; writes nothing when
  * DRY_RUN is set. Mirrors the multi-table parser used in the dashboard itself.
  */
 import fs from 'node:fs';
-import { FILES, regenAll } from './lib/restore-chunks.mjs';
+const FILES = ['docs/polls-data.js'];
 
 const PAGE = 'Opinion_polling_for_the_2026_Israeli_legislative_election';
 const DRY = !!process.env.DRY_RUN;
@@ -221,8 +221,8 @@ if (unrecognizedParties.size) {
   }
 }
 
-const srcHtml = fs.readFileSync(FILES[0], 'utf8');
-const arrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
+const srcJs = fs.readFileSync(FILES[0], 'utf8');
+const arrText = srcJs.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
 if (!arrText) throw new Error('BASE_POLLS_DATA array not found in ' + FILES[0]);
 const existing = JSON.parse(arrText).filter(p => p.date >= POLLS_FROM);
 
@@ -262,13 +262,12 @@ if (DRY) { console.log('DRY_RUN — no files written.'); process.exit(0); }
 const merged = [...existing, ...fresh].sort((a, b) => a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
 const mergedJson = JSON.stringify(merged);
 for (const f of FILES) {
-  const html = fs.readFileSync(f, 'utf8');
-  if (!/window\.BASE_POLLS_DATA = \[.*?\];/s.test(html)) throw new Error('BASE_POLLS_DATA array not found in ' + f);
+  const js = fs.readFileSync(f, 'utf8');
+  if (!/window\.BASE_POLLS_DATA = \[.*?\];/s.test(js)) throw new Error('BASE_POLLS_DATA array not found in ' + f);
   // Function replacement: a literal `$&`/`$'` inside the JSON would otherwise be
   // interpreted as a replacement pattern.
-  fs.writeFileSync(f, html.replace(/window\.BASE_POLLS_DATA = \[.*?\];/s, () => `window.BASE_POLLS_DATA = ${mergedJson};`));
+  fs.writeFileSync(f, js.replace(/window\.BASE_POLLS_DATA = \[.*?\];/s, () => `window.BASE_POLLS_DATA = ${mergedJson};`));
 }
-regenAll();
 
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `added=${fresh.length}\nsummary=${summary}\n`);

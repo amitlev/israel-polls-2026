@@ -37,9 +37,7 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html \
-                  plugins/israel-polls-2026/skills/israel-polls-dashboard/assets/dashboard.html \
-                  .restore/
+          git add docs/polls-data.js
           git commit -m "data: auto-update polls from Wikipedia [skip ci]"
           git push
 
@@ -58,7 +56,7 @@ jobs:
           TITLE="New party column(s) on Wikipedia not yet recognized"
           BODY="The Wikipedia polling table now has a party column this dashboard doesn't recognize yet: **${PARTIES}**.
 
-          Until \`headerKey()\`/\`ALL_KEYS\`/\`PARTIES\` are updated (in both \`.github/scripts/update-polls.mjs\` and \`docs/index.html\`, mirrored to the plugin's \`dashboard.html\`), this party's seats are silently dropped from every poll instead of shown — add the party there (see the Unity/Amcha Yisrael entries for the pattern) and add a PARTIES entry with a photo.
+          Until \`headerKey()\`/\`ALL_KEYS\`/\`PARTIES\` are updated (in both \`.github/scripts/update-polls.mjs\` and \`docs/index.html\`), this party's seats are silently dropped from every poll instead of shown — add the party there (see the Unity/Amcha Yisrael entries for the pattern) and add a PARTIES entry with a photo.
 
           Opened automatically by the twice-daily poll-update workflow. Close manually once fixed — will reopen (well, comment) if it recurs."
           EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')

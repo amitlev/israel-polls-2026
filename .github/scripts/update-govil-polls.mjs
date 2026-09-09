@@ -19,7 +19,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
-import { FILES, regenAll } from './lib/restore-chunks.mjs';
+const FILES = ['docs/polls-data.js'];
 import { mapGovilPollster } from './lib/govil-pollster-map.mjs';
 import { parseGovilPdf } from './lib/govil-pdf-parser.mjs';
 
@@ -99,13 +99,13 @@ function findMatch(existing, pollsterKey, fieldworkDate){
 }
 
 /* ── main ── */
-const srcHtml = fs.readFileSync(FILES[0], 'utf8');
-const pollsArrText = srcHtml.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
+const srcJs = fs.readFileSync(FILES[0], 'utf8');
+const pollsArrText = srcJs.match(/window\.BASE_POLLS_DATA = (\[.*?\]);/s)?.[1];
 if (!pollsArrText) throw new Error('BASE_POLLS_DATA array not found in ' + FILES[0]);
 const polls = JSON.parse(pollsArrText);
 
-const topicalArrText = srcHtml.match(/window\.GOVIL_TOPICAL_DATA = (\[.*?\]);/s)?.[1];
-if (topicalArrText == null) throw new Error('GOVIL_TOPICAL_DATA array not found in ' + FILES[0] + ' — add the empty-array declaration to both HTML files first');
+const topicalArrText = srcJs.match(/window\.GOVIL_TOPICAL_DATA = (\[.*?\]);/s)?.[1];
+if (topicalArrText == null) throw new Error('GOVIL_TOPICAL_DATA array not found in ' + FILES[0] + ' — add the empty-array declaration to docs/polls-data.js first');
 const existingTopical = JSON.parse(topicalArrText);
 const seenTopical = new Set(existingTopical.map(t => t.sourceUrl + '|' + t.topicId));
 
@@ -180,8 +180,8 @@ const newPollsJson = JSON.stringify(polls);
 const freshTopicalJoined = freshTopical.map(t => JSON.stringify(t)).join(', ');
 
 for (const f of FILES){
-  let html = fs.readFileSync(f, 'utf8');
-  html = html.replace(/window\.BASE_POLLS_DATA = \[.*?\];/s, `window.BASE_POLLS_DATA = ${newPollsJson};`);
+  let js = fs.readFileSync(f, 'utf8');
+  js = js.replace(/window\.BASE_POLLS_DATA = \[.*?\];/s, `window.BASE_POLLS_DATA = ${newPollsJson};`);
   if (freshTopical.length){
     // Regex-anchored on the full "window.GOVIL_TOPICAL_DATA = [...];" statement,
     // not a plain string search on just the captured array text — a bare "[]"
@@ -189,14 +189,13 @@ for (const f of FILES){
     // .replace("[]", ...) can silently corrupt an unrelated empty array elsewhere.
     // Also handled explicitly here: appending onto an empty array must not
     // produce a leading comma ("[, {...}]" is invalid JSON).
-    html = html.replace(/window\.GOVIL_TOPICAL_DATA = (\[.*?\]);/s, (full, arr) => {
+    js = js.replace(/window\.GOVIL_TOPICAL_DATA = (\[.*?\]);/s, (full, arr) => {
       const newArr = arr.trim() === '[]' ? `[${freshTopicalJoined}]` : arr.slice(0, -1) + ', ' + freshTopicalJoined + ']';
       return `window.GOVIL_TOPICAL_DATA = ${newArr};`;
     });
   }
-  fs.writeFileSync(f, html);
+  fs.writeFileSync(f, js);
 }
-regenAll();
 
 if (process.env.GITHUB_OUTPUT){
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `enriched=${enrichedCount}\ntopical=${freshTopical.length}\n`);

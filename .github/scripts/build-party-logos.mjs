@@ -14,12 +14,12 @@
  * for identification; that is a publishing decision, recorded here rather than
  * quietly flattened into "from Wikipedia".
  *
- *   npm run build:logos              bake and splice into both HTML files
+ *   npm run build:logos              bake and splice into docs/media-data.js
  *   npm run build:logos -- --preview contact sheet only, HTML untouched
  */
 import fs from 'node:fs';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { FILES, regenAll } from './lib/restore-chunks.mjs';
+const FILES = ['docs/media-data.js'];
 
 const WORK = '.leaderheads/logos', SRC = `${WORK}/src`;
 const LOCAL = 'assets/party-logos/incoming';   // hand-supplied files land here
@@ -130,15 +130,14 @@ function splice(blob) {
   const existing = /window\.PARTY_LOGOS_DATA = \{.*?\};/s;
   const anchor = /(window\.TUG_HEADS_DATA = \{.*?\};\n)/s;
   for (const f of FILES) {
-    const html = fs.readFileSync(f, 'utf8');
-    const hit = existing.test(html) ? existing : anchor;
-    if (!hit.test(html)) throw new Error(`could not find where to splice PARTY_LOGOS_DATA in ${f}`);
+    const js = fs.readFileSync(f, 'utf8');
+    const hit = existing.test(js) ? existing : anchor;
+    if (!hit.test(js)) throw new Error(`could not find where to splice PARTY_LOGOS_DATA in ${f}`);
     const next = hit === existing
-      ? html.replace(existing, () => line)
-      : html.replace(anchor, (_, m) => `${m}</script>\n<script>\n${line}\n`);
+      ? js.replace(existing, () => line)
+      : js.replace(anchor, (_, m) => `${m}${line}\n`);
     fs.writeFileSync(f, next);
   }
-  regenAll();
 }
 
 const previewOnly = process.argv.includes('--preview');
@@ -185,6 +184,6 @@ if (previewOnly) {
     'identify the party they belong to, and are a publishing decision rather than a free licence.\n' +
     'The CC BY-SA entries additionally require attribution.\n\n' +
     '| Party | Baked size | Licence | Source |\n|---|---|---|---|\n' + rows.join('\n') + '\n');
-  console.log(`\n${Object.keys(blob).length} logos, ${(total/1024).toFixed(0)} KB, spliced into both HTML files.`);
+  console.log(`\n${Object.keys(blob).length} logos, ${(total/1024).toFixed(0)} KB, spliced into docs/media-data.js.`);
 }
 if (missing.length) console.log(`still missing: ${missing.join(', ')}`);

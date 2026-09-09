@@ -4,7 +4,7 @@
  * a head cut out of its background, sharp at ~46px on a retina screen, and facing a
  * known direction. This downloads each leader's Wikipedia lead image, crops to the
  * head, masks it to a hand-tuned silhouette, normalises the facing, and splices the
- * result into both HTML files as window.TUG_HEADS_DATA.
+ * result into docs/media-data.js as window.TUG_HEADS_DATA.
  *
  * The automatic masks are curated by eye — `npm run build:heads -- --preview` writes a
  * contact sheet to .leaderheads/preview.png instead of touching the HTML, which is the
@@ -23,7 +23,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { FILES, regenAll } from './lib/restore-chunks.mjs';
+const FILES = ['docs/media-data.js'];
 
 const WORK = '.leaderheads', SRC = `${WORK}/src`;
 const ASSETS = 'assets/leader-heads';                 // the hand-editing workspace
@@ -181,22 +181,21 @@ async function preview(manifest) {
   console.log(`\npreview → ${WORK}/preview.png (light band on top, dark band below)`);
 }
 
-/* ── splice into both HTML files ── */
+/* ── splice into docs/media-data.js ── */
 function splice(blob) {
   const line = `window.TUG_HEADS_DATA = ${JSON.stringify(blob)};`;
   const existing = /window\.TUG_HEADS_DATA = \{.*?\};/s;
   const anchor = /(window\.PHOTOS_DATA = \{.*?\};\n)/s;
   for (const f of FILES) {
-    const html = fs.readFileSync(f, 'utf8');
+    const js = fs.readFileSync(f, 'utf8');
     // replacement passed as a function: base64 is $-free, but never rely on that
-    const hit = existing.test(html) ? existing : anchor;
-    if (!hit.test(html)) throw new Error(`could not find where to splice TUG_HEADS_DATA in ${f}`);
+    const hit = existing.test(js) ? existing : anchor;
+    if (!hit.test(js)) throw new Error(`could not find where to splice TUG_HEADS_DATA in ${f}`);
     const next = hit === existing
-      ? html.replace(existing, () => line)
-      : html.replace(anchor, (_, m) => `${m}</script>\n<script>\n${line}\n`);
+      ? js.replace(existing, () => line)
+      : js.replace(anchor, (_, m) => `${m}${line}\n`);
     fs.writeFileSync(f, next);   // an unchanged result just means the heads did not change
   }
-  regenAll();
 }
 
 /* ── --export: the hand-editing workspace ── */
@@ -248,4 +247,4 @@ for (const [key, cfg] of Object.entries(HEADS)) {
   console.log(`${key.padEnd(20)} ${String((buf.length/1024).toFixed(1)).padStart(5)} KB   ${manifest[key].source}`);
 }
 splice(blob);
-console.log(`\n${Object.keys(blob).length} heads, ${(total/1024).toFixed(0)} KB total, spliced into both HTML files.`);
+console.log(`\n${Object.keys(blob).length} heads, ${(total/1024).toFixed(0)} KB total, spliced into docs/media-data.js.`);
