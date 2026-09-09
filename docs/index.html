@@ -243,6 +243,8 @@
     "האופוזיציה": { ar: "المعارضة", en: "Opposition" },
     "קואליציה": { ar: "ائتلاف", en: "Coalition" },
     "אופוזיציה": { ar: "معارضة", en: "Opposition" },
+  "גוש נתניהו": { ar: "كتلة نتنياهو", en: "Netanyahu bloc" },
+  "גוש איזנקוט": { ar: "كتلة أيزنكوت", en: "Eisenkot bloc" },
     "אחרים": { ar: "أخرى", en: "Others" },
     "אחר": { ar: "أخرى", en: "Other" },
     "קוא׳": { ar: "ائتلاف", en: "Coal." },
@@ -3115,16 +3117,18 @@ tryRefresh();
   /* Columns and rows do not share a pitch. Horizontally a tile needs only the 4px gap;
      vertically it also has to clear the party rule drawn under the run and the party name
      printed under that. The rhythm below a row is spelled out rather than left to a single
-     magic number, because the two gaps either side of the name have to be the SAME: that is
-     what makes the name read as belonging to the rule above it instead of to the faces
-     below it. Change LABEL_GAP and both move together. */
+     magic number, because what the name is attached to has to be unambiguous: it labels the
+     rule above it, not the faces below it, so it sits tight under the rule and the slack
+     goes underneath. What comes off the top is added to the bottom, so the row pitch — and
+     with it the height of the whole panel — does not move. */
   const T = 34, GAP = 4, PITCH = T + GAP;
-  const RULE_TOP = 5,    /* tile bottom → rule */
-        RULE_H = 3,      /* the rule itself */
-        LABEL_GAP = 6,   /* rule → name, and name → the next row's tiles */
-        LABEL_H = 9,     /* the 8.5px name's line box */
-        LABEL_ASC = 7;   /* its top → its baseline */
-  const VGAP = RULE_TOP + RULE_H + LABEL_GAP + LABEL_H + LABEL_GAP, VPITCH = T + VGAP;
+  const RULE_TOP = 5,     /* tile bottom → rule */
+        RULE_H = 3,       /* the rule itself */
+        LABEL_ABOVE = 3,  /* rule → name */
+        LABEL_BELOW = 9,  /* name → the next row's tiles */
+        LABEL_H = 9,      /* the 8.5px name's line box */
+        LABEL_ASC = 7;    /* its top → its baseline */
+  const VGAP = RULE_TOP + RULE_H + LABEL_ABOVE + LABEL_H + LABEL_BELOW, VPITCH = T + VGAP;
   const PAD = 8, HEAD = 30, GUTTER = 22;
   const W = 900;
 
@@ -3138,7 +3142,11 @@ tryRefresh();
        same arrangement a Hebrew one does. The other two cuts carry no such convention, so
        they follow the reading direction instead. */
     blocs:  { key: s => loadBlocAssign()[s.id],
-              groups: [['coal','קואליציה'], ['opp','אופוזיציה'], ['other','אחר']],
+              /* Named after the two people the election is actually a choice between, and
+                 only here: the tug-of-war, the donut and the bloc trend keep קואליציה and
+                 אופוזיציה, which is what a bloc SUM is. A face belongs to a person, and the
+                 seats in this grid are people. */
+              groups: [['coal','גוש נתניהו'], ['opp','גוש איזנקוט'], ['other','אחר']],
               columns: ['coal', 'other', 'opp'] },
     tenure: { key: s => !s.person || s.person.mk == null ? 'unknown' : s.person.mk === 'none' ? 'new' : s.person.mk,
               groups: [['current','ח"כים מכהנים'], ['former','ח"כים לשעבר'], ['new','חדשים'], ['unknown','לא ידוע']] },
@@ -3218,7 +3226,7 @@ tryRefresh();
           const a = pos[line[i].key], b = pos[line[j].key];
           const ruleY = HEAD + row * VPITCH + T + RULE_TOP;
           rules.push({ x: Math.min(a.x, b.x), w: Math.abs(b.x - a.x) + T, y: ruleY,
-                       labelY: ruleY + RULE_H + LABEL_GAP + LABEL_ASC,
+                       labelY: ruleY + RULE_H + LABEL_ABOVE + LABEL_ASC,
                        color: line[i].party.color, name: line[i].party.name, span: j - i + 1 });
           i = j + 1;
         }
@@ -3278,11 +3286,17 @@ tryRefresh();
     const height = Math.max(...Object.keys(MODES).map(m => layout(seats, m).height));
     svg.setAttribute('viewBox', `0 0 ${W} ${height}`);
     const chrome = svg.querySelector('#kChrome');
+    /* The chart SVG renders left-to-right whatever the page does, so a neutral character at
+       the edge of a label — the "!" in ישר!, the digits of a group's count — is placed by the
+       SVG's direction rather than the label's. That put ישר!'s exclamation mark on the wrong
+       side of the word. Set the base direction from the display language, as a presentation
+       attribute so it survives serialisation into the exported PNG. */
+    const dir = window.IL_LANG === 'en' ? 'ltr' : 'rtl';
     chrome.innerHTML =
-      L.heads.map(h => `<text x="${h.x}" y="${h.y}" text-anchor="${h.anchor}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
+      L.heads.map(h => `<text x="${h.x}" y="${h.y}" text-anchor="${h.anchor}" direction="${dir}" fill="${th.ink}" font-size="12" font-weight="800">${esc(window.ILT(h.label))}` +
         `<tspan fill="${th.axis}" font-size="11" font-weight="700">\u00a0\u00a0${h.n}</tspan></text>`).join('') +
       L.rules.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${RULE_H}" rx="${RULE_H / 2}" fill="${r.color}"/>` +
-        (r.span >= 3 ? `<text x="${r.x + r.w / 2}" y="${r.labelY}" text-anchor="middle" fill="${th.axis}" font-size="8.5" font-weight="700">${esc(r.name)}</text>` : '')).join('');
+        (r.span >= 3 ? `<text x="${r.x + r.w / 2}" y="${r.labelY}" text-anchor="middle" direction="${dir}" fill="${th.axis}" font-size="8.5" font-weight="700">${esc(r.name)}</text>` : '')).join('');
 
     svg.querySelectorAll('.seat').forEach(n => {
       const p = L.pos[n.getAttribute('data-key')];
