@@ -100,6 +100,60 @@ rewritten only by the `build:*` scripts). Neither is edited by hand.
   since 1 September, and a party with no data in range simply does not render.
 - A party's `active` flag in `PARTIES` controls whether it's shown at all (used for parties superseded by a later merger, e.g. `Yesh Atid`/`Bennett 2026` after the `Together` merger) — when Wikipedia's table stops populating one tracked key in favor of a differently-named one for the same real-world party (as happened with `Yesodot Yisrael` → `Reservists`/"Zionist Home"), flip the flags to match which key current polls actually populate, rather than assuming the newer-added key is always the active one.
 
+## The gov.il disclosures carry vote shares — Wikipedia does not
+
+Under §16H of the Elections (Means of Propaganda) Law every poll published to the public must
+be filed with the Central Elections Committee, which posts it verbatim. The
+[26th-Knesset collector](https://www.gov.il/he/Departments/DynamicCollectors/knesset_election_polls_26)
+holds 62 filings. Their main table looks like this (Kantar for Kan 11, 9 Sep 2026):
+
+```
+תחזית המנדטים                      מנדטים   אחוזים (נתונים גולמיים)
+הליכוד בראשות בנימין נתניהו           21     17.0%
+…
+עמך ישראל בראשות עופר וינטר            4      3.3%
+כחול לבן בראשות בני גנץ                       0.8%
+הציבור החרדי בראשות מוטי לייטנר               0.9%
+מפלגת נעם בראשות אבי מעוז                     0.4%
+ישראל תחילה ועלה ירוק בראשות שרן השכל          0.5%
+סה"כ (מנדטים)                        120      100%
+```
+
+That is the one thing the Wikipedia feed structurally cannot supply, and it dissolves three
+approximations this project had been carrying:
+
+- **Lists below the threshold have a measured size.** Wikipedia records כחול לבן as `0`; the
+  filings measure it at **0.8%, 1.2% and 1.7%** across the three that parse. The what-if
+  panel's "assume it holds N seats" default was 2.5 — roughly double — and is now **1.5**,
+  citing the measurement.
+- **The wasted vote is knowable, so the real bar is knowable.** The threshold is 3.25% of *all*
+  valid votes; this page tests a party's share of the *seated* vote, because seats are all it
+  has. The gap is the wasted share, and the filings put it at **2.1%, 2.6% and 5.1%** — so the
+  true bar is **3.98 / 4.00 / 4.11** seat-equivalents where the page uses a flat 3.9.
+- **The margins are finer than seats can show.** עמך ישראל and המילואימניקים both sit at 4
+  seats / **3.3%** against a 3.25% threshold — five hundredths of a point. "4 seats" cannot
+  express that; "3.3% vs 3.25%" can.
+
+**What is implemented.** `govil-pdf-parser.mjs` now keeps rows that carry a percentage and no
+seat count — previously dropped, and precisely the rows that matter — and returns the main
+table as `mainParties` instead of discarding it. Table detection no longer keys off a literal
+`שאלה:` prefix or a fixed question wording (both vendor-specific, both documented as broken for
+Kantar); `findMainSeatTable()` finds the table by its shape, anchored on the `סה"כ` row.
+
+**What is not.** Nothing consumes `mainParties` yet — the field is produced and verified, not
+yet stored per poll or read by the page. Three of nine sampled vendor templates parse cleanly
+(Kantar ×2, Next Data); the rest are rejected rather than guessed at. The hard case is a
+vendor that publishes the main question as a multi-column *trend* table — this week beside the
+previous three — which pdf-parse flattens into rows carrying four weeks' numbers with
+neighbouring lists welded on. That shape passed a naive "about 120 seats" check while being
+entirely wrong, so `findMainSeatTable()` also requires the percentages to be nearly complete
+and to sum to ~100, and rejects any row whose list name still contains a digit.
+
+Remaining to make this usable end to end: per-vendor handling for the trend-table templates, a
+Hebrew list-name → party-id matcher (labels read `הליכוד בראשות בנימין נתניהו`, and PARTIES
+already carries the Hebrew names to match against), storage of `pct`/`wastedPct` per poll, and
+then the page reading them where present with the seat-based path as fallback.
+
 ## Languages (he · ar · en)
 
 The dashboard is authored in Hebrew and stays that way — every literal in the render code, every string comparison, every `localStorage` key. Arabic and English are a presentation layer, added entirely in the `<head>` of `docs/index.html`:

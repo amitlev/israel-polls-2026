@@ -217,7 +217,14 @@ export function parseQuestionBlocks(text){
         if (/^מנדטים|^אחוז/.test(line.trim())) continue; // column-header rows
         if (/^\)?\*\(?$/.test(line.trim())) continue; // "(*)" footnote marker
         const row = parseRow(line);
-        if (row && row.seats != null) parties.push({ name: row.label, seats: row.seats, pctBefore: row.pct });
+        /* A row with a percentage but no seat number is a list the pollster measured and
+           placed below the electoral threshold — "כחול לבן בראשות בני גנץ  0.8%". Those
+           used to be dropped, which threw away the only vote shares this project has any
+           access to: Wikipedia publishes seats and nothing else, so a party on 0 seats had
+           no known size at all and the what-if panel had to ask the reader to assume one.
+           They are also the whole of the wasted vote, which is what the 3.25% threshold is
+           actually measured against. Keep any row that carries either number. */
+        if (row && (row.seats != null || row.pct != null)) parties.push({ name: row.label, seats: row.seats, pctBefore: row.pct });
       }
       if (parties.length) seatTables.push({ label: qText, parties, undecidedPct });
     } else {
@@ -255,6 +262,79 @@ function classifyCategory(label){
   return 'policy';
 }
 
+/* ── the main seat table, found by its shape rather than by its question ──
+   parseQuestionBlocks() keys off a literal "שאלה:" prefix. Kantar's template poses its
+   question without one, and words it "עבור איזו מפלגה היית מצביע" rather than the
+   "לאיזו מפלגה" the markers list — so for that vendor the seat table was invisible and
+   its vote shares were lost. Both facts are template trivia; the table itself is not.
+   Every vendor's main table ends in a "סה"כ" row and holds rows carrying a percentage,
+   a seat count, or both, so find it that way and the question wording stops mattering.
+   Used only as a fallback, so the templates that already parse keep their existing path. */
+function looseSeatRows(body){
+  const rows = [];
+  let carry = '';
+  const isNums = toks => toks.length && toks.every(t => /^\d+(\.\d+)?%?$/.test(t));
+  for (const line of body){
+    const t = line.trim();
+    if (!t || t.startsWith('*')) continue;
+    if (t.startsWith('לא החליטו')) continue;
+    if (/^\(?\s*נתונים גולמיים\s*\)?$/.test(t)) continue;
+    if (/^(תחזית המנדטים|מנדטים|אחוזים)$/.test(t)) { carry = ''; continue; }
+    const row = parseRow(line);
+    if (row && (row.seats != null || row.pctBefore != null || row.pct != null)){
+      rows.push({ name: (carry ? carry + ' ' : '') + row.label, seats: row.seats, pctBefore: row.pct });
+      carry = '';
+      continue;
+    }
+    /* pdf-parse wraps a long list name onto its own line(s) and leaves the numbers alone
+       on the next — "…יועז הנדל וירון / זליכה / 4  3.3%". Rejoin those. */
+    const toks = t.split('\t').map(x => x.trim()).filter(Boolean);
+    if (isNums(toks) && carry){
+      const pctTok = toks.find(x => x.includes('%')), seatTok = toks.find(x => !x.includes('%'));
+      rows.push({ name: carry, seats: seatTok != null ? parseInt(seatTok, 10) : null,
+                  pctBefore: pctTok != null ? parseFloat(pctTok) : null });
+      carry = '';
+      continue;
+    }
+    carry = carry ? carry + ' ' + t.replace(/\t/g, ' ') : t.replace(/\t/g, ' ');
+  }
+  return rows;
+}
+
+export function findMainSeatTable(text){
+  const lines = cleanLines(stripNoise(text));
+  const endIdx = lines.findIndex(l => l.trim().startsWith('סה"כ'));
+  if (endIdx < 0) return null;
+  /* Back up to the column header if there is one, otherwise take a bounded run of lines —
+     far enough to hold the longest ballot, short enough not to reach the metadata block,
+     whose "גודל המדגם ההתחלתי 550" would otherwise read as a party on 550 seats. */
+  let start = -1;
+  for (let i = endIdx - 1; i >= 0 && i > endIdx - 60; i--){
+    if (/תחזית המנדטים|אחוזי התמיכה|^אחוזים$|^מנדטים$/.test(lines[i].trim())) { start = i + 1; break; }
+  }
+  if (start < 0) start = Math.max(0, endIdx - 40);
+  const rows = looseSeatRows(lines.slice(start, endIdx));
+  /* Accept only a table this reader clearly understood. Some vendors publish the main
+     question as a multi-column TREND table — this week beside the last three — and
+     pdf-parse flattens those columns into each other, so rows arrive with four numbers
+     from four different weeks and neighbouring lists welded onto one line. That shape
+     passes a naive "about 120 seats" check while being entirely wrong, and letting it
+     through would poison the dataset with numbers nobody could trace. Reject anything
+     that does not look like one clean ballot:
+       · seats that were reported add up to about 120;
+       · nearly every row carries a percentage, and those sum to about 100;
+       · no list name still has a digit in it, which is the signature of column bleed. */
+  if (rows.length < 5) return null;
+  const seatSum = rows.reduce((a, r) => a + (r.seats || 0), 0);
+  if (seatSum < 115 || seatSum > 125) return null;
+  const withPct = rows.filter(r => r.pctBefore != null);
+  if (withPct.length < rows.length * 0.8) return null;
+  const pctSum = withPct.reduce((a, r) => a + r.pctBefore, 0);
+  if (pctSum < 95 || pctSum > 105) return null;
+  if (rows.some(r => /\d/.test(r.name))) return null;
+  return rows;
+}
+
 /* Top-level entry point: parses one PDF's extracted text into the shapes
    consumed by the update-govil-polls.mjs merge step. */
 export function parseGovilPdf(text, { sourceUrl } = {}){
@@ -272,6 +352,10 @@ export function parseGovilPdf(text, { sourceUrl } = {}){
 
   return {
     metadata,
+    /* The main table's own rows, which used to be discarded in favour of its seat counts
+       alone. They carry the raw vote share per list — including for the lists that won no
+       seats — and that is the one thing the Wikipedia feed can never supply. */
+    mainParties: main ? main.parties : findMainSeatTable(text),
     undecidedPct: main ? main.undecidedPct : null,
     govilScenarios: scenarios.map(s => ({ label: s.label, parties: s.parties, undecidedPct: s.undecidedPct })),
     topical: topicalRecords,
