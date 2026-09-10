@@ -13,6 +13,12 @@ export const GOVIL_POLLSTER_MAP = {
   'טאטיקה מחקרים ומדיה': 'Yossi Tatika',
   // Rosner is the on-air face of Channel 13's poll; the fieldwork/panel is Midgam's.
   'שמואל רוזנר': 'Midgam',
+  /* Channel 14's poll files under the firm's name, the principal's name, or both. */
+  'נקסט דאטה': 'Filber',
+  'שלמה פילבר': 'Filber',
+  'נקסט דאטה - שלמה פילבר': 'Filber',
+  'דיירקט פולס': 'Direct Polls',
+  'דיירקט פולס בע"מ': 'Direct Polls',
 };
 
 export function mapGovilPollster(hebrewName){

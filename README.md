@@ -134,25 +134,51 @@ approximations this project had been carrying:
   seats / **3.3%** against a 3.25% threshold — five hundredths of a point. "4 seats" cannot
   express that; "3.3% vs 3.25%" can.
 
-**What is implemented.** `govil-pdf-parser.mjs` now keeps rows that carry a percentage and no
+**How it flows through.** `govil-pdf-parser.mjs` keeps rows that carry a percentage and no
 seat count — previously dropped, and precisely the rows that matter — and returns the main
-table as `mainParties` instead of discarding it. Table detection no longer keys off a literal
-`שאלה:` prefix or a fixed question wording (both vendor-specific, both documented as broken for
-Kantar); `findMainSeatTable()` finds the table by its shape, anchored on the `סה"כ` row.
+table as `mainParties`. Table detection no longer keys off a literal `שאלה:` prefix or a fixed
+question wording (both vendor-specific, both documented as broken for Kantar);
+`findMainSeatTable()` finds the table by its shape, anchored on the `סה"כ` row.
+`govil-party-map.mjs` then maps each Hebrew ballot line to a party id, and
+`update-govil-polls.mjs` stores `pct`, `wastedPct` and `belowThreshold` per poll.
 
-**What is not.** Nothing consumes `mainParties` yet — the field is produced and verified, not
-yet stored per poll or read by the page. Three of nine sampled vendor templates parse cleanly
-(Kantar ×2, Next Data); the rest are rejected rather than guessed at. The hard case is a
+The label matcher carries each list's **leader as well as its name**, because a pollster can
+invent a label mid-cycle but not a new leader for it — `מפלגת ימין חדשה בראשות עופר וינטר`
+is עמך ישראל, and only the leader says so. It also survives the filings' own noise: a typo
+(`המילואמיניקים`), a final mem for a final nun (`רע"מ`), and a word pdf-parse split in half
+(`מפלג ת ישר!`). Names are tried before leaders, so a genuinely new party under a familiar
+figure comes back unmapped rather than being folded into whatever that person led last.
+
+**Two guards, both of which caught real bugs on live filings.** Unmapped labels are reported,
+and separated into lists we knowingly do not track (`נעם`, `הציבור החרדי`, `מפלגות אחרות`)
+and names that should have matched — an unrecognised label *with seats behind it* means the
+ballot changed and the map has not caught up. And two rows landing on one id is refused: one
+Midgam filing runs Zalicha's economic party as its own line beside Hendel's המילואימניקים, so
+matching on Zalicha folded two rows onto `Reservists` and the second silently overwrote the
+first. That id is now dropped with a warning rather than half-kept. The same shape appears
+with Feiglin's זהות, which a pollster may test separately from הציונות הדתית-זהות; mapping it
+to Religious Zionism would count the same vote twice, so it is explicitly untracked.
+
+**What the page does with it.** The party chart's hover card shows the vote share where one
+exists — near the line it is far more informative than seats, since "4 seats" cannot
+distinguish 3.3% from 3.9%, and עמך ישראל sits at **3.3%** against a 3.25% threshold. And the
+what-if panel's "assume it holds N seats" default for a list polling at zero is now read from
+the filings: כחול לבן measures 1.4% across the polls in a typical window, so the slider opens
+at **1.6 seats** and says so, where it used to open at a hand-set 2.5.
+
+**Coverage, honestly.** 13 of the 62 filings match a poll in the dataset — most of the rest
+are from July and August, before `POLLS_FROM`. Of those, the ones whose template parses carry
+vote shares; the others are enriched with methodology fields only. The hard template is a
 vendor that publishes the main question as a multi-column *trend* table — this week beside the
 previous three — which pdf-parse flattens into rows carrying four weeks' numbers with
 neighbouring lists welded on. That shape passed a naive "about 120 seats" check while being
 entirely wrong, so `findMainSeatTable()` also requires the percentages to be nearly complete
 and to sum to ~100, and rejects any row whose list name still contains a digit.
 
-Remaining to make this usable end to end: per-vendor handling for the trend-table templates, a
-Hebrew list-name → party-id matcher (labels read `הליכוד בראשות בנימין נתניהו`, and PARTIES
-already carries the Hebrew names to match against), storage of `pct`/`wastedPct` per poll, and
-then the page reading them where present with the seat-based path as fallback.
+**The wasted share is real but varies a lot** — 2.1%, 4.6% and 12.3% across three filings,
+driven mostly by how many minor lists each pollster puts on the card. So it is reported and
+not used to move the threshold: the page keeps testing a party's share of the *seated* vote
+against a flat 3.9 seats, which is the same approximation before and after any scenario.
 
 ## The party chart (`לפי מפלגה`)
 

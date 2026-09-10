@@ -236,6 +236,7 @@
     "קואליציה": { ar: "ائتلاف", en: "Coalition" },
     "אופוזיציה": { ar: "معارضة", en: "Opposition" },
     "ממוצע": { ar: "المتوسط", en: "Mean" },
+    "אחוז קולות": { ar: "نسبة الأصوات", en: "Vote share" },
     "העמודות ממוינות מהגדולה לקטנה, משמאל לימין בכל השפות. הקו המקווקו הוא אחוז החסימה (3.25%, כ‑3.9 מנדטים). הכפתורים שמתחת לכל מפלגה משייכים אותה לגוש — וזה קובע את המספרים בכל הפאנלים שמתחת.": { ar: "الأعمدة مرتّبة من الأكبر إلى الأصغر، من اليسار إلى اليمين في كل اللغات. والخط المتقطّع هو نسبة الحسم (3.25%، نحو 3.9 مقاعد). والأزرار أسفل كل حزب تُسنده إلى كتلة — وهذا ما يحدّد الأرقام في كل اللوحات أدناه.", en: "Bars run largest to smallest, left to right, in every language. The dashed line is the electoral threshold (3.25%, about 3.9 seats). The buttons under each party assign it to a bloc — and that sets the numbers in every panel below." },
     "שיוך הגושים נקבע בכפתורים שבגרף המפלגות שבראש העמוד.": { ar: "إسناد الكتل يُحدَّد بالأزرار في رسم الأحزاب أعلى الصفحة.", en: "Bloc assignment is set by the buttons in the party chart at the top of the page." },
     "שיתוף מהמכשיר": { ar: "مشاركة من الجهاز", en: "Share via device" },
@@ -1628,6 +1629,19 @@ function thresholdUnits(mu) {
   return units;
 }
 
+/* The raw vote share a §16H filing published for a list, averaged over the polls in the
+   window that carry one. Most polls do not: Wikipedia supplies seats only, and a share
+   exists solely where a gov.il disclosure was matched and parsed. Returns null rather
+   than a guess when nothing measured it.
+
+   Read off `_orig` when present, because a what-if scenario rewrites a poll's seats and
+   would otherwise leave last week's vote share sitting beside a counterfactual seat count. */
+function measuredPct(filtered, id){
+  const vals = filtered.map(p => ((p._orig || p).pct || {})[id]).filter(v => typeof v === 'number');
+  return vals.length ? { pct: mean(vals), polls: vals.length } : null;
+}
+const pctToSeats = pct => pct / 100 * 120;
+
 /* Which parties the threshold seats and which it does not. Factored out because the two
    scenario panels need to NAME a crossing: without it, a party pushed under the line just
    loses six seats on screen for no visible reason, which is the single most confusing
@@ -2077,6 +2091,11 @@ function renderParties(filtered) {
     col.dataset.ttAvg = (Math.round(r.avg * 10) / 10).toFixed(1);
     col.dataset.ttMed = String(Math.round(r.med));
     col.dataset.ttN = String(r.n);
+    /* Seats are what the polls publish; a vote share exists only where a §16H filing was
+       matched. Where it does, show it — near the line it is the more informative number
+       by far, since "4 seats" cannot distinguish 3.3% from 3.9%. */
+    const mp = measuredPct(filtered, r.party.id);
+    if (mp) col.dataset.ttPct = (Math.round(mp.pct * 10) / 10) + '%';
     const raw = filtered
       .filter(p => p[r.party.id] !== null && p[r.party.id] !== undefined)
       .map(p => ({ v: p[r.party.id], date: p.date, outlet: outletDisplay(p.outlet) }))
@@ -2551,6 +2570,7 @@ document.getElementById('toggleLog').addEventListener('click', () => {
     const row = (k, v) => `<div class="tt-row"><span>${k}</span><span class="tt-val">${v}</span></div>`;
     showTT(`<div class="tt-head">${d.ttParty}</div>`
       + row('ממוצע', d.ttAvg) + row('חציון', d.ttMed) + row('סקרים', d.ttN)
+      + (d.ttPct ? row('אחוז קולות', d.ttPct) : '')
       + (d.ttMin ? row('מינימום', d.ttMin) : '')
       + (d.ttMax ? row('מקסימום', d.ttMax) : ''), e.clientX, e.clientY);
   });
@@ -4139,7 +4159,13 @@ tryRefresh();
   function setScenario(id, mode, f){
     if (SC[id] && SC[id].mode === mode) { delete SC[id]; }
     else if (SC[id]) { SC[id].mode = mode; }
-    else { SC[id] = { mode, h: HOME_DEFAULT(id), n: ASSUMED_N, w: defaultWeights(id, f) }; }
+    else {
+      /* Where a filing measured this list, start from the measurement rather than from
+         the fallback constant — that is the whole point of having the vote shares. */
+      const m = measuredPct(f, id);
+      const n = m ? Math.min(3.8, Math.max(0.1, pctToSeats(m.pct))) : ASSUMED_N;
+      SC[id] = { mode, h: HOME_DEFAULT(id), n, w: defaultWeights(id, f) };
+    }
     commit();
   }
 
@@ -4218,7 +4244,10 @@ tryRefresh();
         d.appendChild(slider('גודל מתחת לסף', st.n, 0.5, 3.8, 0.1,
           v => round1(v), v => { st.n = v; commit(); }));
         const z = document.createElement('div'); z.className = 'note';
-        z.textContent = `בסקרים שבהם היא על 0 (${zeros} מתוך ${f.length}) הסקר מדווח "0 מנדטים" ולא אחוז, ולכן גודלה נקבע כאן ידנית. ברירת המחדל אינה ניחוש: בגילויי סעיף 16ה שוועדת הבחירות מפרסמת מופיע גם אחוז הקולות של רשימות שלא עברו, וכחול לבן נמדדה שם ב‑0.8%, 1.2% ו‑1.7% — כ‑1.5 מנדטים.`;
+        const m = measuredPct(f, id);
+        z.textContent = m
+          ? `בסקרים שבהם היא על 0 (${zeros} מתוך ${f.length}) ויקיפדיה מדווחת "0 מנדטים" בלבד, אבל ${m.polls === 1 ? 'סקר אחד בטווח פרסם' : `${m.polls} סקרים בטווח פרסמו`} גם את אחוז הקולות שלה בגילוי לוועדת הבחירות: ${(Math.round(m.pct * 10) / 10)}% מהקולות, שהם כ‑${Math.round(pctToSeats(m.pct) * 10) / 10} מנדטים. זו ברירת המחדל של המחוון — נתון מדוד, לא הנחה.`
+          : `בסקרים שבהם היא על 0 (${zeros} מתוך ${f.length}) הסקר מדווח "0 מנדטים" ולא אחוז, ולכן גודלה נקבע כאן ידנית. ברירת המחדל אינה ניחוש: בגילויי סעיף 16ה שוועדת הבחירות מפרסמת מופיע גם אחוז הקולות של רשימות שלא עברו, וכחול לבן נמדדה שם ב‑0.8%, 1.2% ו‑1.7% — כ‑1.5 מנדטים.`;
         d.appendChild(z);
       }
 
