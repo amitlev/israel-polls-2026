@@ -1252,7 +1252,7 @@ const BACKFILL_DAYS = 45;   /* how far back a refresh re-checks Wikipedia for po
    reading of today's question — it is an answer to a different one, and averaging the two is
    what produces a trend line nobody can act on. Enforced at every entry point, so a scheduled
    run cannot quietly re-add what was cut. */
-const POLLS_FROM = '2026-09-01';
+const POLLS_FROM = '2026-09-04';
 const EN_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const BAKED_DATE = (() => { const d = MAX_BAKED_DATE; if (!d) return '—';
   return window.IL_LANG === 'en' ? heDate(d) : d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4); })();
@@ -1354,7 +1354,7 @@ function makeMultiSelect(ddId, summaryId, menuId, items, defaults, storageKey, a
   };
 }
 
-const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists","Unity","Amcha Yisrael"];
+const ALL_KEYS = ["Likud","Religious Zionism","Otzma Yehudit","Shas","UTJ","Yesh Atid","National Unity","Yisrael Beiteinu","The Democrats","Bennett 2026","Together","Yashar","Yesodot Yisrael","Joint List","Ra'am","Hadash-Ta'al","Balad","Reservists","Unity","Amcha Yisrael","Haredi Public"];
 const MONTHNAMES = {january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,jan:1,feb:2,mar:3,apr:4,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
 function headerKey(txt){ const t=txt.toLowerCase();
   if(/joint list/.test(t)) return 'JOINT2';
@@ -1384,11 +1384,22 @@ function headerKey(txt){ const t=txt.toLowerCase();
   if(/\bzehut\b/.test(t)) return '+Religious Zionism';
   if(/new economic|\bnep\b/.test(t)) return '+Reservists';
   if(/amcha yisrael|winter party/.test(t)) return 'Amcha Yisrael';
+  if(/haredi public|\bharedim\b/.test(t)) return 'Haredi Public';
   if(/\bunity\b/.test(t)) return 'Unity';
   return null; }
 function wikiPlain(s){ return s.replace(/<ref[^>]*\/>/g,'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g,'')
   .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g,'$1').replace(/\[\[([^\]]*)\]\]/g,'$1')
-  .replace(/\{\{small\|([^}]*)\}\}/gi,'$1').replace(/'''/g,'').replace(/''/g,'')
+  .replace(/\{\{small\|([^}]*)\}\}/gi,'$1')
+  /* {{font color|#158b74|<u>Yashar</u>|link=Yashar (political party)}} — the party name is
+     the template's SECOND positional parameter, and the blanket {{...}} strip below used to
+     delete the whole thing. The header then read as empty, headerKey got nothing to match,
+     and the column was dropped without even being logged as unrecognised, taking every
+     column after it one place to the left. Six of the largest parties are written this way
+     in the current table — Together, Yisrael Beiteinu, Ra'am, Joint List, Dems, Yashar —
+     which is what produced the 10 Sep 2026 row that summed to 97 seats. Lift the visible
+     text out before anything strips the template. */
+  .replace(/\{\{\s*font\s*color\s*\|[^|}]*\|([^|}]*)(?:\|[^}]*)?\}\}/gi,'$1')
+  .replace(/'''/g,'').replace(/''/g,'')
   .replace(/\{\{[^}]*\}\}/g,'').replace(/<[^>]+>/g,'').trim(); }
 function cellContent(line){ let s=line.replace(/^\s*\|/,''); let depth=0,sep=-1;
   for(let i=0;i<s.length-1;i++){ const two=s[i]+s[i+1];
@@ -1439,7 +1450,7 @@ function opdrtsDate(cell){ const m=cell.match(/\{\{\s*Opdrts\s*\|([^}]*)\}\}/i);
   return year+'-'+String(mon).padStart(2,'0')+'-'+String(day).padStart(2,'0'); }
 const NON_PARTY_HEADER = /^(fieldwork\s*date|polling\s*firm|publisher|sample\s*size|others|gov\.?)$/i;
 function parseWikiText(wikitext){
-  const results=[]; const seen=new Set();
+  const results=[]; const seen=new Set(); const rejected=[];
   let sec=wikitext; const s26=wikitext.search(/===\s*2026\s*===/); if(s26>=0) sec=wikitext.slice(s26);
   const todayISO=new Date().toISOString().slice(0,10);
   // The 2026 section holds many sub-tables (monthly breakdowns, etc.) — scan them all,
@@ -1468,7 +1479,15 @@ function parseWikiText(wikitext){
           order.push(key);
           for(let k=1;k<headerSpan(hc);k++) order.push('+'+key);
         }
-        else if(plain && !NON_PARTY_HEADER.test(plain)){ unrecognizedHere.push(plain.replace(/[\]}]+$/, '').trim()); } }
+        else if(plain && !NON_PARTY_HEADER.test(plain)){
+          /* CONSUME the column even though we cannot name it. Pushing nothing here was the
+             real fault behind the Yossi Tatika row of 10 Sep 2026: a new "Haredi Public"
+             column appeared, headerKey could not place it, the column was skipped rather
+             than held, and every column after it slid one place left. The warning below has
+             always said such a party is "silently dropped" — it was worse than that, because
+             a dropped column takes its neighbours with it. A placeholder keeps the row
+             aligned, so an unknown party costs exactly that one party. */
+          order.push('?' + plain); unrecognizedHere.push(plain.replace(/[\]}]+$/, '').trim()); } }
       if(order.length>=10){
         cols=order;
         if(!sawFirstQualifyingTable && unrecognizedHere.length){
@@ -1491,14 +1510,30 @@ function parseWikiText(wikitext){
       if(seatCells.length<cols.length) continue;
       const rec={ date:iso, pollster:firm, outlet:alias.outlet||FIRM_OUTLET[firm]||publisher, sampleSize }; ALL_KEYS.forEach(k=>rec[k]=null);
       cols.forEach((c,i)=>{ const v=convSeat(seatCells[i]);
+        if(c[0]==='?') return;                                     // a column we hold open but cannot name
         if(c[0]==='+'){ const k=c.slice(1); if(v!==null) rec[k]=(rec[k]||0)+v; }
         else rec[c]=v; });
       const govsum=GOV_PARTIES.reduce((a,p)=>a+(rec[p]||0),0);
       const tail=seatCells.slice(cols.length).map(convSeat);
       const gv=tail.find(t=>t!==null && Math.abs(t-govsum)<=1);
       const total=ALL_KEYS.reduce((a,p)=>a+(rec[p]||0),0);
-      if(gv!==undefined && total>=95 && total<=122){ rec._govTotal=gv; seen.add(dk); results.push(rec); } }
+      /* Every Israeli poll apportions exactly 120 seats. The old 95..122 window was wide
+         enough to wave through both a row that summed to 122 and one that summed to 97 —
+         each of them a column-shift artefact rather than a poll — and once accepted they
+         moved every average on the page, because pollBlocs() derives "others" as
+         120 − gov − opp and simply absorbs the discrepancy. Take 120 and say what was
+         rejected, so a parser fault surfaces as a missing poll rather than a wrong one. */
+      if(gv===undefined) continue;
+      if(total!==120){ rejected.push(`${iso} ${firm}: seats sum to ${total}, not 120`); continue; }
+      rec._govTotal=gv; seen.add(dk); results.push(rec); }
+    /* Only the top table. Older tables further down the page are frozen snapshots of
+       earlier ballots — different columns, parties that have since merged or withdrawn —
+       and mixing their rows in means the dataset describes two different elections at
+       once. From the point the lists closed, the top table's shape is fixed through
+       polling day, so one table is all there is to read. */
+    break;
   }
+  if(rejected.length) console.warn('\u26a0\ufe0f Rejected ' + rejected.length + ' Wikipedia row(s) whose seats did not sum to 120 (column-shift signature): ' + rejected.join(' | '));
   return results;
 }
 function fmtTimestamp() {

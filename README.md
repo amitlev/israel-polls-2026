@@ -435,15 +435,44 @@ parties under the line; Haredi −25% moves one. Judea and Samaria at +50% and t
 vote at 72.9%, and the Druze are 1.1%. They are in the panel anyway, because a reader who
 wonders about them deserves to see the answer rather than be told there was no slider.
 
-### A data fault this audit turned up
+### The corrupt-poll investigation, and the three faults behind it
 
-`warnNon120()` reports any poll whose party seats do not sum to 120. One currently does: Direct
-Polls, 2 Sep 2026, sums to **122**. That is not a rounding artefact and not cosmetic —
-`pollBlocs()` derives "others" as `120 − gov − opp`, so the poll does not report a 122-seat
-Knesset, it quietly shrinks its own "others" by two to balance the books, in every bloc total
-and every average. The seats come from Wikipedia's table, so either the table or the scraper has
-a cell wrong. It is left flagged rather than silently corrected: docking some party two seats to
-make the row add up would be inventing data.
+`warnNon120()` flagged a poll summing to 122 and, after the next cron run, one summing to
+97 — Yossi Tatika, 10 Sep 2026, with הציונות הדתית at 19, ש"ס at 0 and ישר! missing
+entirely. Three separate faults were stacked behind it.
+
+**1. `wikiPlain()` deleted the party name.** Wikipedia now writes the busiest headers as
+`{{font color|#345aab|<u>Yashar</u>|link=Yashar (political party)}}`. `wikiPlain()` stripped
+`{{...}}` wholesale, so the header read as an *empty string* — which meant `headerKey()` got
+nothing to match, the column was dropped, and it was not even logged as unrecognised,
+because the "unrecognised" branch required a non-empty name. **Six of the largest parties
+are written that way in the current table** — Together, Yisrael Beiteinu, Ra'am, Joint List,
+Dems, Yashar — so six columns vanished and everything after each one slid a place left.
+`wikiPlain()` now lifts the visible text out of `{{font color|…}}` before anything strips it.
+
+**2. An unrecognised column was skipped rather than held.** Even when a header *is* named
+and simply unknown — a new `Haredi Public` column appeared for Leitner's list, the one the
+gov.il filings measure at ~1% — pushing nothing into `order` shifted every later column. A
+placeholder key now holds the position, so an unknown party costs exactly that one party.
+`Haredi Public` is also recognised outright and added to `ALL_KEYS` (parser only, not
+`PARTIES`: it polls at 0 and does not need a bar, but its column must be consumed and its
+votes counted in the 120).
+
+**3. The acceptance window was `95..122`.** Wide enough to wave through both wrecks. Every
+Israeli poll apportions exactly 120 seats, so the gate is now exactly 120 and anything else
+is rejected *and named* — a parser fault should surface as a missing poll, never a wrong one.
+The rejects are logged on every run.
+
+**Only the top table is read now.** The tables below it are frozen snapshots of earlier
+ballots, with different columns and parties that have since merged or withdrawn; mixing
+their rows in means the dataset describes two elections at once. That is also how the
+`2026-09-04 Lazar` record kept a `Unity` column after Unity had withdrawn — it came from an
+older table, parsed correctly against that table's own header. From the point the lists
+closed, the top table's shape is fixed through polling day, so one table is all there is to
+read, and `POLLS_FROM` moves to `2026-09-04` to match its boundary.
+
+Rebuilt from scratch on that basis: 13 polls, 6–10 September, **every one summing to exactly
+120**, no `Unity` column anywhere, `Haredi Public` captured.
 
 ## Languages (he · ar · en)
 
