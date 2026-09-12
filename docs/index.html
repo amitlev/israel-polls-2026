@@ -253,6 +253,7 @@
     "תרחיש": { ar: "سيناريو", en: "Scenario" },
     "%n תרחישים פעילים": { ar: "%n سيناريوهات فعّالة", en: "%n active scenarios" },
     "תרחיש אחד פעיל": { ar: "سيناريو واحد فعّال", en: "One active scenario" },
+    "לחצו לניקוי": { ar: "انقروا للمسح", en: "click to clear" },
     "נקה תרחישים": { ar: "مسح السيناريوهات", en: "Clear scenarios" },
     "מה קורה למנדטים אם מפלגה פורשת מהמרוץ, או לא עוברת את אחוז החסימה. הבחירה משנה את כל הדף — משיכת החבל, חלוקת הגושים ורשת 120 המושבים.": { ar: "ماذا يحدث للمقاعد إذا انسحب حزب من السباق، أو لم يتجاوز نسبة الحسم. الاختيار يغيّر الصفحة بأكملها — شدّ الحبل، وتقسيم الكتل، وشبكة المقاعد الـ120.", en: "What happens to the seats if a party withdraws from the race, or fails to clear the electoral threshold. The choice changes the whole page — the tug-of-war, the bloc split and the 120-seat grid." },
     "פורשת": { ar: "تنسحب", en: "Withdraws" },
@@ -2814,6 +2815,7 @@ tryRefresh();
        probability computed on the real polls directly beneath a rope drawn on the
        counterfactual — two widgets disagreeing about the same world. */
     if (window.WHATIF && window.WHATIF.active()) w = w.map(window.WHATIF.apply);
+    if (window.TURNOUT && window.TURNOUT.active()) w = w.map(window.TURNOUT.apply);
     const ds = w.map(p=>p.date).sort();
     return { polls:w, from:ds[0], to:ds[ds.length-1] };
   }
@@ -3799,6 +3801,7 @@ tryRefresh();
       Object.keys(a).forEach(k => { if (a[k] !== BLOC_DEFAULTS[k]) diff.push(slug(k) + ':' + BLOC_CODE[a[k]]); });
       if (diff.length) s.b = diff.join(',');
       if (window.WHATIF) { const wi = window.WHATIF.serialize(); if (wi) s.wi = wi; }
+      if (window.TURNOUT && window.TURNOUT.serialize) { const to = window.TURNOUT.serialize(); if (to) s.to = to; }
       if (window.USE_WEIGHTED) s.wt = '1';
       if (window.USE_ADJUST) s.adj = '1';
       if (window.knessetMode && window.knessetMode !== 'blocs') s.k = window.knessetMode;
@@ -3832,6 +3835,9 @@ tryRefresh();
        trap. It travels only in a link that was made while it was on. */
     if (q.has('wi') && window.WHATIF && window.WHATIF.deserialize) {
       if (window.WHATIF.deserialize(q.get('wi'))) touched = true;
+    }
+    if (q.has('to') && window.TURNOUT && window.TURNOUT.deserialize) {
+      if (window.TURNOUT.deserialize(q.get('to'))) touched = true;
     }
     /* The two mode toggles own their own label and re-render, so flip them by
        their button rather than by poking the flag behind their back. */
@@ -4472,7 +4478,10 @@ tryRefresh();
   /* ── the banner: every number on the page is counterfactual while this is on ── */
   function banner(){
     let b = $('wiBanner');
-    if (!active()) { if (b) b.remove(); return; }
+    /* Both scenario layers are counterfactual, and both rewrite every number on the page,
+       so one banner speaks for both. */
+    const turnoutOn = !!(window.TURNOUT && window.TURNOUT.active());
+    if (!active() && !turnoutOn) { if (b) b.remove(); return; }
     if (!b) {
       const inner = document.querySelector('.site-header .inner'); if (!inner) return;
       b = document.createElement('button');
@@ -4480,12 +4489,17 @@ tryRefresh();
       b.addEventListener('click', clear);
       inner.appendChild(b);
     }
-    const names = Object.keys(SC).map(id => byId[id].name + (SC[id].mode === 'fail' ? ' (לא עוברת)' : ' (פורשת)'));
+    const names = Object.keys(SC).map(id => byId[id].name + (SC[id].mode === 'fail' ? ' (לא עוברת)' : ' (פורשת)'))
+      .concat(turnoutOn ? window.TURNOUT.describe() : []);
     b.innerHTML = '⚠️ תרחיש היפותטי — לא נתוני הסקרים';
     b.title = names.join(' · ') + ' — לחצו לניקוי';
   }
 
-  function clear(){ Object.keys(SC).forEach(k => delete SC[k]); commit(); }
+  function clear(){
+    Object.keys(SC).forEach(k => delete SC[k]);
+    if (window.TURNOUT && window.TURNOUT.reset) window.TURNOUT.reset();
+    commit();
+  }
 
   /* The turnout panel below draws the same before/after tiles and the same labelled
      sliders. Sharing the two builders keeps the two panels looking like one feature
@@ -4583,9 +4597,8 @@ tryRefresh();
  *   denominator, so the bar modelled here is marginally lenient. It is lenient by the same
  *   amount before and after a slider moves, so the differences the panel reports hold.
  *
- * The panel computes into its own body and changes no other number on the page. The
- * scenarios above rest on arithmetic the poll data supports; this rests on assumptions
- * layered on top of it, and letting it drive the page would launder the difference.
+ * The panel drives the whole page, the way the scenario layer above does — see the note at
+ * getFiltered() below for why it stopped being walled off.
  * ══════════════════════════════════════════════════════════════════════════════════ */
 (function(){
   const KEYS = (typeof ALL_KEYS !== 'undefined' ? ALL_KEYS : PARTIES.map(p => p.id));
@@ -4668,15 +4681,60 @@ tryRefresh();
     return out;
   }
 
+  /* This panel used to compute into its own body and change nothing else, on the grounds
+     that it rested on assumptions while the what-if scenarios rested on arithmetic the
+     polls support. That distinction no longer holds: the weights here are measured from
+     the Central Elections Committee's own results, while "פורשת" above rests on an
+     editorial guess about where votes go — and that panel drives the whole page. Leaving
+     this one walled off meant a reader could move a slider, watch the bloc tiles change,
+     and look down at a seat grid that had not moved. So it wraps getFiltered() too, and
+     the hypothetical banner covers it. */
+  let rawFiltered = getFiltered;
+  const active = dirty;
+  getFiltered = function(){ const f = rawFiltered(); return active() ? f.map(scale) : f; };
+  window.TURNOUT = {
+    active,
+    apply: scale,
+    /* For the banner, so it can name what is being simulated. */
+    describe: () => GROUPS.filter(([k]) => M[k] !== 1)
+      .map(([k, label]) => `${label} ${M[k] > 1 ? '+' : ''}${Math.round((M[k] - 1) * 100)}%`),
+    /* Assigned in wire(), once the sliders exist to put back to zero. */
+    reset: null,
+    /* Compact enough for a URL: the groups that moved, each as key:percent. */
+    serialize: () => GROUPS.filter(([k]) => M[k] !== 1)
+      .map(([k]) => k + ':' + Math.round((M[k] - 1) * 100)).join(','),
+    deserialize: (str) => {
+      GROUPS.forEach(([k]) => M[k] = 1);
+      String(str).split(',').filter(Boolean).forEach(pair => {
+        const [k, v] = pair.split(':');
+        if (GROUPS.some(g => g[0] === k)) M[k] = 1 + Math.max(-50, Math.min(50, parseFloat(v) || 0)) / 100;
+      });
+      /* Put the sliders where the link says, without firing their handlers back at us. */
+      const host = document.getElementById('toSliders');
+      if (host) GROUPS.forEach(([k], i) => {
+        const inp = host.querySelectorAll('.wi-sl input[type=range]')[i];
+        if (inp) { inp.value = Math.round((M[k] - 1) * 100); inp.dispatchEvent(new Event('input')); }
+      });
+      return active();
+    },
+  };
+
   const $ = id => document.getElementById(id);
   const pctFmt = v => (v > 0 ? '+' : '') + v + '%';
+
+  /* renderAll() redraws this panel through the wrapper installed in wire(), so render()
+     must never call it back. */
+  function commit(){
+    renderAll();
+    if (typeof window.updateForecast === 'function') window.updateForecast();
+  }
 
   function render(){
     const out = $('toOut'), note = $('toNote'), reset = $('toReset');
     if (!out) return;
     reset.style.display = dirty() ? '' : 'none';
 
-    const base = getFiltered(), now = base.map(scale);
+    const base = rawFiltered(), now = getFiltered();
     const bB = blocTotals(base), bN = blocTotals(now);
     if (!bB || !bN) { out.textContent = 'אין מספיק סקרים בטווח שנבחר.'; return; }
     const sB = seatVector(base), sN = seatVector(now);
@@ -4708,7 +4766,12 @@ tryRefresh();
       /* Show where the slider actually lands. Clamped at 95% on the readout because a
          turnout rate cannot exceed 100 and nothing in Israel has ever come near it. */
       const fmt = v => `${v > 0 ? '+' : ''}${v}% ← ${Math.min(95, base * (1 + v / 100)).toFixed(0)}%`;
-      host.appendChild(S(`${label} (${base}%)`, 0, -50, 50, 1, fmt, v => { M[key] = 1 + v / 100; render(); }));
+      /* Start where the model already is, not at zero. A shared ?to= link is applied on
+         DOMContentLoaded by the share module, which runs before this panel is built — so
+         by the time the sliders exist M may already be off zero, and hardcoding 0 here
+         left the page simulating +40% while the handles sat in the middle. */
+      host.appendChild(S(`${label} (${base}%)`, Math.round((M[key] - 1) * 100), -50, 50, 1, fmt,
+        v => { M[key] = 1 + v / 100; commit(); }));
     });
 
     const d = document.createElement('details'); d.className = 'wi-assume';
@@ -4718,12 +4781,17 @@ tryRefresh();
     d.appendChild(n);
     host.appendChild(d);
 
+    window.TURNOUT.reset = () => {
+      GROUPS.forEach(([k]) => M[k] = 1);
+      host.querySelectorAll('input[type=range]').forEach((inp, i) => { if (i < GROUPS.length) inp.value = 0; });
+      host.querySelectorAll('.wi-sl').forEach((row, i) => { if (i < GROUPS.length) row.querySelector('input').dispatchEvent(new Event('input')); });
+    };
     $('toReset').addEventListener('click', () => {
       GROUPS.forEach(([k]) => M[k] = 1);
       host.querySelectorAll('input[type=range]').forEach((inp, i) => {
         if (i < GROUPS.length) { inp.value = 0; inp.dispatchEvent(new Event('input')); }
       });
-      render();
+      commit();
     });
 
     /* Redraw with everything else: the panel reads the date range, the outlet filter and

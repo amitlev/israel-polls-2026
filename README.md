@@ -277,9 +277,14 @@ averaging under 6 seats in the selected range.
 
 ## Turnout model (`מה אם ההצבעה תשתנה`)
 
-Deliberately walled off: it computes into its own panel body and changes no other number on
-the page. The scenarios above rest on arithmetic the poll data supports; this rests on
-assumptions layered on top of it, and letting it drive the page would launder the difference.
+It drives the whole page, like the what-if scenarios above. It did not at first: it was walled
+off on the grounds that the scenarios rested on arithmetic the polls support while this rested
+on assumptions layered on top. That distinction stopped being true once the weights were
+measured from the Central Elections Committee's own results — while "פורשת" above still rests
+on an editorial guess about where votes go, and drives everything. Walling this one off meant a
+reader could move a slider, watch the bloc tiles change, and look down at a seat grid that had
+not moved. It now wraps `getFiltered()` and is applied by hand in the Monte Carlo, exactly as
+the scenario layer is, and the two compose; the hypothetical banner names both and clears both.
 
 **Why turnout can move a seat at all — and why it can cost a party everything.** Seats come
 from vote *shares*. When one group votes more, the votes it adds enlarge the national pool,
