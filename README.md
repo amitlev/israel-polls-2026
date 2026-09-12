@@ -378,35 +378,62 @@ and report them beside the average-level answer:
 The sliders also run to ±50% now rather than ±25%: Arab turnout moved 44.6% → 53.2% between
 2021 and 2022, so the old cap could not express a swing that has actually happened.
 
-### Turnout groups: what is measurable and what is not
+### Turnout groups, measured against the official results
 
-Each slider is labelled with its **measured 2022 turnout**, and shows where a given position
-lands, so `+50%` reads as `86%` and the reader can see when a scenario has left reality. That
-matters more than it sounds, because the decisive fact about turnout here is an asymmetry:
+The earlier version of this model guessed. Every weight in it is now measured from the
+Central Elections Committee's own polling-station export for the 25th Knesset
+(`media25.bechirot.gov.il/files/expb.csv`, 12,545 stations), which **reconciles to the
+published national totals to the single vote** — 6,788,804 eligible, 4,794,593 voters,
+4,764,742 valid, and every party's national count exact. Because the national denominators
+are in that file, these are each party's actual share of its own vote by group, not a ratio
+inferred from a handful of towns.
 
-| group | measured 2022 turnout | room to rise |
-|---|---|---|
-| Haredi towns (בני ברק, מודיעין עילית, ביתר עילית, אלעד) | **79.0%** | almost none |
-| Bedouin Negev (רהט, תל שבע, חורה) | 57.4% | large |
-| Arab north and Triangle | 50.9% | large (אום אלפחם is at 38.3%) |
+**Groups are defined at polling-station level, and that is what makes them usable.** A
+quarter of the Haredi vote and a tenth of the Arab vote is cast in mixed cities — Jerusalem,
+Beit Shemesh, Ashdod, Lod, Haifa, Acre — where the town as a whole is neither. Classifying by
+locality put only **35.5%** of UTJ's vote in the Haredi group; classifying by station puts
+**75.2%**. A station counts as Haredi where UTJ+Shas took a majority of it and Arab where the
+Arab lists did — the simplest cut that works, and at that line it catches 1.8% of Likud's
+vote as collateral, so it separates existing electorates rather than manufacturing them.
 
-**Groups checked against the data and rejected**, which is why there are four sliders and not
-eight:
+| group | eligible | share of roll | measured turnout | headroom |
+|---|---|---|---|---|
+| הבדואים בנגב | 117,280 | 1.7% | **50.7%** | large |
+| הערבים בצפון ובמשולש | 789,848 | 11.6% | **53.4%** | large |
+| הדרוזים | 75,218 | 1.1% | **49.8%** | large but tiny group |
+| הציבור החרדי | 538,527 | 7.9% | **73.0%** | little |
+| יהודה ושומרון | 194,180 | 2.9% | **72.9%** | little |
+| שאר הציבור | 5,073,751 | 74.7% | **73.7%** | little |
 
-- **Druze.** Measured — Yarka votes Likud 34%, National Unity 23%, Yisrael Beiteinu 16%, with
-  the Arab lists on 9.7% between them, so they are a genuinely distinct electorate. They are
-  also about 1% of the national vote, so even a 50% swing moves less than a quarter of a seat.
-- **Haredi streams (Ashkenazi vs Sephardi).** Bnei Brak is 60% UTJ / 30% Shas; Elad is 50% Shas
-  / 35% UTJ. Real difference, but the streams share the same towns rather than separating by
-  locality, so a locality-based split cannot represent them: weighted by size, both parties come
-  out ~85% in the same bucket and the second slider would do nothing.
-- **Russian-speakers and the development towns.** Not separable by locality at all — they live
-  in mixed cities, and the data is per settlement.
+Each party's exposure, as a share of its own national vote:
 
-The general limit behind all three: the Arab split works because the Arab lists take essentially
-all their votes in Arab localities, so within-sector ratios are enough. For every other group,
-the parties draw only part of their vote from it, which needs each party's **national** total —
-and the tool serves settlement totals only.
+| | Negev | Arab north | Druze | Haredi | J&S | rest |
+|---|---|---|---|---|---|---|
+| Ra'am | **21.7%** | **68.3%** | 2.1% | – | – | 7.8% |
+| Joint List | 4.1% | **79.5%** | 2.4% | 0.1% | – | 13.9% |
+| UTJ | – | 0.1% | – | **75.2%** | 0.7% | 24.0% |
+| Shas | – | 0.4% | 0.1% | **29.9%** | 1.8% | 67.7% |
+| RZ / Otzma | – | 0.2% | – | 5.6% | **11.5%** | 82.7% |
+| Likud | 0.1% | 0.6% | 0.4% | 1.8% | 3.4% | 93.8% |
+
+**The hand-set numbers this replaced were all substantially wrong.** UTJ had been assigned
+100% to the Haredi group against a measured 75.2%; Shas 60% against 29.9%; Ra'am split 53/47
+between the Negev and the north against a measured 22/68. They came from eight sampled
+localities, and eight localities cannot stand in for a sector. The Shas slider is gone —
+its share is a measurement now, not a parameter.
+
+2026 lists are read through their 2022 ancestors: הדמוקרטים through מרצ+העבודה, יחד through
+יש עתיד, ישר! and כחול לבן through המחנה הממלכתי, and הציונות הדתית and עוצמה יהודית through
+the joint ticket they ran on and have since split. Lists with no ancestor — עמך ישראל,
+המילואימניקים, האחדות — fall through to the general group, which is where a new list with no
+measured geography belongs.
+
+**Which groups can actually move a seat**, and the panel now lets a reader check rather than
+take it on trust: Arab +40% costs the Netanyahu bloc two seats and takes both threshold
+parties under the line; Haredi −25% moves one. Judea and Samaria at +50% and the Druze at
++50% move nothing at whole-seat resolution — the settlements are 2.9% of the roll and already
+vote at 72.9%, and the Druze are 1.1%. They are in the panel anyway, because a reader who
+wonders about them deserves to see the answer rather than be told there was no slider.
 
 ### A data fault this audit turned up
 
