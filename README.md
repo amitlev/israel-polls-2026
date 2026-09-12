@@ -402,7 +402,7 @@ vote as collateral, so it separates existing electorates rather than manufacturi
 | הערבים בצפון ובמשולש | 789,848 | 11.6% | **53.4%** | large |
 | הדרוזים | 75,218 | 1.1% | **49.8%** | large but tiny group |
 | הציבור החרדי | 538,527 | 7.9% | **73.0%** | little |
-| יהודה ושומרון | 194,180 | 2.9% | **72.9%** | little |
+| התנחלויות | 194,180 | 2.9% | **72.9%** | little |
 | שאר הציבור | 5,073,751 | 74.7% | **73.7%** | little |
 
 Each party's exposure, as a share of its own national vote:
@@ -430,7 +430,7 @@ measured geography belongs.
 
 **Which groups can actually move a seat**, and the panel now lets a reader check rather than
 take it on trust: Arab +40% costs the Netanyahu bloc two seats and takes both threshold
-parties under the line; Haredi −25% moves one. Judea and Samaria at +50% and the Druze at
+parties under the line; Haredi −25% moves one. The settlements at +50% and the Druze at
 +50% move nothing at whole-seat resolution — the settlements are 2.9% of the roll and already
 vote at 72.9%, and the Druze are 1.1%. They are in the panel anyway, because a reader who
 wonders about them deserves to see the answer rather than be told there was no slider.
