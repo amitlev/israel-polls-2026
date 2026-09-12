@@ -334,6 +334,90 @@ turnout panel all ask the threshold question in exactly the same way and cannot 
 announcing that the list you just took out of the race is below the line is noise; the
 crossings worth naming are the second-order ones nobody asked for.
 
+### What depends on the bloc assignment
+
+The three-way buttons under each party are the page's most consequential control, and what
+redraws when one is clicked used to be a hand-written list inside the click handler, carrying
+a comment warning that anything new depending on the assignment "has to be added here as well,
+and will silently ignore bloc changes if it is not". That warning was missed twice — first by
+the seat grid, then by both scenario panels, which went on showing `גוש נתניהו 54` after the
+reader had moved Likud out of it. A note telling future code to remember something is not a
+mechanism. `onBlocAssignChange(fn)` is a registry; panels subscribe next to the code that
+actually reads `loadBlocAssign()`.
+
+Measured by flipping Likud from coalition to opposition and diffing every panel:
+
+| redraws | correctly does not |
+|---|---|
+| tug-of-war, hero, donut, bloc trend, seat grid, what-if, turnout, 61+ forecast | party chart bars, party trends, PM matchup, poll log |
+
+The party chart is deliberately excluded: re-rendering it would rebuild the very button the
+reader just clicked. Its own segment updates in place.
+
+### Why a turnout rise did not push anyone under the threshold
+
+It does. The page was hiding it, and the reason is worth stating because it is a property of
+the whole pipeline rather than of this panel.
+
+`seatVector()` applies the threshold to the **window average**. עמך ישראל is on 4 seats in the
+polls that seat it and 0 in the rest, so it averages about 2 — already below the line, so a
+scenario that genuinely knocks it out changes nothing on screen. Meanwhile the smallest party
+actually above the average line, הציונות הדתית at 6.0 seats, needs the national pool to grow
+about 60% before it is in danger, and no turnout shift can do that: the Arab lists are a tenth
+of the vote, so even doubling their turnout grows the pool by a tenth.
+
+So the average level says "nothing happens" while the poll level says a party lost its seats —
+and the poll level is the one describing an election. Both panels now count crossings per poll
+and report them beside the average-level answer:
+
+| Arab turnout | per-poll crossings |
+|---|---|
+| +25% | עמך ישראל and המילואימניקים, one poll each |
+| +40% | **עמך ישראל in all 4 polls that seat it, המילואימניקים in all 3** |
+
+The sliders also run to ±50% now rather than ±25%: Arab turnout moved 44.6% → 53.2% between
+2021 and 2022, so the old cap could not express a swing that has actually happened.
+
+### Turnout groups: what is measurable and what is not
+
+Each slider is labelled with its **measured 2022 turnout**, and shows where a given position
+lands, so `+50%` reads as `86%` and the reader can see when a scenario has left reality. That
+matters more than it sounds, because the decisive fact about turnout here is an asymmetry:
+
+| group | measured 2022 turnout | room to rise |
+|---|---|---|
+| Haredi towns (בני ברק, מודיעין עילית, ביתר עילית, אלעד) | **79.0%** | almost none |
+| Bedouin Negev (רהט, תל שבע, חורה) | 57.4% | large |
+| Arab north and Triangle | 50.9% | large (אום אלפחם is at 38.3%) |
+
+**Groups checked against the data and rejected**, which is why there are four sliders and not
+eight:
+
+- **Druze.** Measured — Yarka votes Likud 34%, National Unity 23%, Yisrael Beiteinu 16%, with
+  the Arab lists on 9.7% between them, so they are a genuinely distinct electorate. They are
+  also about 1% of the national vote, so even a 50% swing moves less than a quarter of a seat.
+- **Haredi streams (Ashkenazi vs Sephardi).** Bnei Brak is 60% UTJ / 30% Shas; Elad is 50% Shas
+  / 35% UTJ. Real difference, but the streams share the same towns rather than separating by
+  locality, so a locality-based split cannot represent them: weighted by size, both parties come
+  out ~85% in the same bucket and the second slider would do nothing.
+- **Russian-speakers and the development towns.** Not separable by locality at all — they live
+  in mixed cities, and the data is per settlement.
+
+The general limit behind all three: the Arab split works because the Arab lists take essentially
+all their votes in Arab localities, so within-sector ratios are enough. For every other group,
+the parties draw only part of their vote from it, which needs each party's **national** total —
+and the tool serves settlement totals only.
+
+### A data fault this audit turned up
+
+`warnNon120()` reports any poll whose party seats do not sum to 120. One currently does: Direct
+Polls, 2 Sep 2026, sums to **122**. That is not a rounding artefact and not cosmetic —
+`pollBlocs()` derives "others" as `120 − gov − opp`, so the poll does not report a 122-seat
+Knesset, it quietly shrinks its own "others" by two to balance the books, in every bloc total
+and every average. The seats come from Wikipedia's table, so either the table or the scraper has
+a cell wrong. It is left flagged rather than silently corrected: docking some party two seats to
+make the row add up would be inventing data.
+
 ## Languages (he · ar · en)
 
 The dashboard is authored in Hebrew and stays that way — every literal in the render code, every string comparison, every `localStorage` key. Arabic and English are a presentation layer, added entirely in the `<head>` of `docs/index.html`:
