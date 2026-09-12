@@ -22,6 +22,51 @@ import { PDFParse } from 'pdf-parse';
 const FILES = ['docs/polls-data.js'];
 import { mapGovilPollster } from './lib/govil-pollster-map.mjs';
 import { parseGovilPdf } from './lib/govil-pdf-parser.mjs';
+import { mapGovilParty, isKnownUntracked } from './lib/govil-party-map.mjs';
+
+/* Turns the filing's main table into { pct, wastedPct, below }, or null if the table
+   did not survive parsing.
+
+   `pct` and `wastedPct` OVERLAP, deliberately, and adding them together is wrong.
+   `pct` carries every tracked list's share whether or not it won seats — a list on 0
+   seats having a known size is the entire point of reading these filings. `wastedPct`
+   is the total share of all lists that won no seats, tracked or not. So a tracked list
+   below the threshold is counted in both, and `sum(pct) + wastedPct` double-counts it.
+   The identity that does hold is:
+
+       sum(pct for lists WITH seats) + wastedPct === 100
+
+   which is what to assert against if you are checking a filing parsed correctly. A label that maps to no tracked party and is not a list we
+   knowingly ignore is reported rather than dropped: an unrecognised name with SEATS
+   behind it means the ballot changed and this map has not caught up, which is the one
+   failure here that silently corrupts a total. */
+function buildVoteShares(mainParties, ref){
+  if (!mainParties || !mainParties.length) return null;
+  const pct = {}, below = [];
+  let wastedPct = 0;
+  for (const row of mainParties){
+    if (row.pctBefore == null) continue;
+    const id = mapGovilParty(row.name);
+    /* Two rows landing on one id means this filing splits a list our data treats as one —
+       Zalicha's economic party beside Hendel's Reservists, say. Keeping either share
+       would be wrong and keeping the last one silently is worse, so drop the id and say
+       so. The seated/wasted totals below are unaffected: they are computed per row. */
+    if (id && id in pct){
+      console.warn(`  [warn] ${ref}: "${row.name}" is a second row mapping to ${id} — this filing splits that list, so its share is dropped`);
+      pct[id] = null;
+    } else if (id) pct[id] = row.pctBefore;
+    else if (!isKnownUntracked(row.name)){
+      console.warn(`  [warn] ${ref}: unrecognised list "${row.name}"` +
+        (row.seats ? ` holding ${row.seats} seats — govil-party-map.mjs needs it` : ' (below the threshold)'));
+    }
+    if (!row.seats){ wastedPct += row.pctBefore; below.push({ name: row.name, pct: row.pctBefore, id: id || undefined }); }
+  }
+  for (const k of Object.keys(pct)) if (pct[k] == null) delete pct[k];
+  if (!Object.keys(pct).length) return null;
+  if (process.env.DEBUG) for (const row of mainParties)
+    console.error(`  [debug] ${String(row.seats ?? '-').padStart(3)} ${String(row.pctBefore ?? '-').padStart(5)}%  ${mapGovilParty(row.name) || (isKnownUntracked(row.name) ? '(untracked)' : '?')}  ${row.name}`);
+  return { pct, wastedPct: Math.round(wastedPct * 10) / 10, below };
+}
 
 const WRITE = !!process.env.WRITE;
 const LISTING_URL = 'https://www.gov.il/he/Departments/DynamicCollectors/knesset_election_polls_26';
@@ -136,6 +181,14 @@ for (const entry of listing){
   const { poll, reason } = findMatch(polls, pollsterKey, fieldworkDate);
   if (!poll) { skipped.push(`${entry.UrlName}: ${reason}`); continue; }
 
+  /* The vote shares behind the seats. Wikipedia publishes seats and nothing else, so
+     this is the only place the project can learn what fraction of the vote a list
+     actually took — and, for the lists that took no seats at all, that they exist and
+     how big they are. `wastedPct` is the sum of those: the votes cast for lists that
+     missed the threshold, which is the gap between "3.25% of the seated vote" (all the
+     page can otherwise test) and "3.25% of every valid vote" (what the law says). */
+  const votes = buildVoteShares(parsed.mainParties, entry.UrlName);
+
   const enrichment = {
     respondents: parsed.metadata.respondents,
     invited: parsed.metadata.invited,
@@ -150,8 +203,11 @@ for (const entry of listing){
     fieldworkDate,
     govilSourceUrl: url,
     govilScenarios: parsed.govilScenarios.length ? parsed.govilScenarios : undefined,
+    pct: votes ? votes.pct : undefined,
+    wastedPct: votes ? votes.wastedPct : undefined,
+    belowThreshold: votes && votes.below.length ? votes.below : undefined,
   };
-  console.log(`MATCH  ${entry.UrlName} -> ${poll.date} ${poll.pollster}  (MOE=${enrichment.marginOfError}, respondents=${enrichment.respondents}, scenarios=${parsed.govilScenarios.length}, topical=${parsed.topical.length})`);
+  console.log(`MATCH  ${entry.UrlName} -> ${poll.date} ${poll.pollster}  (MOE=${enrichment.marginOfError}, respondents=${enrichment.respondents}, scenarios=${parsed.govilScenarios.length}, topical=${parsed.topical.length}, votes=${votes ? Object.keys(votes.pct).length + ' lists, ' + votes.wastedPct + '% wasted' : 'none'})`);
   Object.assign(poll, enrichment);
   enrichedCount++;
 
