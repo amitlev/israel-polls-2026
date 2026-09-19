@@ -78,35 +78,65 @@ async function fetchListing(){
   const byUrlName = new Map();
   let total = null;
 
-  // A fresh browser *context* per skip value, not a reused one — reusing one
-  // context across sequential navigations (even with a fresh Page each time)
-  // was observed to silently re-serve the first page's API response instead
-  // of re-fetching, presumably some client-side (localStorage/session) cache
-  // in the Angular app keyed only on the template ID, ignoring skip.
+  /* Cloudflare's JS challenge is still running when the page first loads from an
+     unrecognized IP: the two JS bundles that boot the Angular app 403, the app
+     never starts, and the listing API never fires (this was the recurring
+     "API response never intercepted" failure on scheduled runs). Once the
+     challenge clears it sets cf_clearance and a plain reload returns the
+     bundles and boots the app. So: retry each page a few times, and carry the
+     cf_clearance cookie into the next context so the challenge is solved once
+     per run instead of once per page. */
+  let cfCookies = [];
   let skip = 0;
+  let firstPage = true;
   do {
+    // Pace page loads: rapid-fire navigations from a datacenter IP are what
+    // trips Cloudflare into blocking the rest of the run.
+    if (!firstPage) await new Promise(r => setTimeout(r, 5000));
+    firstPage = false;
+    // A fresh browser *context* per skip value, not a reused one — reusing one
+    // context across sequential navigations (even with a fresh Page each time)
+    // was observed to silently re-serve the first page's API response instead
+    // of re-fetching, presumably some client-side (localStorage/session) cache
+    // in the Angular app keyed only on the template ID, ignoring skip.
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       locale: 'he-IL',
     });
+    if (cfCookies.length) await context.addCookies(cfCookies);
     const page = await context.newPage();
+    let pageTotal = null;
     page.on('response', async (res) => {
       if (!res.url().includes('/he/api/DynamicCollector')) return;
       try {
         const json = await res.json();
-        if (json?.TotalResults != null) total = json.TotalResults;
+        if (json?.TotalResults != null) pageTotal = json.TotalResults;
         for (const r of json?.Results || []) byUrlName.set(r.UrlName, r);
       } catch { /* non-JSON response on that URL, ignore */ }
     });
-    await page.goto(`${LISTING_URL}?skip=${skip}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(4000);
+    const MAX_ATTEMPTS = 4;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS && pageTotal == null; attempt++){
+      await page.goto(`${LISTING_URL}?skip=${skip}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
+      await page.waitForTimeout(6000);
+      if (pageTotal == null)
+        console.warn(`  [warn] skip=${skip}: listing API not seen (attempt ${attempt}/${MAX_ATTEMPTS}) — Cloudflare challenge likely still running; reloading`);
+    }
+    // Carry the clearance cookie forward so the next page does not re-challenge.
+    cfCookies = (await context.cookies('https://www.gov.il')).filter(c => c.name.startsWith('cf'));
     await context.close();
+    if (pageTotal != null) total = pageTotal;
+    else if (total == null) {
+      await browser.close();
+      throw new Error(`gov.il listing: API response never intercepted after ${MAX_ATTEMPTS} attempts (Cloudflare block, or the page/API changed shape)`);
+    } else {
+      console.warn(`  [warn] skip=${skip}: page failed after ${MAX_ATTEMPTS} attempts — ${byUrlName.size}/${total} entries collected; continuing with partial listing`);
+      break;
+    }
     if (process.env.DEBUG) console.error(`  [debug] skip=${skip} -> total=${total} entriesSoFar=${byUrlName.size}`);
     skip += 10;
   } while (total != null && skip < total);
 
   await browser.close();
-  if (total == null) throw new Error('gov.il listing: API response never intercepted (Cloudflare block, or the page/API changed shape)');
   return [...byUrlName.values()];
 }
 
